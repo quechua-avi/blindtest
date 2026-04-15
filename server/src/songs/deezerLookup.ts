@@ -52,7 +52,7 @@ export async function fetchDeezerPreview(title: string, artist: string): Promise
       return null
     }
 
-    const json: DeezerSearchResponse = await res.json()
+    const json = await res.json() as DeezerSearchResponse
     const tracks = json.data ?? []
 
     // Trouver le meilleur résultat (avec preview non-vide)
