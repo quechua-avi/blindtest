@@ -4,7 +4,6 @@ import { motion } from 'framer-motion'
 import { getSocket } from '../socket/socketClient'
 import { useGameStore } from '../store/useGameStore'
 import { usePlayerStore } from '../store/usePlayerStore'
-import { preloadYTApi } from '../hooks/useYouTubePlayer'
 import { RoomCodeDisplay } from '../components/lobby/RoomCodeDisplay'
 import { PlayerList } from '../components/lobby/PlayerList'
 import { SettingsPanel } from '../components/lobby/SettingsPanel'
@@ -15,9 +14,6 @@ export function LobbyPage() {
   const { code } = useParams<{ code: string }>()
   const { players, isHost, settings, myPlayerId, status, roomCode } = useGameStore()
   const { name } = usePlayerStore()
-
-  // Pré-charger l'API YouTube dès le lobby pour qu'elle soit prête au démarrage
-  useEffect(() => { preloadYTApi() }, [])
 
   // Auto-rejoindre si on arrive par lien direct
   useEffect(() => {

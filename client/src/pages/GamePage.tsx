@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useGameStore } from '../store/useGameStore'
-import { useYouTubePlayer } from '../hooks/useYouTubePlayer'
+import { useYTPlayer } from '../App'
 import { Countdown } from '../components/game/Countdown'
 import { AnswerInput } from '../components/game/AnswerInput'
 import { MultipleChoice } from '../components/game/MultipleChoice'
@@ -19,7 +19,7 @@ import type { Genre } from '../types/game'
 export function GamePage() {
   const navigate = useNavigate()
   const { status, currentRound, settings, revealedSong, pendingSong } = useGameStore()
-  const { containerRef, playSong, stopSong, isAdPlaying } = useYouTubePlayer()
+  const { playSong, stopSong, isAdPlaying } = useYTPlayer()
 
   useEffect(() => {
     if (status === 'idle') navigate('/')
@@ -46,13 +46,6 @@ export function GamePage() {
 
   return (
     <div className="min-h-screen bg-bg flex flex-col">
-      {/* Iframe YouTube caché */}
-      <div
-        ref={containerRef}
-        style={{ position: 'fixed', left: '-9999px', width: 1, height: 1 }}
-        aria-hidden="true"
-      />
-
       {/* Score feed flottant */}
       <ScoreFeed />
 
