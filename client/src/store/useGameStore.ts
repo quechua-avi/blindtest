@@ -46,8 +46,8 @@ interface GameStore {
   // Results
   finalResults: GameResults | null
 
-  // Lecture YouTube en attente (stockée ici pour éviter la race condition)
-  pendingSong: { ytId: string; startSeconds: number } | null
+  // Lecture audio en attente (stockée ici pour éviter la race condition)
+  pendingSong: { previewUrl: string } | null
 
   // Chat
   messages: ChatMessage[]
@@ -55,7 +55,7 @@ interface GameStore {
 
   // Actions
   setStatus: (s: AppStatus) => void
-  onPlaySong: (ytId: string, startSeconds: number) => void
+  onPlaySong: (previewUrl: string) => void
   setError: (e: string | null) => void
   onRoomJoined: (room: RoomState, myId: string) => void
   onRoomCreated: (room: RoomState, myId: string) => void
@@ -117,7 +117,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   setStatus: (status) => set({ status }),
   setError: (error) => set({ error }),
-  onPlaySong: (ytId, startSeconds) => set({ pendingSong: { ytId, startSeconds } }),
+  onPlaySong: (previewUrl) => set({ pendingSong: { previewUrl } }),
 
   onRoomJoined: (room, myId) => {
     const me = room.players.find((p) => p.id === myId)
@@ -186,7 +186,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       correctGuesserIds: [],
       revealedSong: null,
       scoreFeed: [],
-      pendingSong: null, // Réinitialiser avant l'arrivée du nouvel ytId
+      pendingSong: null, // Réinitialiser avant l'arrivée de la nouvelle preview
     })
   },
 

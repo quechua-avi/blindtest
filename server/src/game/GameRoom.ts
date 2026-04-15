@@ -13,6 +13,7 @@ import type {
 import { CONFIG } from '../config'
 import { selectSongs, generateChoices } from '../songs/songSelector'
 import { SONG_LIBRARY } from '../songs/songLibrary'
+import { fetchDeezerPreview } from '../songs/deezerLookup'
 import { checkAnswer } from '../matching/fuzzyMatch'
 import {
   calculatePoints,
@@ -34,6 +35,7 @@ export class GameRoom {
 
   // Game state
   private playlist: Song[] = []
+  private previewUrls: Map<string, string> = new Map() // song.id → Deezer preview URL
   private currentRoundIndex = -1
   private currentSong: Song | null = null
   private roundStartedAt = 0
@@ -149,9 +151,24 @@ export class GameRoom {
     this.status = 'playing'
     this.currentRoundIndex = -1
     this.songsPlayed = []
+    this.previewUrls = new Map()
     this.gameStartedAt = Date.now()
-    this.startNextRound()
+
+    // Pré-fetcher toutes les previews Deezer en parallèle, puis démarrer
+    this.prefetchAllPreviews().then(() => this.startNextRound())
     return null
+  }
+
+  private async prefetchAllPreviews(): Promise<void> {
+    console.log(`[Deezer] Pré-fetch de ${this.playlist.length} chansons...`)
+    await Promise.all(
+      this.playlist.map(async (song) => {
+        const url = await fetchDeezerPreview(song.title, song.artist)
+        if (url) this.previewUrls.set(song.id, url)
+      })
+    )
+    const found = this.previewUrls.size
+    console.log(`[Deezer] ${found}/${this.playlist.length} previews trouvées`)
   }
 
   private addAIPlayers() {
@@ -198,13 +215,13 @@ export class GameRoom {
       startedAt: this.roundStartedAt,
     })
 
-    // Émettre l'ytId séparément pour déclencher la lecture
-    // (les clients reçoivent game:roundStart SANS le titre/artiste pour éviter la triche,
-    //  mais ont besoin de l'id YouTube pour lire l'audio)
-    this.io.to(this.code).emit('game:playSong' as any, {
-      ytId: this.currentSong.id,
-      startSeconds: this.currentSong.startSeconds ?? 15,
-    })
+    // Émettre l'URL de preview Deezer séparément (sans titre/artiste = anti-triche)
+    const previewUrl = this.previewUrls.get(this.currentSong.id)
+    if (previewUrl) {
+      this.io.to(this.code).emit('game:playSong', { previewUrl })
+    } else {
+      console.warn(`[Deezer] Pas de preview pour "${this.currentSong.title}" — round sans audio`)
+    }
 
     // Démarrer le tick
     let timeRemaining = this.settings.playDuration

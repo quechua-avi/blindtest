@@ -18,7 +18,7 @@ export interface GameSettings {
 }
 
 export interface Song {
-  id: string          // YouTube video ID
+  id: string          // identifiant interne (ex-YouTube ID, conservé pour le fuzzy match)
   title: string
   artist: string
   year: number
@@ -26,7 +26,6 @@ export interface Song {
   decade: Decade
   alternativeTitles?: string[]
   alternativeArtists?: string[]
-  startSeconds?: number  // où commencer dans la vidéo (défaut: 15)
 }
 
 export interface Player {
@@ -140,6 +139,7 @@ export interface ServerToClientEvents {
   'lobby:teamAssigned': (data: { playerId: string; teamId: 'A' | 'B' }) => void
   'lobby:error': (data: { code: string; message: string }) => void
   'game:roundStart': (data: RoundState) => void
+  'game:playSong': (data: { previewUrl: string }) => void
   'game:tick': (data: { timeRemaining: number }) => void
   'game:correctAnswer': (data: {
     playerId: string

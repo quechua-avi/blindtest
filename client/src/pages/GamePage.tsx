@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useGameStore } from '../store/useGameStore'
-import { useYTPlayer } from '../App'
+import { useAudioPlayerContext } from '../App'
 import { Countdown } from '../components/game/Countdown'
 import { AnswerInput } from '../components/game/AnswerInput'
 import { MultipleChoice } from '../components/game/MultipleChoice'
@@ -18,8 +18,8 @@ import type { Genre } from '../types/game'
 
 export function GamePage() {
   const navigate = useNavigate()
-  const { status, currentRound, settings, revealedSong, pendingSong } = useGameStore()
-  const { playSong, stopSong, isAdPlaying } = useYTPlayer()
+  const { status, currentRound, settings, pendingSong } = useGameStore()
+  const { playSong, stopSong } = useAudioPlayerContext()
 
   useEffect(() => {
     if (status === 'idle') navigate('/')
@@ -29,8 +29,8 @@ export function GamePage() {
   // Déclencher la lecture dès que pendingSong change dans le store
   useEffect(() => {
     if (pendingSong) {
-      stopSong() // Stopper l'éventuelle chanson précédente avant de lancer la nouvelle
-      playSong(pendingSong.ytId, pendingSong.startSeconds)
+      stopSong()
+      playSong(pendingSong.previewUrl)
     }
   }, [pendingSong, playSong, stopSong])
 
@@ -78,19 +78,11 @@ export function GamePage() {
       <main className="flex-1 flex flex-col items-center justify-center gap-6 px-4 pb-32 max-w-5xl mx-auto w-full">
         {isPlaying && (
           <>
-            {/* Indicateur pub YouTube */}
-            {isAdPlaying && (
-              <div className="flex items-center gap-2 px-4 py-2 bg-yellow-500/10 border border-yellow-500/30 rounded-full text-yellow-400 text-sm">
-                <span className="animate-pulse">⏳</span>
-                Pub YouTube en cours, la musique arrive…
-              </div>
-            )}
-
             {/* Timer + Waveform */}
             <div className="flex items-center gap-8">
               <Countdown />
               <div className="w-48 sm:w-72">
-                <WaveformVisualizer genre={currentRound?.genre as Genre | undefined} isPlaying={!isAdPlaying} />
+                <WaveformVisualizer genre={currentRound?.genre as Genre | undefined} isPlaying={true} />
               </div>
             </div>
 
