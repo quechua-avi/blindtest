@@ -3,7 +3,7 @@ import { usePlayerStore } from '../store/usePlayerStore'
 
 declare global {
   interface Window {
-    YT: typeof YT
+    YT: typeof YT & { Player: new (...args: unknown[]) => YT.Player }
     onYouTubeIframeAPIReady: () => void
   }
 }
@@ -45,7 +45,7 @@ export function useYouTubePlayer() {
           rel: 0,
         },
         events: {
-          onReady: (e) => {
+          onReady: (e: YT.PlayerEvent) => {
             e.target.setVolume(volume)
           },
         },
