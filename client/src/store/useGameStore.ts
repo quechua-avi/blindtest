@@ -46,12 +46,16 @@ interface GameStore {
   // Results
   finalResults: GameResults | null
 
+  // Lecture YouTube en attente (stockée ici pour éviter la race condition)
+  pendingSong: { ytId: string; startSeconds: number } | null
+
   // Chat
   messages: ChatMessage[]
   reactions: ReactionEvent[]
 
   // Actions
   setStatus: (s: AppStatus) => void
+  onPlaySong: (ytId: string, startSeconds: number) => void
   setError: (e: string | null) => void
   onRoomJoined: (room: RoomState, myId: string) => void
   onRoomCreated: (room: RoomState, myId: string) => void
@@ -107,11 +111,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
   leaderboard: [],
   scoreFeed: [],
   finalResults: null,
+  pendingSong: null,
   messages: [],
   reactions: [],
 
   setStatus: (status) => set({ status }),
   setError: (error) => set({ error }),
+  onPlaySong: (ytId, startSeconds) => set({ pendingSong: { ytId, startSeconds } }),
 
   onRoomJoined: (room, myId) => {
     const me = room.players.find((p) => p.id === myId)
@@ -217,6 +223,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       status: 'roundEnd',
       leaderboard,
       revealedSong: { song, correctGuessers },
+      pendingSong: null,
     })
   },
 
@@ -253,6 +260,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       leaderboard: [],
       scoreFeed: [],
       finalResults: null,
+      pendingSong: null,
       messages: [],
       reactions: [],
     })

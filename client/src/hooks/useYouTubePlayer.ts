@@ -25,6 +25,8 @@ function loadYTApi(): Promise<void> {
 export function useYouTubePlayer() {
   const playerRef = useRef<YT.Player | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
+  // File d'attente : si playSong est appelé avant que le player soit prêt
+  const pendingRef = useRef<{ videoId: string; startSeconds: number } | null>(null)
   const volume = usePlayerStore((s) => s.volume)
 
   useEffect(() => {
@@ -47,6 +49,12 @@ export function useYouTubePlayer() {
         events: {
           onReady: (e: YT.PlayerEvent) => {
             e.target.setVolume(volume)
+            // Jouer la chanson en attente si elle est arrivée avant que le player soit prêt
+            if (pendingRef.current) {
+              const { videoId, startSeconds } = pendingRef.current
+              pendingRef.current = null
+              e.target.loadVideoById({ videoId, startSeconds })
+            }
           },
         },
       })
@@ -59,16 +67,21 @@ export function useYouTubePlayer() {
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Mettre à jour le volume quand il change
   useEffect(() => {
     playerRef.current?.setVolume(volume)
   }, [volume])
 
   const playSong = useCallback((videoId: string, startSeconds = 15) => {
-    playerRef.current?.loadVideoById({ videoId, startSeconds })
+    if (playerRef.current) {
+      playerRef.current.loadVideoById({ videoId, startSeconds })
+    } else {
+      // Player pas encore prêt → on met en file d'attente
+      pendingRef.current = { videoId, startSeconds }
+    }
   }, [])
 
   const stopSong = useCallback(() => {
+    pendingRef.current = null
     playerRef.current?.stopVideo()
   }, [])
 

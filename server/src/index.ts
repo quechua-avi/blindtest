@@ -44,8 +44,10 @@ io.on('connection', (socket) => {
 })
 
 // Servir le client React en production
-// __dirname = server/dist/ → ../../client/dist
-const clientDist = path.join(__dirname, '..', '..', 'client', 'dist')
+// Le serveur tourne depuis la racine du repo sur Railway
+// process.cwd() = /app, client/dist = /app/client/dist
+const clientDist = path.join(process.cwd(), 'client', 'dist')
+console.log(`[Static] Serving client from: ${clientDist}`)
 app.use(express.static(clientDist))
 
 // Catch-all pour React Router (toutes les routes renvoient index.html)

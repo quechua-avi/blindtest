@@ -68,6 +68,10 @@ export function useSocketSetup() {
       navigate('/game')
     })
 
+    socket.on('game:playSong' as any, ({ ytId, startSeconds }: { ytId: string; startSeconds: number }) => {
+      store.onPlaySong(ytId, startSeconds ?? 15)
+    })
+
     socket.on('game:tick', ({ timeRemaining }) => {
       store.onTick(timeRemaining)
     })

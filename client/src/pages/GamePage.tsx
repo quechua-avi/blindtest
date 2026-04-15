@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useGameStore } from '../store/useGameStore'
 import { useYouTubePlayer } from '../hooks/useYouTubePlayer'
@@ -16,46 +16,31 @@ import { Badge } from '../components/ui/Badge'
 import { GENRE_LABELS, GENRE_COLORS, DECADE_LABELS } from '../types/game'
 import type { Genre } from '../types/game'
 
-// Clé: associer l'event game:roundStart à la lecture YouTube
-// Le server envoie l'ytId via un channel spécial après roundStart
-// Pour éviter la triche (joueurs ne voient pas l'id avant la fin du round),
-// on utilise un channel dédié uniquement pour déclencher le player
-import { getSocket } from '../socket/socketClient'
-
 export function GamePage() {
   const navigate = useNavigate()
-  const { status, currentRound, settings, revealedSong } = useGameStore()
+  const { status, currentRound, settings, revealedSong, pendingSong } = useGameStore()
   const { containerRef, playSong, stopSong } = useYouTubePlayer()
-  const songIdRef = useRef<string | null>(null)
 
   useEffect(() => {
     if (status === 'idle') navigate('/')
     if (status === 'results') navigate('/results')
   }, [status, navigate])
 
-  // Écouter l'événement de play de la chanson (séparé pour éviter la triche)
+  // Déclencher la lecture dès que pendingSong change dans le store
+  // (le store est mis à jour par useSocket dès réception de game:playSong,
+  // même avant que GamePage soit monté → plus de race condition)
   useEffect(() => {
-    const socket = getSocket()
-
-    // Event custom émis par le serveur juste après game:roundStart
-    // Il contient l'ytId de la chanson
-    const handlePlay = ({ ytId, startSeconds }: { ytId: string; startSeconds: number }) => {
-      songIdRef.current = ytId
-      playSong(ytId, startSeconds ?? 15)
+    if (pendingSong) {
+      playSong(pendingSong.ytId, pendingSong.startSeconds)
     }
+  }, [pendingSong, playSong])
 
-    const handleStop = () => stopSong()
-
-    socket.on('game:playSong' as any, handlePlay)
-    socket.on('game:roundEnd', handleStop)
-    socket.on('game:ended', handleStop)
-
-    return () => {
-      socket.off('game:playSong' as any, handlePlay)
-      socket.off('game:roundEnd', handleStop)
-      socket.off('game:ended', handleStop)
+  // Arrêter la musique à la fin du round ou de la partie
+  useEffect(() => {
+    if (status === 'roundEnd' || status === 'results') {
+      stopSong()
     }
-  }, [playSong, stopSong])
+  }, [status, stopSong])
 
   const isPlaying = status === 'playing'
   const isReveal = status === 'roundEnd'
