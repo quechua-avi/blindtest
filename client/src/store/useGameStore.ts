@@ -186,6 +186,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       correctGuesserIds: [],
       revealedSong: null,
       scoreFeed: [],
+      pendingSong: null, // Réinitialiser avant l'arrivée du nouvel ytId
     })
   },
 

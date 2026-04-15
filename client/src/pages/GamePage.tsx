@@ -19,7 +19,7 @@ import type { Genre } from '../types/game'
 export function GamePage() {
   const navigate = useNavigate()
   const { status, currentRound, settings, revealedSong, pendingSong } = useGameStore()
-  const { containerRef, playSong, stopSong } = useYouTubePlayer()
+  const { containerRef, playSong, stopSong, isAdPlaying } = useYouTubePlayer()
 
   useEffect(() => {
     if (status === 'idle') navigate('/')
@@ -27,13 +27,12 @@ export function GamePage() {
   }, [status, navigate])
 
   // Déclencher la lecture dès que pendingSong change dans le store
-  // (le store est mis à jour par useSocket dès réception de game:playSong,
-  // même avant que GamePage soit monté → plus de race condition)
   useEffect(() => {
     if (pendingSong) {
+      stopSong() // Stopper l'éventuelle chanson précédente avant de lancer la nouvelle
       playSong(pendingSong.ytId, pendingSong.startSeconds)
     }
-  }, [pendingSong, playSong])
+  }, [pendingSong, playSong, stopSong])
 
   // Arrêter la musique à la fin du round ou de la partie
   useEffect(() => {
@@ -86,11 +85,19 @@ export function GamePage() {
       <main className="flex-1 flex flex-col items-center justify-center gap-6 px-4 pb-32 max-w-5xl mx-auto w-full">
         {isPlaying && (
           <>
+            {/* Indicateur pub YouTube */}
+            {isAdPlaying && (
+              <div className="flex items-center gap-2 px-4 py-2 bg-yellow-500/10 border border-yellow-500/30 rounded-full text-yellow-400 text-sm">
+                <span className="animate-pulse">⏳</span>
+                Pub YouTube en cours, la musique arrive…
+              </div>
+            )}
+
             {/* Timer + Waveform */}
             <div className="flex items-center gap-8">
               <Countdown />
               <div className="w-48 sm:w-72">
-                <WaveformVisualizer genre={currentRound?.genre as Genre | undefined} isPlaying={true} />
+                <WaveformVisualizer genre={currentRound?.genre as Genre | undefined} isPlaying={!isAdPlaying} />
               </div>
             </div>
 
