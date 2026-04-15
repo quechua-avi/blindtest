@@ -1,26 +1,26 @@
-import express from 'express'
+import express, { type Request, type Response } from 'express'
 import { createServer } from 'http'
 import { Server } from 'socket.io'
 import cors from 'cors'
+import path from 'path'
 import type { ClientToServerEvents, ServerToClientEvents } from './types'
 import { CONFIG } from './config'
 import { registerLobbyHandlers } from './socket/handlers/lobbyHandlers'
 import { registerGameHandlers } from './socket/handlers/gameHandlers'
 import { registerChatHandlers } from './socket/handlers/chatHandlers'
 
-// CLIENT_URL peut contenir plusieurs origines séparées par une virgule
-// ex: "https://beatblind.netlify.app,http://localhost:5173"
-const allowedOrigins = CONFIG.CLIENT_URL.split(',').map((u) => u.trim())
-
 const app = express()
-app.use(cors({ origin: allowedOrigins }))
+
+// En dev, le client Vite tourne sur un port différent → CORS nécessaire
+// En prod, client et serveur sont sur la même origine → CORS optionnel mais inoffensif
+app.use(cors({ origin: CONFIG.CLIENT_URL }))
 app.use(express.json())
 
 const httpServer = createServer(app)
 
 const io = new Server<ClientToServerEvents, ServerToClientEvents>(httpServer, {
   cors: {
-    origin: allowedOrigins,
+    origin: CONFIG.CLIENT_URL,
     methods: ['GET', 'POST'],
   },
 })
@@ -41,6 +41,16 @@ io.on('connection', (socket) => {
   socket.on('disconnect', (reason) => {
     console.log(`[Socket] Déconnexion: ${socket.id} (${reason})`)
   })
+})
+
+// Servir le client React en production
+// __dirname = server/dist/ → ../../client/dist
+const clientDist = path.join(__dirname, '..', '..', 'client', 'dist')
+app.use(express.static(clientDist))
+
+// Catch-all pour React Router (toutes les routes renvoient index.html)
+app.get('*', (_req: Request, res: Response) => {
+  res.sendFile(path.join(clientDist, 'index.html'))
 })
 
 httpServer.listen(CONFIG.PORT, () => {
