@@ -3,6 +3,7 @@ import { createServer } from 'http'
 import { Server } from 'socket.io'
 import cors from 'cors'
 import path from 'path'
+import fs from 'fs'
 import type { ClientToServerEvents, ServerToClientEvents } from './types'
 import { CONFIG } from './config'
 import { registerLobbyHandlers } from './socket/handlers/lobbyHandlers'
@@ -46,8 +47,13 @@ io.on('connection', (socket) => {
 // Servir le client React en production
 // Le serveur tourne depuis la racine du repo sur Railway
 // process.cwd() = /app, client/dist = /app/client/dist
-const clientDist = path.join(process.cwd(), 'client', 'dist')
-console.log(`[Static] Serving client from: ${clientDist}`)
+// Essaie les deux chemins possibles selon le répertoire de lancement
+const clientDistFromRoot = path.join(process.cwd(), 'client', 'dist')
+const clientDistFromServer = path.join(__dirname, '..', '..', 'client', 'dist')
+const clientDist = fs.existsSync(path.join(clientDistFromRoot, 'index.html'))
+  ? clientDistFromRoot
+  : clientDistFromServer
+console.log(`[Static] cwd=${process.cwd()} → serving from: ${clientDist}`)
 app.use(express.static(clientDist))
 
 // Catch-all pour React Router (toutes les routes renvoient index.html)
