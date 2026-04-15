@@ -52,7 +52,11 @@ export class GameRoom {
   constructor(io: IoServer, hostSocket: Socket, hostName: string, avatarColor: string) {
     this.io = io
     this.code = ''  // sera défini par GameManager
-    this.settings = { ...CONFIG.DEFAULT_SETTINGS }
+    this.settings = {
+      ...CONFIG.DEFAULT_SETTINGS,
+      genres: [...CONFIG.DEFAULT_SETTINGS.genres],
+      decades: [...CONFIG.DEFAULT_SETTINGS.decades],
+    }
 
     const host: Player = {
       id: hostSocket.id,
