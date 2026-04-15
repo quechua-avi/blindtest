@@ -31,6 +31,10 @@ export function checkAnswer(input: string, song: Song): AnswerCheckResult {
   const norm = normalize(input)
   if (norm.length < 2) return { correct: false }
 
+  // Vérifier le format "Titre - Artiste" (choix multiple)
+  const combined = normalize(`${song.title} - ${song.artist}`)
+  if (norm === combined) return { correct: true, matched: 'exact', matchedField: 'title' }
+
   const titleTargets = [song.title, ...(song.alternativeTitles ?? [])].map(normalize)
   const artistTargets = [song.artist, ...(song.alternativeArtists ?? [])].map(normalize)
 

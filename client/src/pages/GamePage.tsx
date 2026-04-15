@@ -87,7 +87,7 @@ export function GamePage() {
             </div>
 
             {/* Input ou choix multiple */}
-            {settings.answerMode === 'text' ? <AnswerInput /> : <MultipleChoice />}
+            {settings.answerMode === 'text' ? <AnswerInput /> : <MultipleChoice key={currentRound?.roundNumber} />}
           </>
         )}
 
