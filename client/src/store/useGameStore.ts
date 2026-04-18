@@ -36,6 +36,7 @@ interface GameStore {
   currentRound: RoundState | null
   timeRemaining: number
   myAnswerResult: 'pending' | 'correct' | 'wrong' | null
+  attemptsLeft: number
   correctGuesserIds: string[]
   revealedSong: RevealedSong | null
 
@@ -76,7 +77,7 @@ interface GameStore {
     guessTime: number
     matchType: AnswerMatchType
   }) => void
-  onWrongAnswer: () => void
+  onWrongAnswer: (attemptsLeft: number) => void
   onRoundEnd: (data: { song: Song; leaderboard: PlayerScore[]; correctGuessers: string[] }) => void
   onGameEnded: (results: GameResults) => void
   onChatMessage: (msg: ChatMessage) => void
@@ -106,6 +107,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   currentRound: null,
   timeRemaining: 0,
   myAnswerResult: null,
+  attemptsLeft: 3,
   correctGuesserIds: [],
   revealedSong: null,
   leaderboard: [],
@@ -183,6 +185,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       currentRound: round,
       timeRemaining: round.timeLimit,
       myAnswerResult: 'pending',
+      attemptsLeft: 3,
       correctGuesserIds: [],
       revealedSong: null,
       scoreFeed: [],
@@ -217,7 +220,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     })
   },
 
-  onWrongAnswer: () => set({ myAnswerResult: 'wrong' }),
+  onWrongAnswer: (attemptsLeft) => set({
+    attemptsLeft,
+    myAnswerResult: attemptsLeft === 0 ? 'wrong' : 'pending',
+  }),
 
   onRoundEnd: ({ song, leaderboard, correctGuessers }) => {
     set({
@@ -256,6 +262,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       currentRound: null,
       timeRemaining: 0,
       myAnswerResult: null,
+      attemptsLeft: 3,
       correctGuesserIds: [],
       revealedSong: null,
       leaderboard: [],

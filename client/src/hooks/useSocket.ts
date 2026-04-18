@@ -82,8 +82,8 @@ export function useSocketSetup() {
       store.onCorrectAnswer({ ...data, avatarColor: player?.avatarColor ?? '#7c3aed' })
     })
 
-    socket.on('game:wrongAnswer', () => {
-      store.onWrongAnswer()
+    socket.on('game:wrongAnswer', ({ attemptsLeft }) => {
+      store.onWrongAnswer(attemptsLeft)
     })
 
     socket.on('game:roundEnd', (data) => {

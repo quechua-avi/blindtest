@@ -41,6 +41,8 @@ export class GameRoom {
   private roundStartedAt = 0
   private correctGuessers: Array<{ playerId: string; guessTime: number }> = []
   private hasAnswered: Set<string> = new Set()
+  private wrongAttempts: Map<string, number> = new Map()
+  private readonly MAX_ATTEMPTS = 3
   private roundTimer: NodeJS.Timeout | null = null
   private tickTimer: NodeJS.Timeout | null = null
   private cleanupTimer: NodeJS.Timeout | null = null
@@ -197,6 +199,7 @@ export class GameRoom {
     this.currentSong = this.playlist[this.currentRoundIndex]
     this.correctGuessers = []
     this.hasAnswered = new Set()
+    this.wrongAttempts = new Map()
     this.isPaused = false
     this.roundStartedAt = Date.now()
 
@@ -310,17 +313,24 @@ export class GameRoom {
     if (this.hasAnswered.has(playerId)) return { correct: false }
 
     const result = checkAnswer(answer, this.currentSong)
-    this.hasAnswered.add(playerId)
 
     if (!result.correct) {
+      const attempts = (this.wrongAttempts.get(playerId) ?? 0) + 1
+      this.wrongAttempts.set(playerId, attempts)
+      const attemptsLeft = Math.max(0, this.MAX_ATTEMPTS - attempts)
+      if (attemptsLeft === 0) this.hasAnswered.add(playerId)
       const player = this.players.get(playerId)
       if (player && !player.isAI) {
-        this.io.to(playerId).emit('game:wrongAnswer', { playerId })
+        this.io.to(playerId).emit('game:wrongAnswer', { playerId, attemptsLeft })
       }
-      const score = this.scores.get(playerId)
-      if (score) this.scores.set(playerId, applyWrongAnswer(score))
+      if (attemptsLeft === 0) {
+        const score = this.scores.get(playerId)
+        if (score) this.scores.set(playerId, applyWrongAnswer(score))
+      }
       return { correct: false }
     }
+
+    this.hasAnswered.add(playerId)
 
     // Bonne réponse
     const guessTime = (timestamp - this.roundStartedAt) / 1000

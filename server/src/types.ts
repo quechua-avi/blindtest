@@ -149,7 +149,7 @@ export interface ServerToClientEvents {
     guessTime: number
     matchType: AnswerMatchType
   }) => void
-  'game:wrongAnswer': (data: { playerId: string }) => void
+  'game:wrongAnswer': (data: { playerId: string; attemptsLeft: number }) => void
   'game:roundEnd': (data: RoundReveal) => void
   'game:paused': (data: { paused: boolean }) => void
   'game:ended': (data: { finalResults: GameResults }) => void

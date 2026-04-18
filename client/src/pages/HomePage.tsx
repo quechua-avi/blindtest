@@ -58,7 +58,7 @@ export function HomePage() {
           Blindtest musical multijoueur · 2000–2026
         </p>
         <div className="flex items-center justify-center gap-2 mt-3 flex-wrap">
-          {['Pop', 'Rock', 'Hip-Hop', 'Electronic', 'R&B', 'French', 'Latin', 'K-Pop'].map((g) => (
+          {['Pop', 'Hip-Hop', 'Electronic', 'R&B', 'Musique Française', 'Latin'].map((g) => (
             <span key={g} className="text-xs bg-bg-card border border-bg-border text-slate-500 px-2 py-0.5 rounded-full">
               {g}
             </span>
@@ -149,9 +149,6 @@ export function HomePage() {
         )}
       </AnimatePresence>
 
-      <p className="mt-8 text-slate-600 text-xs text-center">
-        Musiques via YouTube · Scores en temps réel · Mobile friendly
-      </p>
     </div>
   )
 }
