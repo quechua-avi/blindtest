@@ -49,11 +49,31 @@ export function selectSongs(settings: GameSettings): Song[] {
 
 export function generateChoices(song: Song, allSongs: Song[], count = 4): string[] {
   const correctAnswer = `${song.title} - ${song.artist}`
-  const sameGenre = allSongs.filter((s) => s.id !== song.id && s.genre === song.genre)
-  const otherSongs = allSongs.filter((s) => s.id !== song.id && s.genre !== song.genre)
+  const needed = count - 1
 
-  const pool = shuffle([...sameGenre, ...otherSongs]).slice(0, count - 1)
-  const choices = pool.map((s) => `${s.title} - ${s.artist}`)
+  // Priorité : même genre + même décennie
+  const sameGenreAndDecade = shuffle(
+    allSongs.filter((s) => s.id !== song.id && s.genre === song.genre && s.decade === song.decade)
+  )
+  // Fallback : même genre, décennie différente
+  const sameGenreOtherDecade = shuffle(
+    allSongs.filter((s) => s.id !== song.id && s.genre === song.genre && s.decade !== song.decade)
+  )
+  // Dernier recours : autre genre
+  const otherGenre = shuffle(
+    allSongs.filter((s) => s.id !== song.id && s.genre !== song.genre)
+  )
+
+  const distractors: Song[] = []
+  for (const pool of [sameGenreAndDecade, sameGenreOtherDecade, otherGenre]) {
+    for (const s of pool) {
+      if (distractors.length >= needed) break
+      distractors.push(s)
+    }
+    if (distractors.length >= needed) break
+  }
+
+  const choices = distractors.map((s) => `${s.title} - ${s.artist}`)
   choices.push(correctAnswer)
   return shuffle(choices)
 }
