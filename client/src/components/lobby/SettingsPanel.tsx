@@ -7,7 +7,7 @@ interface SettingsPanelProps {
   onChange: (partial: Partial<GameSettings>) => void
 }
 
-const GENRES: Genre[] = ['pop', 'rock', 'hiphop', 'electronic', 'rnb', 'indie', 'french', 'latin', 'kpop']
+const GENRES: Genre[] = ['pop', 'hiphop', 'electronic', 'rnb', 'french', 'latin']
 const DECADES: Decade[] = ['2000s', '2010s', '2020s']
 
 function toggle<T>(arr: T[], val: T): T[] {

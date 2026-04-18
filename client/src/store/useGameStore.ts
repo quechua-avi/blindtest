@@ -86,7 +86,7 @@ interface GameStore {
 
 const DEFAULT_SETTINGS: GameSettings = {
   mode: 'classic',
-  genres: ['pop', 'rock', 'hiphop', 'electronic', 'rnb'],
+  genres: ['pop', 'hiphop', 'electronic', 'rnb', 'french', 'latin'],
   decades: ['2000s', '2010s', '2020s'],
   rounds: 10,
   difficulty: 'medium',

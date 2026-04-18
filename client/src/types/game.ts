@@ -1,4 +1,4 @@
-export type Genre = 'pop' | 'rock' | 'hiphop' | 'electronic' | 'rnb' | 'indie' | 'french' | 'latin' | 'kpop'
+export type Genre = 'pop' | 'hiphop' | 'electronic' | 'rnb' | 'french' | 'latin'
 export type Decade = '2000s' | '2010s' | '2020s'
 export type GameMode = 'classic' | 'speedRound' | 'teams' | 'soloVsAI'
 export type Difficulty = 'easy' | 'medium' | 'hard'
@@ -112,26 +112,20 @@ export interface ScoreFeedItem {
 
 export const GENRE_LABELS: Record<Genre, string> = {
   pop: 'Pop',
-  rock: 'Rock',
   hiphop: 'Hip-Hop',
   electronic: 'Electronic',
   rnb: 'R&B',
-  indie: 'Indie',
   french: 'Musique Française',
   latin: 'Latin',
-  kpop: 'K-Pop',
 }
 
 export const GENRE_COLORS: Record<Genre, string> = {
   pop: '#ec4899',
-  rock: '#ef4444',
   hiphop: '#f59e0b',
   electronic: '#8b5cf6',
   rnb: '#6366f1',
-  indie: '#84cc16',
   french: '#3b82f6',
   latin: '#f97316',
-  kpop: '#d946ef',
 }
 
 export const DECADE_LABELS: Record<Decade, string> = {

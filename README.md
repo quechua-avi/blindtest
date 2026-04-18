@@ -1,6 +1,6 @@
 # 🎵 BeatBlind — Blindtest Musical Multijoueur
 
-Site de blindtest en temps réel, jouable sur plusieurs appareils simultanément. Musique 2000–2026, 9 genres.
+Site de blindtest en temps réel, jouable sur plusieurs appareils simultanément. Musique 2000–2026, 6 genres, +600 titres.
 
 ## Prérequis
 
@@ -58,7 +58,7 @@ Le site sera accessible sur :
 ### Configuration de partie
 | Option | Choix |
 |--------|-------|
-| **Genres** | Pop, Rock, Hip-Hop, Electronic, R&B, Indie, French, Latin, K-Pop |
+| **Genres** | Pop, Hip-Hop, Electronic, R&B, Musique Française, Latin |
 | **Décennies** | 2000s, 2010s, 2020s |
 | **Mode de jeu** | Classique / Speed Round / Équipes / Solo vs IA |
 | **Difficulté** | Facile (30s) / Moyen (20s) / Difficile (15s) |
@@ -66,7 +66,7 @@ Le site sera accessible sur :
 | **Rounds** | 5 / 10 / 15 / 20 |
 
 ### Gameplay
-- 🎵 Audio YouTube joué depuis le refrain (vidéo cachée)
+- 🎵 Extraits audio Deezer (30s) via l'API preview
 - 🌊 Visualiseur de waveform animé coloré par genre
 - ✏️ Fuzzy matching : les fautes de frappe mineures sont acceptées
 - ⚡ Score basé sur la vitesse + bonus premier à répondre
@@ -88,7 +88,7 @@ Blindt/
 ├── server/          Node.js + Socket.io (port 3001)
 │   └── src/
 │       ├── game/    Moteur de jeu (GameRoom, ScoreEngine, AIPlayer...)
-│       ├── songs/   Bibliothèque ~200 chansons + sélection
+│       ├── songs/   Bibliothèque ~615 chansons (6 genres × 3 décennies)
 │       └── socket/  Handlers en temps réel
 └── client/          React + Vite + Tailwind (port 5173)
     └── src/

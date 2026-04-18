@@ -10,7 +10,7 @@ export const CONFIG = {
   BETWEEN_ROUNDS_DELAY_MS: 5000,         // 5s entre les rounds
   DEFAULT_SETTINGS: {
     mode: 'classic' as const,
-    genres: ['pop', 'rock', 'hiphop', 'electronic', 'rnb'] as const,
+    genres: ['pop', 'hiphop', 'electronic', 'rnb', 'french', 'latin'] as const,
     decades: ['2000s', '2010s', '2020s'] as const,
     rounds: 10,
     difficulty: 'medium' as const,

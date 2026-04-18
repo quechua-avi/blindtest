@@ -1,4 +1,4 @@
-export type Genre = 'pop' | 'rock' | 'hiphop' | 'electronic' | 'rnb' | 'indie' | 'french' | 'latin' | 'kpop'
+export type Genre = 'pop' | 'hiphop' | 'electronic' | 'rnb' | 'french' | 'latin'
 export type Decade = '2000s' | '2010s' | '2020s'
 export type GameMode = 'classic' | 'speedRound' | 'teams' | 'soloVsAI'
 export type Difficulty = 'easy' | 'medium' | 'hard'
