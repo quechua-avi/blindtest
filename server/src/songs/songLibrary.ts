@@ -832,4 +832,230 @@ export const SONG_LIBRARY: Song[] = [
   { id: 'lat-n-party-2021', title: 'Party', artist: 'Bad Bunny ft. Rauw Alejandro', year: 2021, genre: 'latin', decade: '2020s', alternativeArtists: ['Bad Bunny', 'Rauw Alejandro'] },
   { id: 'lat-n-fiel-2020', title: 'Fiel', artist: 'Los Legendarios ft. Jhay Cortez & J Balvin', year: 2020, genre: 'latin', decade: '2020s', alternativeArtists: ['Los Legendarios', 'Jhay Cortez', 'J Balvin'] },
   { id: 'lat-n-hawairemix-2020', title: 'Hawái (Remix)', artist: 'Maluma ft. The Weeknd', year: 2020, genre: 'latin', decade: '2020s', alternativeArtists: ['Maluma', 'The Weeknd'], alternativeTitles: ['Hawaii Remix', 'Hawaii'] },
+
+  // ═══════════════════════════════════════════════════════════
+  // POP — 2000s (v2)
+  // ═══════════════════════════════════════════════════════════
+  { id: 'pop2-cantgetyou-2001', title: "Can't Get You Out of My Head", artist: 'Kylie Minogue', year: 2001, genre: 'pop', decade: '2000s', alternativeTitles: ['Cant Get You Out of My Head'] },
+  { id: 'pop2-maneater-2006', title: 'Maneater', artist: 'Nelly Furtado', year: 2006, genre: 'pop', decade: '2000s' },
+  { id: 'pop2-justlikeapill-2001', title: 'Just Like a Pill', artist: 'Pink', year: 2001, genre: 'pop', decade: '2000s', alternativeArtists: ['P!nk'] },
+  { id: 'pop2-fallin-2001', title: "Fallin'", artist: 'Alicia Keys', year: 2001, genre: 'pop', decade: '2000s', alternativeTitles: ['Falling'] },
+  { id: 'pop2-bootylicious-2001', title: 'Bootylicious', artist: "Destiny's Child", year: 2001, genre: 'pop', decade: '2000s' },
+  { id: 'pop2-biggirlsdontcry-2006', title: "Big Girls Don't Cry", artist: 'Fergie', year: 2006, genre: 'pop', decade: '2000s', alternativeTitles: ['Big Girls Dont Cry'] },
+
+  // ═══════════════════════════════════════════════════════════
+  // POP — 2010s (v2)
+  // ═══════════════════════════════════════════════════════════
+  { id: 'pop2-countingstars-2013', title: 'Counting Stars', artist: 'OneRepublic', year: 2013, genre: 'pop', decade: '2010s' },
+  { id: 'pop2-royals-2013', title: 'Royals', artist: 'Lorde', year: 2013, genre: 'pop', decade: '2010s' },
+  { id: 'pop2-lockedout-2012', title: 'Locked Out of Heaven', artist: 'Bruno Mars', year: 2012, genre: 'pop', decade: '2010s' },
+  { id: 'pop2-wedonttalk-2016', title: "We Don't Talk Anymore", artist: 'Charlie Puth ft. Selena Gomez', year: 2016, genre: 'pop', decade: '2010s', alternativeArtists: ['Charlie Puth', 'Selena Gomez'] },
+  { id: 'pop2-22-2012', title: '22', artist: 'Taylor Swift', year: 2012, genre: 'pop', decade: '2010s' },
+  { id: 'pop2-badliar-2017', title: 'Bad Liar', artist: 'Selena Gomez', year: 2017, genre: 'pop', decade: '2010s' },
+
+  // ═══════════════════════════════════════════════════════════
+  // POP — 2020s (v2)
+  // ═══════════════════════════════════════════════════════════
+  { id: 'pop2-heather-2020', title: 'Heather', artist: 'Conan Gray', year: 2020, genre: 'pop', decade: '2020s' },
+  { id: 'pop2-untilifound-2022', title: 'Until I Found You', artist: 'Stephen Sanchez', year: 2022, genre: 'pop', decade: '2020s' },
+  { id: 'pop2-nonsense-2022', title: 'Nonsense', artist: 'Sabrina Carpenter', year: 2022, genre: 'pop', decade: '2020s' },
+  { id: 'pop2-stickseason-2022', title: 'Stick Season', artist: 'Noah Kahan', year: 2022, genre: 'pop', decade: '2020s' },
+  { id: 'pop2-brutal-2021', title: 'brutal', artist: 'Olivia Rodrigo', year: 2021, genre: 'pop', decade: '2020s' },
+  { id: 'pop2-padampadam-2023', title: 'Padam Padam', artist: 'Kylie Minogue', year: 2023, genre: 'pop', decade: '2020s' },
+
+  // ═══════════════════════════════════════════════════════════
+  // HIP-HOP — 2000s (v2)
+  // ═══════════════════════════════════════════════════════════
+  { id: 'hh2-lollipop-2008', title: 'Lollipop', artist: 'Lil Wayne', year: 2008, genre: 'hiphop', decade: '2000s' },
+  { id: 'hh2-crankthat-2007', title: 'Crank That', artist: 'Soulja Boy', year: 2007, genre: 'hiphop', decade: '2000s', alternativeTitles: ['Crank That (Soulja Boy)'] },
+  { id: 'hh2-dropit-2004', title: "Drop It Like It's Hot", artist: 'Snoop Dogg ft. Pharrell', year: 2004, genre: 'hiphop', decade: '2000s', alternativeArtists: ['Snoop Dogg', 'Pharrell'] },
+  { id: 'hh2-low-2007', title: 'Low', artist: 'Flo Rida ft. T-Pain', year: 2007, genre: 'hiphop', decade: '2000s', alternativeArtists: ['Flo Rida', 'T-Pain'] },
+  { id: 'hh2-whatever-2008', title: 'Whatever You Like', artist: 'T.I.', year: 2008, genre: 'hiphop', decade: '2000s' },
+  { id: 'hh2-standup-2003', title: 'Stand Up', artist: 'Ludacris', year: 2003, genre: 'hiphop', decade: '2000s' },
+
+  // ═══════════════════════════════════════════════════════════
+  // HIP-HOP — 2010s (v2)
+  // ═══════════════════════════════════════════════════════════
+  { id: 'hh2-godsplan-2018', title: "God's Plan", artist: 'Drake', year: 2018, genre: 'hiphop', decade: '2010s' },
+  { id: 'hh2-middlechild-2019', title: 'Middle Child', artist: 'J. Cole', year: 2019, genre: 'hiphop', decade: '2010s' },
+  { id: 'hh2-birthdaysong-2012', title: 'Birthday Song', artist: '2 Chainz ft. Kanye West', year: 2012, genre: 'hiphop', decade: '2010s', alternativeArtists: ['2 Chainz', 'Kanye West'] },
+  { id: 'hh2-idfwu-2014', title: "I Don't F**k With You", artist: 'Big Sean', year: 2014, genre: 'hiphop', decade: '2010s', alternativeTitles: ['IDFWU'] },
+  { id: 'hh2-marchmadness-2015', title: 'March Madness', artist: 'Future', year: 2015, genre: 'hiphop', decade: '2010s' },
+  { id: 'hh2-workhardplay-2011', title: 'Work Hard, Play Hard', artist: 'Wiz Khalifa', year: 2011, genre: 'hiphop', decade: '2010s', alternativeTitles: ['Work Hard Play Hard'] },
+
+  // ═══════════════════════════════════════════════════════════
+  // HIP-HOP — 2020s (v2)
+  // ═══════════════════════════════════════════════════════════
+  { id: 'hh2-biggerpicture-2020', title: 'The Bigger Picture', artist: 'Lil Baby', year: 2020, genre: 'hiphop', decade: '2020s' },
+  { id: 'hh2-doja-2022', title: 'Doja', artist: 'Central Cee', year: 2022, genre: 'hiphop', decade: '2020s' },
+  { id: 'hh2-fnf-2022', title: 'F.N.F.', artist: 'GloRilla', year: 2022, genre: 'hiphop', decade: '2020s', alternativeTitles: ["F.N.F. (Let's Go)", 'FNF'] },
+  { id: 'hh2-munch-2022', title: 'Munch (Feelin U)', artist: 'Ice Spice', year: 2022, genre: 'hiphop', decade: '2020s', alternativeTitles: ['Munch', 'Feelin U'] },
+  { id: 'hh2-highfashion-2020', title: 'High Fashion', artist: 'Roddy Ricch ft. Mustard', year: 2020, genre: 'hiphop', decade: '2020s', alternativeArtists: ['Roddy Ricch', 'Mustard'] },
+  { id: 'hh2-pushinp-2022', title: 'Pushin P', artist: 'Gunna ft. Future', year: 2022, genre: 'hiphop', decade: '2020s', alternativeArtists: ['Gunna', 'Future'] },
+
+  // ═══════════════════════════════════════════════════════════
+  // ELECTRONIC — 2000s (v2)
+  // ═══════════════════════════════════════════════════════════
+  { id: 'el2-traffic-2003', title: 'Traffic', artist: 'Tiësto', year: 2003, genre: 'electronic', decade: '2000s', alternativeTitles: ['Tiesto Traffic'] },
+  { id: 'el2-wheresyourhead-2001', title: "Where's Your Head At", artist: 'Basement Jaxx', year: 2001, genre: 'electronic', decade: '2000s' },
+  { id: 'el2-iremember-2008', title: 'I Remember', artist: 'deadmau5 & Kaskade', year: 2008, genre: 'electronic', decade: '2000s', alternativeArtists: ['deadmau5', 'Kaskade'] },
+  { id: 'el2-starryeyed-2002', title: 'Starry Eyed Surprise', artist: 'Paul Oakenfold', year: 2002, genre: 'electronic', decade: '2000s' },
+  { id: 'el2-insomnia-2001', title: 'Insomnia', artist: 'Faithless', year: 2001, genre: 'electronic', decade: '2000s' },
+  { id: 'el2-adagiostrings-2004', title: 'Adagio for Strings', artist: 'Tiësto', year: 2004, genre: 'electronic', decade: '2000s', alternativeTitles: ['Adagio for Strings (Tiesto)'] },
+
+  // ═══════════════════════════════════════════════════════════
+  // ELECTRONIC — 2010s (v2)
+  // ═══════════════════════════════════════════════════════════
+  { id: 'el2-thiswhat-2016', title: 'This Is What You Came For', artist: 'Calvin Harris ft. Rihanna', year: 2016, genre: 'electronic', decade: '2010s', alternativeArtists: ['Calvin Harris', 'Rihanna'] },
+  { id: 'el2-inthenameofluv-2016', title: 'In the Name of Love', artist: 'Martin Garrix & Bebe Rexha', year: 2016, genre: 'electronic', decade: '2010s', alternativeArtists: ['Martin Garrix', 'Bebe Rexha'] },
+  { id: 'el2-dontletmedown-2016', title: "Don't Let Me Down", artist: 'The Chainsmokers ft. Daya', year: 2016, genre: 'electronic', decade: '2010s', alternativeArtists: ['The Chainsmokers', 'Daya'] },
+  { id: 'el2-beautifulnow-2015', title: 'Beautiful Now', artist: 'Zedd ft. Jon Bellion', year: 2015, genre: 'electronic', decade: '2010s', alternativeArtists: ['Zedd', 'Jon Bellion'] },
+  { id: 'el2-cinema-2011', title: 'Cinema', artist: 'Benny Benassi ft. Gary Go', year: 2011, genre: 'electronic', decade: '2010s', alternativeArtists: ['Benny Benassi', 'Gary Go'] },
+  { id: 'el2-withoutyou-2011', title: 'Without You', artist: 'David Guetta ft. Usher', year: 2011, genre: 'electronic', decade: '2010s', alternativeArtists: ['David Guetta', 'Usher'] },
+
+  // ═══════════════════════════════════════════════════════════
+  // ELECTRONIC — 2020s (v2)
+  // ═══════════════════════════════════════════════════════════
+  { id: 'el2-marea-2022', title: 'Marea', artist: 'Fred again.. & The Blessed Madonna', year: 2022, genre: 'electronic', decade: '2020s', alternativeTitles: ["Marea (we've lost dancing)"] },
+  { id: 'el2-headheart-2020', title: 'Head & Heart', artist: 'Joel Corry ft. MNEK', year: 2020, genre: 'electronic', decade: '2020s', alternativeArtists: ['Joel Corry', 'MNEK'], alternativeTitles: ['Head and Heart'] },
+  { id: 'el2-imgoodblue-2022', title: "I'm Good (Blue)", artist: 'David Guetta & Bebe Rexha', year: 2022, genre: 'electronic', decade: '2020s', alternativeArtists: ['David Guetta', 'Bebe Rexha'], alternativeTitles: ["I'm Good", 'Im Good Blue'] },
+  { id: 'el2-paradise-2020', title: 'Paradise', artist: 'MEDUZA ft. Dermot Kennedy', year: 2020, genre: 'electronic', decade: '2020s', alternativeArtists: ['MEDUZA', 'Dermot Kennedy'] },
+  { id: 'el2-higherthanheaven-2022', title: 'Higher Than Heaven', artist: 'Ellie Goulding', year: 2022, genre: 'electronic', decade: '2020s' },
+  { id: 'el2-bed-2021', title: 'Bed', artist: 'Joel Corry ft. RAYE & David Guetta', year: 2021, genre: 'electronic', decade: '2020s', alternativeArtists: ['Joel Corry', 'RAYE', 'David Guetta'] },
+
+  // ═══════════════════════════════════════════════════════════
+  // R&B — 2000s (v2)
+  // ═══════════════════════════════════════════════════════════
+  { id: 'rnb2-ifaiaintgot-2003', title: "If I Ain't Got You", artist: 'Alicia Keys', year: 2003, genre: 'rnb', decade: '2000s', alternativeTitles: ['If I Aint Got You'] },
+  { id: 'rnb2-fallin-2001', title: "Fallin'", artist: 'Alicia Keys', year: 2001, genre: 'rnb', decade: '2000s', alternativeTitles: ['Falling'] },
+  { id: 'rnb2-alwaysontime-2002', title: 'Always on Time', artist: 'Ja Rule ft. Ashanti', year: 2002, genre: 'rnb', decade: '2000s', alternativeArtists: ['Ja Rule', 'Ashanti'] },
+  { id: 'rnb2-1thing-2005', title: '1 Thing', artist: 'Amerie', year: 2005, genre: 'rnb', decade: '2000s', alternativeTitles: ['One Thing'] },
+  { id: 'rnb2-icebox-2006', title: 'Ice Box', artist: 'Omarion', year: 2006, genre: 'rnb', decade: '2000s' },
+  { id: 'rnb2-love-2005', title: 'Love', artist: 'Keyshia Cole', year: 2005, genre: 'rnb', decade: '2000s' },
+
+  // ═══════════════════════════════════════════════════════════
+  // R&B — 2010s (v2)
+  // ═══════════════════════════════════════════════════════════
+  { id: 'rnb2-bestpart-2017', title: 'Best Part', artist: 'Daniel Caesar ft. H.E.R.', year: 2017, genre: 'rnb', decade: '2010s', alternativeArtists: ['Daniel Caesar', 'H.E.R.'] },
+  { id: 'rnb2-drewbarrymore-2017', title: 'Drew Barrymore', artist: 'SZA', year: 2017, genre: 'rnb', decade: '2010s' },
+  { id: 'rnb2-novacane-2011', title: 'Novacane', artist: 'Frank Ocean', year: 2011, genre: 'rnb', decade: '2010s' },
+  { id: 'rnb2-bedpeace-2013', title: 'Bed Peace', artist: 'Jhené Aiko ft. Childish Gambino', year: 2013, genre: 'rnb', decade: '2010s', alternativeArtists: ['Jhené Aiko', 'Childish Gambino'] },
+  { id: 'rnb2-2on-2014', title: '2 On', artist: 'Tinashe ft. ScHoolboy Q', year: 2014, genre: 'rnb', decade: '2010s', alternativeArtists: ['Tinashe', 'ScHoolboy Q'] },
+  { id: 'rnb2-focus-2016', title: 'Focus', artist: 'H.E.R.', year: 2016, genre: 'rnb', decade: '2010s' },
+
+  // ═══════════════════════════════════════════════════════════
+  // R&B — 2020s (v2)
+  // ═══════════════════════════════════════════════════════════
+  { id: 'rnb2-gravity-2022', title: 'Gravity', artist: 'Brent Faiyaz', year: 2022, genre: 'rnb', decade: '2020s' },
+  { id: 'rnb2-nolove-2021', title: 'No Love', artist: 'Future ft. Summer Walker & SZA', year: 2021, genre: 'rnb', decade: '2020s', alternativeArtists: ['Future', 'Summer Walker', 'SZA'] },
+  { id: 'rnb2-havemercy-2021', title: 'Have Mercy', artist: 'Chlöe', year: 2021, genre: 'rnb', decade: '2020s', alternativeArtists: ['Chloe Bailey', 'Chloe'] },
+  { id: 'rnb2-andthen-2021', title: 'And Then', artist: 'Lucky Daye', year: 2021, genre: 'rnb', decade: '2020s' },
+  { id: 'rnb2-coastin-2020', title: 'Coastin', artist: 'Victoria Monét', year: 2020, genre: 'rnb', decade: '2020s' },
+  { id: 'rnb2-superblack-2021', title: 'Super Black', artist: 'Ari Lennox ft. Cordae', year: 2021, genre: 'rnb', decade: '2020s', alternativeArtists: ['Ari Lennox', 'Cordae'] },
+
+  // ═══════════════════════════════════════════════════════════
+  // MUSIQUE FRANÇAISE — 2000s (v2)
+  // ═══════════════════════════════════════════════════════════
+  { id: 'fr2-bellebadboy-2001', title: 'La Belle et le Bad Boy', artist: 'MC Solaar', year: 2001, genre: 'french', decade: '2000s' },
+  { id: 'fr2-lechemin-2003', title: 'Le chemin', artist: 'Kyo', year: 2003, genre: 'french', decade: '2000s' },
+  { id: 'fr2-commedesenfants-2008', title: 'Comme des enfants', artist: 'Cœur de Pirate', year: 2008, genre: 'french', decade: '2000s', alternativeTitles: ['Comme des enfants (Coeur de Pirate)', 'Comme des Enfants'] },
+  { id: 'fr2-lefestin-2007', title: 'Le festin', artist: 'Camille', year: 2007, genre: 'french', decade: '2000s' },
+  { id: 'fr2-butterfly-2007', title: 'Butterfly', artist: 'Superbus', year: 2007, genre: 'french', decade: '2000s' },
+  { id: 'fr2-jalouse-2006', title: 'Jalouse', artist: 'Christophe Willem', year: 2006, genre: 'french', decade: '2000s' },
+
+  // ═══════════════════════════════════════════════════════════
+  // MUSIQUE FRANÇAISE — 2010s (v2)
+  // ═══════════════════════════════════════════════════════════
+  { id: 'fr2-desole-2011', title: 'Désolé', artist: "Sexion d'Assaut", year: 2011, genre: 'french', decade: '2010s', alternativeTitles: ['Desole'] },
+  { id: 'fr2-dommage-2017', title: 'Dommage', artist: 'BigFlo & Oli', year: 2017, genre: 'french', decade: '2010s' },
+  { id: 'fr2-zombie-2014', title: 'Zombie', artist: 'Maître Gims', year: 2014, genre: 'french', decade: '2010s', alternativeArtists: ['Maitre Gims', 'Gims'] },
+  { id: 'fr2-onverra-2015', title: 'On verra', artist: 'Nekfeu', year: 2015, genre: 'french', decade: '2010s' },
+  { id: 'fr2-jaloux-2017', title: 'Jaloux', artist: 'Dadju', year: 2017, genre: 'french', decade: '2010s' },
+  { id: 'fr2-guerrilla-2018', title: 'Guerrilla', artist: 'Soolking', year: 2018, genre: 'french', decade: '2010s' },
+
+  // ═══════════════════════════════════════════════════════════
+  // MUSIQUE FRANÇAISE — 2020s (v2)
+  // ═══════════════════════════════════════════════════════════
+  { id: 'fr2-jaivu-2022', title: "J'ai vu", artist: 'Gazo', year: 2022, genre: 'french', decade: '2020s' },
+  { id: 'fr2-pyramide-2023', title: 'Pyramide', artist: 'Werenoi', year: 2023, genre: 'french', decade: '2020s' },
+  { id: 'fr2-fleurfroide-2021', title: 'Fleur froide', artist: 'Tayc', year: 2021, genre: 'french', decade: '2020s' },
+  { id: 'fr2-melodie-2022', title: 'Mélodie', artist: 'Tiakola', year: 2022, genre: 'french', decade: '2020s', alternativeTitles: ['Melodie'] },
+  { id: 'fr2-glacon-2021', title: 'Glaçon', artist: 'PLK', year: 2021, genre: 'french', decade: '2020s', alternativeTitles: ['Glacon'] },
+  { id: 'fr2-tumenanques-2022', title: 'Tu me manques', artist: 'Ninho', year: 2022, genre: 'french', decade: '2020s' },
+
+  // ═══════════════════════════════════════════════════════════
+  // LATIN — 2000s (v2)
+  // ═══════════════════════════════════════════════════════════
+  { id: 'lat2-wheneverwherever-2001', title: 'Whenever, Wherever', artist: 'Shakira', year: 2001, genre: 'latin', decade: '2000s', alternativeTitles: ['Whenever Wherever'] },
+  { id: 'lat2-escape-2001', title: 'Escape', artist: 'Enrique Iglesias', year: 2001, genre: 'latin', decade: '2000s' },
+  { id: 'lat2-shebangs-2000', title: 'She Bangs', artist: 'Ricky Martin', year: 2000, genre: 'latin', decade: '2000s' },
+  { id: 'lat2-espority-2003', title: 'Es Por Ti', artist: 'Juanes', year: 2003, genre: 'latin', decade: '2000s' },
+  { id: 'lat2-rompe-2005', title: 'Rompe', artist: 'Daddy Yankee', year: 2005, genre: 'latin', decade: '2000s' },
+  { id: 'lat2-pobrediabla-2003', title: 'Pobre Diabla', artist: 'Don Omar', year: 2003, genre: 'latin', decade: '2000s' },
+
+  // ═══════════════════════════════════════════════════════════
+  // LATIN — 2010s (v2)
+  // ═══════════════════════════════════════════════════════════
+  { id: 'lat2-vivirmivia-2013', title: 'Vivir Mi Vida', artist: 'Marc Anthony', year: 2013, genre: 'latin', decade: '2010s' },
+  { id: 'lat2-givemeeverything-2011', title: 'Give Me Everything', artist: 'Pitbull ft. Ne-Yo', year: 2011, genre: 'latin', decade: '2010s', alternativeArtists: ['Pitbull', 'Ne-Yo'] },
+  { id: 'lat2-migente-2017', title: 'Mi Gente', artist: 'J Balvin & Willy William', year: 2017, genre: 'latin', decade: '2010s', alternativeArtists: ['J Balvin', 'Willy William'] },
+  { id: 'lat2-cantremember-2014', title: "Can't Remember to Forget You", artist: 'Shakira ft. Rihanna', year: 2014, genre: 'latin', decade: '2010s', alternativeArtists: ['Shakira', 'Rihanna'] },
+  { id: 'lat2-takitaki-2018', title: 'Taki Taki', artist: 'DJ Snake ft. Ozuna', year: 2018, genre: 'latin', decade: '2010s', alternativeArtists: ['DJ Snake', 'Ozuna', 'Selena Gomez', 'Cardi B'] },
+  { id: 'lat2-backitup-2014', title: 'Back It Up', artist: 'Prince Royce ft. Jennifer Lopez', year: 2014, genre: 'latin', decade: '2010s', alternativeArtists: ['Prince Royce', 'Jennifer Lopez'] },
+
+  // ═══════════════════════════════════════════════════════════
+  // LATIN — 2020s (v2)
+  // ═══════════════════════════════════════════════════════════
+  { id: 'lat2-elapagon-2022', title: 'El Apagón', artist: 'Bad Bunny', year: 2022, genre: 'latin', decade: '2020s', alternativeTitles: ['El Apagon'] },
+  { id: 'lat2-despecha-2022', title: 'Despechá', artist: 'Rosalía', year: 2022, genre: 'latin', decade: '2020s', alternativeTitles: ['Despecha'] },
+  { id: 'lat2-monotonia-2022', title: 'Monotonía', artist: 'Shakira ft. Ozuna', year: 2022, genre: 'latin', decade: '2020s', alternativeArtists: ['Shakira', 'Ozuna'], alternativeTitles: ['Monotonia'] },
+  { id: 'lat2-porfa-2020', title: 'Porfa', artist: 'Feid ft. J Balvin', year: 2020, genre: 'latin', decade: '2020s', alternativeArtists: ['Feid', 'J Balvin'] },
+  { id: 'lat2-lala-2021', title: 'LALA', artist: 'Myke Towers', year: 2021, genre: 'latin', decade: '2020s' },
+  { id: 'lat2-indagetto-2021', title: 'In Da Getto', artist: 'J Balvin & Skrillex', year: 2021, genre: 'latin', decade: '2020s', alternativeArtists: ['J Balvin', 'Skrillex'] },
+
+  // ═══════════════════════════════════════════════════════════
+  // RAP FRANÇAIS — 2000s
+  // ═══════════════════════════════════════════════════════════
+  { id: 'rapfr-diams-suzy-2006', title: 'Suzy', artist: "Diam's", year: 2006, genre: 'french', decade: '2000s', alternativeArtists: ['Diams'] },
+  { id: 'rapfr-diams-boulette-2006', title: 'La boulette', artist: "Diam's", year: 2006, genre: 'french', decade: '2000s', alternativeArtists: ['Diams'], alternativeTitles: ['Boulette'] },
+  { id: 'rapfr-rohff-fiertedesnotes-2004', title: 'La fierté des nôtres', artist: 'Rohff', year: 2004, genre: 'french', decade: '2000s', alternativeTitles: ['La fierte des notres', 'Fierte des notres'] },
+  { id: 'rapfr-booba-tombepouelle-2004', title: 'Tombé pour elle', artist: 'Booba', year: 2004, genre: 'french', decade: '2000s', alternativeTitles: ['Tombe pour elle'] },
+  { id: 'rapfr-keryjames-ombre-2008', title: 'À l\'ombre du show business', artist: 'Kery James', year: 2008, genre: 'french', decade: '2000s', alternativeTitles: ['A l ombre du show business', 'Ombre du show business'] },
+  { id: 'rapfr-sefyu-quiSuisJe-2007', title: 'Qui suis-je', artist: 'Sefyu', year: 2007, genre: 'french', decade: '2000s', alternativeTitles: ['Qui suis je'] },
+  { id: 'rapfr-lafouine-loin-2008', title: 'Loin de ma base', artist: 'La Fouine', year: 2008, genre: 'french', decade: '2000s' },
+  { id: 'rapfr-113-tonton-2003', title: 'Tonton du bled', artist: '113', year: 2003, genre: 'french', decade: '2000s' },
+  { id: 'rapfr-iam-nessous-2003', title: 'Nés sous la même étoile', artist: 'IAM', year: 2003, genre: 'french', decade: '2000s', alternativeTitles: ['Nes sous la meme etoile'] },
+  { id: 'rapfr-disiz-plombs-2003', title: 'Je pète les plombs', artist: 'Disiz la Peste', year: 2003, genre: 'french', decade: '2000s', alternativeTitles: ['Je pete les plombs'] },
+
+  // ═══════════════════════════════════════════════════════════
+  // RAP FRANÇAIS — 2010s
+  // ═══════════════════════════════════════════════════════════
+  { id: 'rapfr-pnl-danslalegende-2016', title: 'Dans la légende', artist: 'PNL', year: 2016, genre: 'french', decade: '2010s', alternativeTitles: ['Dans la legende'] },
+  { id: 'rapfr-pnl-lemondeourien-2015', title: 'Le monde ou rien', artist: 'PNL', year: 2015, genre: 'french', decade: '2010s' },
+  { id: 'rapfr-pnl-onizuka-2014', title: 'Onizuka', artist: 'PNL', year: 2014, genre: 'french', decade: '2010s' },
+  { id: 'rapfr-niska-reseaux-2017', title: 'Réseaux', artist: 'Niska', year: 2017, genre: 'french', decade: '2010s', alternativeTitles: ['Reseaux'] },
+  { id: 'rapfr-niska-charo-2016', title: 'Charo life', artist: 'Niska', year: 2016, genre: 'french', decade: '2010s' },
+  { id: 'rapfr-kaaris-ornoir-2013', title: 'Or Noir', artist: 'Kaaris', year: 2013, genre: 'french', decade: '2010s' },
+  { id: 'rapfr-sch-rooftop-2019', title: 'Rooftop', artist: 'SCH', year: 2019, genre: 'french', decade: '2010s' },
+  { id: 'rapfr-ninho-millions-2017', title: 'Millions', artist: 'Ninho', year: 2017, genre: 'french', decade: '2010s' },
+  { id: 'rapfr-ninho-lettre-2017', title: 'Lettre à une femme', artist: 'Ninho', year: 2017, genre: 'french', decade: '2010s', alternativeTitles: ['Lettre a une femme'] },
+  { id: 'rapfr-jul-madirection-2016', title: 'Ma direction', artist: 'Jul', year: 2016, genre: 'french', decade: '2010s' },
+  { id: 'rapfr-lomepal-amour-2016', title: 'Amour', artist: 'Lomepal', year: 2016, genre: 'french', decade: '2010s' },
+  { id: 'rapfr-alonzo-tds-2016', title: 'TDS', artist: 'Alonzo', year: 2016, genre: 'french', decade: '2010s' },
+
+  // ═══════════════════════════════════════════════════════════
+  // RAP FRANÇAIS — 2020s
+  // ═══════════════════════════════════════════════════════════
+  { id: 'rapfr-sch-peurdunoir-2020', title: 'Peur du noir', artist: 'SCH', year: 2020, genre: 'french', decade: '2020s' },
+  { id: 'rapfr-ninho-agenouxpartoi-2023', title: 'À genoux par toi', artist: 'Ninho', year: 2023, genre: 'french', decade: '2020s', alternativeTitles: ['A genoux par toi', 'Agenoux par toi'] },
+  { id: 'rapfr-gazo-drillFR-2021', title: 'Drill FR', artist: 'Gazo', year: 2021, genre: 'french', decade: '2020s' },
+  { id: 'rapfr-laylow-trinity-2020', title: 'Trinity', artist: 'Laylow', year: 2020, genre: 'french', decade: '2020s' },
+  { id: 'rapfr-kobala-crimepayant-2020', title: 'Crime payant', artist: 'Koba LaD', year: 2020, genre: 'french', decade: '2020s' },
+  { id: 'rapfr-naps-lemondestbeau-2021', title: 'Le monde est beau', artist: 'Naps', year: 2021, genre: 'french', decade: '2020s' },
+  { id: 'rapfr-damso-batteriesfaibles-2023', title: 'Batterie faible', artist: 'Damso', year: 2023, genre: 'french', decade: '2020s' },
+  { id: 'rapfr-gambi-popopop-2022', title: 'Popopop', artist: 'Gambi', year: 2022, genre: 'french', decade: '2020s' },
+  { id: 'rapfr-freezecorleone-calmela-2020', title: 'Calme-la', artist: 'Freeze Corleone', year: 2020, genre: 'french', decade: '2020s', alternativeTitles: ['Calme la'] },
+  { id: 'rapfr-lomepal-chocolat-2021', title: 'Chocolat', artist: 'Lomepal', year: 2021, genre: 'french', decade: '2020s' },
+  { id: 'rapfr-ninho-comment-2023', title: "Comment c'est", artist: 'Ninho', year: 2023, genre: 'french', decade: '2020s', alternativeTitles: ['Comment cest'] },
+  { id: 'rapfr-jodwet-monbebe-2021', title: 'Mon bébé', artist: 'Joé Dwèt Filé', year: 2021, genre: 'french', decade: '2020s', alternativeArtists: ['Joe Dwet File'], alternativeTitles: ['Mon bebe'] },
 ]
