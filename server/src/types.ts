@@ -68,6 +68,7 @@ export interface RoundReveal {
   leaderboard: PlayerScore[]
   correctGuessers: string[]
   teamScores?: { A: number; B: number }
+  coverUrl?: string
 }
 
 export interface GameResults {
