@@ -85,7 +85,7 @@ export function SettingsPanel({ settings, isHost, onChange }: SettingsPanelProps
             <button
               key={value}
               disabled={disabled}
-              onClick={() => onChange({ mode: value })}
+              onClick={() => onChange({ mode: value, ...(value === 'buzzer' ? { answerMode: 'text' } : {}) })}
               className={`p-3 rounded-xl border text-left transition-all duration-200 ${
                 disabled ? 'cursor-default' : 'cursor-pointer'
               } ${settings.mode === value
@@ -107,13 +107,16 @@ export function SettingsPanel({ settings, isHost, onChange }: SettingsPanelProps
           {([
             { value: 'text', label: '⌨️ Texte libre', desc: 'Tape ta réponse' },
             { value: 'multipleChoice', label: '🔘 Choix multiple', desc: '4 options' },
-          ] as const).map(({ value, label, desc }) => (
+          ] as const).map(({ value, label, desc }) => {
+            const isBuzzerMode = settings.mode === 'buzzer'
+            const isDisabledOption = disabled || (isBuzzerMode && value === 'multipleChoice')
+            return (
             <button
               key={value}
-              disabled={disabled}
-              onClick={() => onChange({ answerMode: value })}
+              disabled={isDisabledOption}
+              onClick={() => !isDisabledOption && onChange({ answerMode: value })}
               className={`flex-1 p-3 rounded-xl border text-left transition-all ${
-                disabled ? 'cursor-default' : 'cursor-pointer'
+                isDisabledOption ? 'cursor-default opacity-40' : 'cursor-pointer'
               } ${settings.answerMode === value
                 ? 'bg-primary/20 border-primary/50'
                 : 'bg-bg-surface border-bg-border'
@@ -122,7 +125,7 @@ export function SettingsPanel({ settings, isHost, onChange }: SettingsPanelProps
               <div className="text-sm font-semibold text-white">{label}</div>
               <div className="text-xs text-slate-500">{desc}</div>
             </button>
-          ))}
+          )})}
         </div>
       </div>
 
