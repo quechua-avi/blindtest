@@ -26,7 +26,7 @@ export function registerLobbyHandlers(io: IoServer, socket: IoSocket) {
     console.log(`[Lobby] Room ${room.code} créée par ${playerName}`)
   })
 
-  socket.on('lobby:join', ({ roomCode, playerName }) => {
+  socket.on('lobby:join', ({ roomCode, playerName, avatarColor }) => {
     if (!playerName?.trim()) {
       socket.emit('lobby:error', { code: 'INVALID_NAME', message: 'Nom invalide' })
       return
