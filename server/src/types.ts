@@ -1,4 +1,4 @@
-export type Genre = 'pop' | 'hiphop' | 'electronic' | 'rnb' | 'french' | 'latin'
+export type Genre = 'pop' | 'hiphop' | 'electronic' | 'rnb' | 'french' | 'latin' | 'jul'
 export type Decade = '2000s' | '2010s' | '2020s'
 export type GameMode = 'classic' | 'teams' | 'soloVsAI' | 'buzzer'
 export type AnswerMode = 'text' | 'multipleChoice'

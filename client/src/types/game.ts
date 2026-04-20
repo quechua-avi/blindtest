@@ -1,4 +1,4 @@
-export type Genre = 'pop' | 'hiphop' | 'electronic' | 'rnb' | 'french' | 'latin'
+export type Genre = 'pop' | 'hiphop' | 'electronic' | 'rnb' | 'french' | 'latin' | 'jul'
 export type Decade = '2000s' | '2010s' | '2020s'
 export type GameMode = 'classic' | 'teams' | 'soloVsAI' | 'buzzer'
 export type AnswerMode = 'text' | 'multipleChoice'
@@ -118,6 +118,7 @@ export const GENRE_LABELS: Record<Genre, string> = {
   rnb: 'R&B',
   french: 'Musique Française',
   latin: 'Latin',
+  jul: 'Jul',
 }
 
 export const GENRE_COLORS: Record<Genre, string> = {
@@ -127,6 +128,7 @@ export const GENRE_COLORS: Record<Genre, string> = {
   rnb: '#6366f1',
   french: '#3b82f6',
   latin: '#f97316',
+  jul: '#0ea5e9',
 }
 
 export const DECADE_LABELS: Record<Decade, string> = {

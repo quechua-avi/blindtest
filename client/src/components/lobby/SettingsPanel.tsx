@@ -8,7 +8,7 @@ interface SettingsPanelProps {
   light?: boolean
 }
 
-const GENRES: Genre[] = ['pop', 'hiphop', 'electronic', 'rnb', 'french', 'latin']
+const GENRES: Genre[] = ['pop', 'hiphop', 'electronic', 'rnb', 'french', 'latin', 'jul']
 
 function toggle<T>(arr: T[], val: T): T[] {
   return arr.includes(val) ? arr.filter((x) => x !== val) : [...arr, val]
