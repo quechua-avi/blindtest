@@ -14,10 +14,12 @@ export function HomePage() {
   const [localName, setLocalName] = useState(name)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [createPassword, setCreatePassword] = useState('')
 
   const handleCreate = () => {
     const trimmed = localName.trim()
     if (!trimmed) { setError('Entre ton pseudo'); return }
+    if (createPassword !== 'buzzyquizpitchounes') { setError('Mot de passe incorrect'); return }
     setError('')
     setName(trimmed)
     setLoading(true)
@@ -98,9 +100,16 @@ export function HomePage() {
               placeholder="Ex: Marvin"
               value={localName}
               onChange={(e) => setLocalName(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
               maxLength={20}
               autoFocus
+            />
+            <Input
+              label="Mot de passe"
+              placeholder="••••••••"
+              type="password"
+              value={createPassword}
+              onChange={(e) => setCreatePassword(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
               error={error}
             />
             <Button onClick={handleCreate} loading={loading} className="w-full">
