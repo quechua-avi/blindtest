@@ -1338,4 +1338,65 @@ export const SONG_LIBRARY: Song[] = [
   { id: 'lat3-bzrp53-2023', title: 'BZRP Music Sessions #53', artist: 'Bizarrap & Shakira', year: 2023, genre: 'latin', decade: '2020s', alternativeArtists: ['Bizarrap', 'Shakira'], alternativeTitles: ['BZRP Music Sessions 53', 'Music Sessions 53'] },
   { id: 'lat3-lalabye-2020', title: 'La Nota', artist: 'Rauw Alejandro ft. Nicky Jam', year: 2020, genre: 'latin', decade: '2020s', alternativeArtists: ['Rauw Alejandro', 'Nicky Jam'] },
   { id: 'lat3-conbunny-2022', title: 'Un Verano Sin Ti', artist: 'Bad Bunny', year: 2022, genre: 'latin', decade: '2020s', alternativeTitles: ['Un Verano Sin Ti (Album)'] },
+
+  // ═══════════════════════════════════════════
+  // POP — 2020s (v4 · nouveaux 2024)
+  // ═══════════════════════════════════════════
+  { id: 'pop4-pleaseplease-2024', title: 'Please Please Please', artist: 'Sabrina Carpenter', year: 2024, genre: 'pop', decade: '2020s' },
+  { id: 'pop4-360-2024', title: '360', artist: 'Charli xcx', year: 2024, genre: 'pop', decade: '2020s', alternativeArtists: ['Charli XCX'] },
+  { id: 'pop4-sympathy-2024', title: 'Sympathy Is a Knife', artist: 'Charli xcx', year: 2024, genre: 'pop', decade: '2020s', alternativeArtists: ['Charli XCX'] },
+  { id: 'pop4-river-2023', title: 'River', artist: 'Miley Cyrus', year: 2023, genre: 'pop', decade: '2020s' },
+  { id: 'pop4-usandthem-2024', title: 'Us and Them', artist: 'Coldplay', year: 2024, genre: 'pop', decade: '2020s' },
+  { id: 'pop4-thatgreen-2023', title: 'That Green Gentlem', artist: 'Hozier', year: 2023, genre: 'pop', decade: '2020s' },
+  { id: 'pop4-fortnight-2024', title: 'Fortnight', artist: 'Taylor Swift ft. Post Malone', year: 2024, genre: 'pop', decade: '2020s', alternativeArtists: ['Taylor Swift', 'Post Malone'] },
+  { id: 'pop4-ipreditct-2024', title: 'I Can Do It with a Broken Heart', artist: 'Taylor Swift', year: 2024, genre: 'pop', decade: '2020s', alternativeTitles: ['Broken Heart'] },
+
+  // ═══════════════════════════════════════════
+  // HIP-HOP — 2020s (v4 · nouveaux)
+  // ═══════════════════════════════════════════
+  { id: 'hh4-superhero-2022', title: 'Superhero (Heroes & Villains)', artist: 'Metro Boomin & Future', year: 2022, genre: 'hiphop', decade: '2020s', alternativeArtists: ['Metro Boomin', 'Future'], alternativeTitles: ['Superhero'] },
+  { id: 'hh4-magnolia-2017', title: 'Magnolia', artist: 'Playboi Carti', year: 2017, genre: 'hiphop', decade: '2020s' },
+  { id: 'hh4-myeyes-2023', title: 'MY EYES', artist: 'Travis Scott', year: 2023, genre: 'hiphop', decade: '2020s', alternativeTitles: ['My Eyes'] },
+  { id: 'hh4-carnival-2023', title: 'Carnival', artist: 'Kanye West ft. Ty Dolla $ign', year: 2023, genre: 'hiphop', decade: '2020s', alternativeArtists: ['Kanye West', 'Ty Dolla Sign', 'Playboi Carti'] },
+  { id: 'hh4-science-2024', title: 'Like That', artist: 'Future ft. Metro Boomin & Kendrick Lamar', year: 2024, genre: 'hiphop', decade: '2020s', alternativeArtists: ['Future', 'Metro Boomin', 'Kendrick Lamar'] },
+  { id: 'hh4-elements-2023', title: 'Elements', artist: 'Metro Boomin & Future ft. Travis Scott', year: 2023, genre: 'hiphop', decade: '2020s', alternativeArtists: ['Metro Boomin', 'Future', 'Travis Scott'] },
+
+  // ═══════════════════════════════════════════
+  // ELECTRONIC — 2020s (v4 · nouveaux)
+  // ═══════════════════════════════════════════
+  { id: 'el4-losingit-2018', title: 'Losing It', artist: 'FISHER', year: 2018, genre: 'electronic', decade: '2020s' },
+  { id: 'el4-youandme-2013', title: 'You & Me', artist: 'Disclosure ft. Eliza Doolittle', year: 2013, genre: 'electronic', decade: '2020s', alternativeArtists: ['Disclosure', 'Eliza Doolittle'] },
+  { id: 'el4-bicep-glue-2017', title: 'Glue', artist: 'Bicep', year: 2017, genre: 'electronic', decade: '2020s' },
+  { id: 'el4-dom-dolla-2023', title: 'Saving Up', artist: 'Dom Dolla', year: 2023, genre: 'electronic', decade: '2020s' },
+  { id: 'el4-anyma-consciousness-2023', title: 'Consciousness', artist: 'Anyma', year: 2023, genre: 'electronic', decade: '2020s' },
+  { id: 'el4-fisher-you-2019', title: "You Little Beauty", artist: 'FISHER', year: 2019, genre: 'electronic', decade: '2020s' },
+
+  // ═══════════════════════════════════════════
+  // R&B — 2020s (v4 · nouveaux)
+  // ═══════════════════════════════════════════
+  { id: 'rnb4-tyla-jump-2024', title: 'Jump', artist: 'Tyla', year: 2024, genre: 'rnb', decade: '2020s' },
+  { id: 'rnb4-victoriamone-experience-2023', title: 'Experience', artist: 'Victoria Monét', year: 2023, genre: 'rnb', decade: '2020s', alternativeArtists: ['Victoria Monet'] },
+  { id: 'rnb4-jhene-triggers-2020', title: 'Trigger Protection Mantra', artist: 'Jhené Aiko', year: 2020, genre: 'rnb', decade: '2020s', alternativeArtists: ['Jhene Aiko'] },
+  { id: 'rnb4-ari-lennox-2020', title: 'BMO', artist: 'Ari Lennox', year: 2020, genre: 'rnb', decade: '2020s' },
+  { id: 'rnb4-dvsn-keep-2021', title: 'Keep It Going', artist: 'dvsn', year: 2021, genre: 'rnb', decade: '2020s' },
+
+  // ═══════════════════════════════════════════
+  // MUSIQUE FRANÇAISE — 2020s (v4 · nouveaux)
+  // ═══════════════════════════════════════════
+  { id: 'fr4-gazo-freestyle-2022', title: 'Freestyle #667', artist: 'Gazo', year: 2022, genre: 'french', decade: '2020s', alternativeTitles: ['Freestyle 667'] },
+  { id: 'fr4-tiakola-soleil-2023', title: 'Taxi', artist: 'Tiakola', year: 2023, genre: 'french', decade: '2020s' },
+  { id: 'fr4-luidji-ciel-2020', title: 'Bonne Étoile', artist: 'Luidji', year: 2020, genre: 'french', decade: '2020s', alternativeTitles: ['Bonne Etoile'] },
+  { id: 'fr4-hamza-intro-2022', title: 'Habillé en noir', artist: 'Hamza', year: 2022, genre: 'french', decade: '2020s' },
+  { id: 'fr4-werenoi-voici-2023', title: 'Cocktail', artist: 'Werenoi', year: 2023, genre: 'french', decade: '2020s' },
+  { id: 'fr4-koba-euphorie-2022', title: 'Euphorie', artist: 'Koba LaD', year: 2022, genre: 'french', decade: '2020s' },
+
+  // ═══════════════════════════════════════════
+  // LATIN — 2020s (v4 · nouveaux)
+  // ═══════════════════════════════════════════
+  { id: 'lat4-feid-luna-2022', title: 'Luna', artist: 'Feid', year: 2022, genre: 'latin', decade: '2020s' },
+  { id: 'lat4-feid-normal-2023', title: 'Normal', artist: 'Feid', year: 2023, genre: 'latin', decade: '2020s' },
+  { id: 'lat4-rauw-campo-2022', title: 'Campo', artist: 'Rauw Alejandro', year: 2022, genre: 'latin', decade: '2020s' },
+  { id: 'lat4-anuel-bebe-2021', title: 'Bebé', artist: 'Anuel AA ft. Drake', year: 2021, genre: 'latin', decade: '2020s', alternativeArtists: ['Anuel AA', 'Drake'], alternativeTitles: ['Bebe'] },
+  { id: 'lat4-peso-pluma-ella-2023', title: 'Ella Baila Sola', artist: 'Eslabon Armado ft. Peso Pluma', year: 2023, genre: 'latin', decade: '2020s', alternativeArtists: ['Eslabon Armado', 'Peso Pluma'] },
+  { id: 'lat4-peso-pluma-lleva-2023', title: 'La Bebe (Remix)', artist: 'Yng Lvcas ft. Peso Pluma', year: 2023, genre: 'latin', decade: '2020s', alternativeArtists: ['Yng Lvcas', 'Peso Pluma'], alternativeTitles: ['La Bebe'] },
 ]

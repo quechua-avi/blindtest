@@ -1,5 +1,5 @@
-import type { GameSettings, Genre, Decade } from '../../types/game'
-import { GENRE_LABELS, GENRE_COLORS, DECADE_LABELS } from '../../types/game'
+import type { GameSettings, Genre } from '../../types/game'
+import { GENRE_LABELS, GENRE_COLORS } from '../../types/game'
 
 interface SettingsPanelProps {
   settings: GameSettings
@@ -9,7 +9,6 @@ interface SettingsPanelProps {
 }
 
 const GENRES: Genre[] = ['pop', 'hiphop', 'electronic', 'rnb', 'french', 'latin']
-const DECADES: Decade[] = ['2000s', '2010s', '2020s']
 
 function toggle<T>(arr: T[], val: T): T[] {
   return arr.includes(val) ? arr.filter((x) => x !== val) : [...arr, val]
@@ -52,28 +51,6 @@ export function SettingsPanel({ settings, isHost, onChange, light }: SettingsPan
                 }}
               >
                 {GENRE_LABELS[g]}
-              </button>
-            )
-          })}
-        </div>
-      </div>
-
-      {/* Décennies */}
-      <div>
-        <label className={label}>Décennies</label>
-        <div className="flex gap-2">
-          {DECADES.map((d) => {
-            const active = settings.decades.includes(d)
-            return (
-              <button
-                key={d}
-                disabled={disabled}
-                onClick={() => onChange({ decades: toggle(settings.decades, d) })}
-                className={`flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-all duration-200 ${
-                  disabled ? 'cursor-default' : 'cursor-pointer'
-                } ${active ? activeBtn : inactiveBtn}`}
-              >
-                {DECADE_LABELS[d]}
               </button>
             )
           })}

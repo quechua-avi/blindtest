@@ -63,7 +63,6 @@ export class GameRoom {
     this.settings = {
       ...CONFIG.DEFAULT_SETTINGS,
       genres: [...CONFIG.DEFAULT_SETTINGS.genres],
-      decades: [...CONFIG.DEFAULT_SETTINGS.decades],
     }
 
     const host: Player = {

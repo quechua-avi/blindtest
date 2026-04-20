@@ -11,7 +11,6 @@ export const CONFIG = {
   DEFAULT_SETTINGS: {
     mode: 'classic' as const,
     genres: ['pop', 'hiphop', 'electronic', 'rnb', 'french', 'latin'] as const,
-    decades: ['2000s', '2010s', '2020s'] as const,
     rounds: 10,
     answerMode: 'text' as const,
     playDuration: 20,

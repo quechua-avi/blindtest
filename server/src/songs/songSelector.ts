@@ -14,11 +14,7 @@ function shuffle<T>(arr: T[]): T[] {
 const recentlyPlayed = new Set<string>()
 
 export function selectSongs(settings: GameSettings): Song[] {
-  const filtered = SONG_LIBRARY.filter(
-    (s) =>
-      settings.genres.includes(s.genre) &&
-      settings.decades.includes(s.decade)
-  )
+  const filtered = SONG_LIBRARY.filter((s) => settings.genres.includes(s.genre))
 
   // Exclure les chansons récemment jouées pour plus de variété
   const fresh = filtered.filter((s) => !recentlyPlayed.has(s.id))

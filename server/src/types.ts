@@ -8,7 +8,6 @@ export type AnswerMatchType = 'exact' | 'fuzzy' | 'partial'
 export interface GameSettings {
   mode: GameMode
   genres: Genre[]
-  decades: Decade[]
   rounds: number
   answerMode: AnswerMode
   playDuration: number

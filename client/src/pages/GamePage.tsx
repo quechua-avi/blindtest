@@ -14,7 +14,7 @@ import { RoundReveal } from '../components/game/RoundReveal'
 import { BuzzerPanel } from '../components/game/BuzzerPanel'
 import { ChatPanel } from '../components/game/ChatPanel'
 import { Badge } from '../components/ui/Badge'
-import { GENRE_LABELS, GENRE_COLORS, DECADE_LABELS } from '../types/game'
+import { GENRE_LABELS, GENRE_COLORS } from '../types/game'
 import type { Genre } from '../types/game'
 
 export function GamePage() {
@@ -70,7 +70,7 @@ export function GamePage() {
                 color={GENRE_COLORS[currentRound.genre]}
               />
               <Badge
-                label={DECADE_LABELS[currentRound.decade]}
+                label={currentRound.decade}
                 className="bg-bg-card border border-bg-border text-slate-400"
               />
               <span className="text-slate-500 text-sm hidden sm:inline">
