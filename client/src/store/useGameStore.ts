@@ -18,6 +18,7 @@ type AppStatus = 'idle' | 'connecting' | 'lobby' | 'playing' | 'roundEnd' | 'res
 interface RevealedSong {
   song: Song
   correctGuessers: string[]
+  coverUrl?: string
 }
 
 interface GameStore {
@@ -43,6 +44,7 @@ interface GameStore {
   // Scores
   leaderboard: PlayerScore[]
   scoreFeed: ScoreFeedItem[]
+  teamScores: { A: number; B: number } | null
 
   // Results
   finalResults: GameResults | null
@@ -78,7 +80,7 @@ interface GameStore {
     matchType: AnswerMatchType
   }) => void
   onWrongAnswer: (attemptsLeft: number) => void
-  onRoundEnd: (data: { song: Song; leaderboard: PlayerScore[]; correctGuessers: string[] }) => void
+  onRoundEnd: (data: { song: Song; leaderboard: PlayerScore[]; correctGuessers: string[]; teamScores?: { A: number; B: number }; coverUrl?: string }) => void
   onGameEnded: (results: GameResults) => void
   onChatMessage: (msg: ChatMessage) => void
   onReaction: (reaction: ReactionEvent) => void
@@ -112,6 +114,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   revealedSong: null,
   leaderboard: [],
   scoreFeed: [],
+  teamScores: null,
   finalResults: null,
   pendingSong: null,
   messages: [],
@@ -225,17 +228,23 @@ export const useGameStore = create<GameStore>((set, get) => ({
     myAnswerResult: attemptsLeft === 0 ? 'wrong' : 'pending',
   }),
 
-  onRoundEnd: ({ song, leaderboard, correctGuessers }) => {
+  onRoundEnd: ({ song, leaderboard, correctGuessers, teamScores, coverUrl }) => {
     set({
       status: 'roundEnd',
       leaderboard,
-      revealedSong: { song, correctGuessers },
+      teamScores: teamScores ?? null,
+      revealedSong: { song, correctGuessers, coverUrl },
       pendingSong: null,
     })
   },
 
   onGameEnded: (finalResults) => {
-    set({ status: 'results', finalResults, leaderboard: finalResults.leaderboard })
+    set({
+      status: 'results',
+      finalResults,
+      leaderboard: finalResults.leaderboard,
+      teamScores: finalResults.teamScores ?? null,
+    })
   },
 
   onChatMessage: (msg) => {
@@ -267,6 +276,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       revealedSong: null,
       leaderboard: [],
       scoreFeed: [],
+      teamScores: null,
       finalResults: null,
       pendingSong: null,
       messages: [],

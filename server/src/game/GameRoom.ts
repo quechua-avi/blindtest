@@ -36,6 +36,7 @@ export class GameRoom {
   // Game state
   private playlist: Song[] = []
   private previewUrls: Map<string, string> = new Map() // song.id → Deezer preview URL
+  private coverUrls: Map<string, string> = new Map()   // song.id → Deezer cover URL
   private currentRoundIndex = -1
   private currentSong: Song | null = null
   private roundStartedAt = 0
@@ -154,6 +155,7 @@ export class GameRoom {
     this.currentRoundIndex = -1
     this.songsPlayed = []
     this.previewUrls = new Map()
+    this.coverUrls = new Map()
     this.gameStartedAt = Date.now()
 
     // Pré-fetcher toutes les previews Deezer en parallèle, puis démarrer
@@ -165,8 +167,11 @@ export class GameRoom {
     console.log(`[Deezer] Pré-fetch de ${this.playlist.length} chansons...`)
     await Promise.all(
       this.playlist.map(async (song) => {
-        const url = await fetchDeezerPreview(song.title, song.artist)
-        if (url) this.previewUrls.set(song.id, url)
+        const result = await fetchDeezerPreview(song.title, song.artist)
+        if (result) {
+          this.previewUrls.set(song.id, result.previewUrl)
+          if (result.coverUrl) this.coverUrls.set(song.id, result.coverUrl)
+        }
       })
     )
     const found = this.previewUrls.size
@@ -262,6 +267,8 @@ export class GameRoom {
       song,
       leaderboard,
       correctGuessers: winners,
+      teamScores: this.getTeamScores(),
+      coverUrl: this.coverUrls.get(song.id),
     })
 
     // Pause entre rounds
@@ -286,12 +293,18 @@ export class GameRoom {
 
     const leaderboard = this.getLeaderboard()
     const gameDuration = Date.now() - this.gameStartedAt
+    const teamScores = this.getTeamScores()
+    const teamWinner = teamScores
+      ? teamScores.A > teamScores.B ? 'A' : teamScores.B > teamScores.A ? 'B' : 'tie'
+      : undefined
 
     const finalResults: GameResults = {
       leaderboard,
       mvp: this.computeMVP(leaderboard),
       songsPlayed: this.songsPlayed,
       gameDuration,
+      teamScores,
+      teamWinner,
     }
 
     this.io.to(this.code).emit('game:ended', { finalResults })
@@ -315,9 +328,10 @@ export class GameRoom {
     const result = checkAnswer(answer, this.currentSong)
 
     if (!result.correct) {
+      const maxAttempts = this.settings.answerMode === 'multipleChoice' ? 1 : this.MAX_ATTEMPTS
       const attempts = (this.wrongAttempts.get(playerId) ?? 0) + 1
       this.wrongAttempts.set(playerId, attempts)
-      const attemptsLeft = Math.max(0, this.MAX_ATTEMPTS - attempts)
+      const attemptsLeft = Math.max(0, maxAttempts - attempts)
       if (attemptsLeft === 0) this.hasAnswered.add(playerId)
       const player = this.players.get(playerId)
       if (player && !player.isAI) {
@@ -377,6 +391,16 @@ export class GameRoom {
 
   getLeaderboard(): PlayerScore[] {
     return [...this.scores.values()].sort((a, b) => b.score - a.score)
+  }
+
+  private getTeamScores(): { A: number; B: number } | undefined {
+    if (this.settings.mode !== 'teams') return undefined
+    let A = 0, B = 0
+    for (const score of this.scores.values()) {
+      if (score.teamId === 'A') A += score.score
+      else if (score.teamId === 'B') B += score.score
+    }
+    return { A, B }
   }
 
   getPublicState(): RoomState {

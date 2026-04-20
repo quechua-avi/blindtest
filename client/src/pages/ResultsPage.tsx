@@ -53,6 +53,41 @@ export function ResultsPage() {
           </p>
         </motion.div>
 
+        {/* Vainqueur équipe (mode teams uniquement) */}
+        {finalResults.teamScores && finalResults.teamWinner && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.05 }}
+            className={`rounded-2xl p-6 text-center border ${
+              finalResults.teamWinner === 'tie'
+                ? 'bg-slate-700/30 border-slate-600'
+                : finalResults.teamWinner === 'A'
+                ? 'bg-blue-500/10 border-blue-500/40'
+                : 'bg-red-500/10 border-red-500/40'
+            }`}
+          >
+            <div className="text-4xl mb-2">
+              {finalResults.teamWinner === 'tie' ? '🤝' : '🏆'}
+            </div>
+            <p className={`text-2xl font-extrabold font-display ${
+              finalResults.teamWinner === 'tie' ? 'text-slate-300' : finalResults.teamWinner === 'A' ? 'text-blue-300' : 'text-red-300'
+            }`}>
+              {finalResults.teamWinner === 'tie' ? 'Égalité !' : `Équipe ${finalResults.teamWinner} gagne !`}
+            </p>
+            <div className="flex justify-center gap-8 mt-3">
+              <div className="text-center">
+                <p className="text-xs text-blue-400 font-semibold">Équipe A</p>
+                <p className="text-xl font-bold text-blue-300">{finalResults.teamScores.A.toLocaleString()} pts</p>
+              </div>
+              <div className="text-center">
+                <p className="text-xs text-red-400 font-semibold">Équipe B</p>
+                <p className="text-xl font-bold text-red-300">{finalResults.teamScores.B.toLocaleString()} pts</p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         {/* Podium */}
         <motion.div
           initial={{ opacity: 0 }}

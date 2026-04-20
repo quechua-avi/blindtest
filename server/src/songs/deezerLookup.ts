@@ -9,6 +9,12 @@ interface DeezerTrack {
   title: string
   artist: { name: string }
   preview: string // URL du MP3 preview 30s
+  album: { cover_medium: string } // Pochette 250×250
+}
+
+export interface DeezerResult {
+  previewUrl: string
+  coverUrl: string
 }
 
 interface DeezerSearchResponse {
@@ -17,7 +23,7 @@ interface DeezerSearchResponse {
 }
 
 // Cache en mémoire pour éviter les appels répétés
-const previewCache = new Map<string, string | null>()
+const previewCache = new Map<string, DeezerResult | null>()
 
 function buildCacheKey(title: string, artist: string): string {
   return `${title.toLowerCase()}|||${artist.toLowerCase()}`
@@ -32,7 +38,7 @@ function normalize(str: string): string {
     .trim()
 }
 
-export async function fetchDeezerPreview(title: string, artist: string): Promise<string | null> {
+export async function fetchDeezerPreview(title: string, artist: string): Promise<DeezerResult | null> {
   const cacheKey = buildCacheKey(title, artist)
   if (previewCache.has(cacheKey)) {
     return previewCache.get(cacheKey)!
@@ -63,9 +69,13 @@ export async function fetchDeezerPreview(title: string, artist: string): Promise
       return null
     }
 
-    console.log(`[Deezer] ✓ "${match.title}" par ${match.artist.name} → ${match.preview.slice(0, 60)}...`)
-    previewCache.set(cacheKey, match.preview)
-    return match.preview
+    const result: DeezerResult = {
+      previewUrl: match.preview,
+      coverUrl: match.album?.cover_medium ?? '',
+    }
+    console.log(`[Deezer] ✓ "${match.title}" par ${match.artist.name} → preview + cover`)
+    previewCache.set(cacheKey, result)
+    return result
   } catch (err) {
     console.warn(`[Deezer] Erreur réseau pour "${title}" - ${artist}:`, err)
     previewCache.set(cacheKey, null)

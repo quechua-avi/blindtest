@@ -67,6 +67,7 @@ export interface RoundReveal {
   song: Song
   leaderboard: PlayerScore[]
   correctGuessers: string[]
+  teamScores?: { A: number; B: number }
 }
 
 export interface GameResults {
@@ -78,6 +79,8 @@ export interface GameResults {
   }
   songsPlayed: Array<{ song: Song; winners: string[] }>
   gameDuration: number
+  teamScores?: { A: number; B: number }
+  teamWinner?: 'A' | 'B' | 'tie'
 }
 
 export interface RoomState {
