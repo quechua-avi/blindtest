@@ -1,13 +1,27 @@
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useGameStore } from '../../store/useGameStore'
 import { Badge } from '../ui/Badge'
 import { GENRE_LABELS, GENRE_COLORS } from '../../types/game'
+
+const BETWEEN_ROUNDS_DELAY = 5
 
 export function RoundReveal() {
   const revealedSong = useGameStore((s) => s.revealedSong)
   const players = useGameStore((s) => s.players)
   const settings = useGameStore((s) => s.settings)
   const teamScores = useGameStore((s) => s.teamScores)
+  const currentRound = useGameStore((s) => s.currentRound)
+
+  const [countdown, setCountdown] = useState(BETWEEN_ROUNDS_DELAY)
+
+  useEffect(() => {
+    setCountdown(BETWEEN_ROUNDS_DELAY)
+    const interval = setInterval(() => {
+      setCountdown((n) => Math.max(0, n - 1))
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [revealedSong])
 
   if (!revealedSong) return null
 
@@ -50,7 +64,29 @@ export function RoundReveal() {
           <p className="text-slate-500 text-sm">Personne n'a trouvé cette fois...</p>
         )}
 
-        <p className="text-slate-600 text-xs">Prochain round dans quelques secondes...</p>
+        {/* Countdown */}
+        <div className="pt-1">
+          {currentRound && currentRound.roundNumber < currentRound.totalRounds ? (
+            <div className="space-y-2">
+              <div className="w-full h-1 bg-bg-surface rounded-full overflow-hidden">
+                <motion.div
+                  className="h-full bg-primary rounded-full"
+                  initial={{ width: '100%' }}
+                  animate={{ width: '0%' }}
+                  transition={{ duration: BETWEEN_ROUNDS_DELAY, ease: 'linear' }}
+                />
+              </div>
+              <p className="text-slate-500 text-xs">
+                {countdown > 0
+                  ? <>Prochain round dans <span className="text-primary font-bold">{countdown}s</span></>
+                  : <span className="text-primary font-bold">C'est parti !</span>
+                }
+              </p>
+            </div>
+          ) : (
+            <p className="text-slate-500 text-xs">Calcul des résultats...</p>
+          )}
+        </div>
       </div>
 
       {isTeams && (
