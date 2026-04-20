@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { getSocket } from '../socket/socketClient'
-import { usePlayerStore } from '../store/usePlayerStore'
+import { usePlayerStore, AVATAR_COLORS } from '../store/usePlayerStore'
 import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
 
@@ -17,36 +17,42 @@ const GENRES = [
 const BARS = [0.35, 0.7, 1, 0.55, 0.85, 0.45, 0.9, 0.65, 1, 0.5, 0.75, 0.4]
 
 export function HomePage() {
-  const { name, setName } = usePlayerStore()
-  const [joinName, setJoinName]       = useState(name)
-  const [createName, setCreateName]   = useState(name)
+  const { name, avatarColor, setName, setAvatarColor } = usePlayerStore()
+  const [pseudo, setPseudo]           = useState(name)
   const [roomCode, setRoomCode]       = useState('')
   const [password, setPassword]       = useState('')
+  const [pseudoError, setPseudoError] = useState('')
   const [joinError, setJoinError]     = useState('')
   const [createError, setCreateError] = useState('')
   const [joinLoading, setJoinLoading]     = useState(false)
   const [createLoading, setCreateLoading] = useState(false)
 
+  const savePseudo = (): string | null => {
+    const trimmed = pseudo.trim()
+    if (!trimmed) { setPseudoError('Entre ton pseudo'); return null }
+    setPseudoError('')
+    setName(trimmed)
+    return trimmed
+  }
+
   const handleJoin = () => {
-    const trimmed = joinName.trim()
+    const trimmed = savePseudo()
+    if (!trimmed) return
     const code = roomCode.trim().toUpperCase()
-    if (!trimmed) { setJoinError('Entre ton pseudo'); return }
     if (code.length !== 6) { setJoinError('Code invalide (6 caractères)'); return }
     setJoinError('')
-    setName(trimmed)
     setJoinLoading(true)
-    getSocket().emit('lobby:join', { roomCode: code, playerName: trimmed })
+    getSocket().emit('lobby:join', { roomCode: code, playerName: trimmed, avatarColor })
     setTimeout(() => setJoinLoading(false), 3000)
   }
 
   const handleCreate = () => {
-    const trimmed = createName.trim()
-    if (!trimmed) { setCreateError('Entre ton pseudo'); return }
+    const trimmed = savePseudo()
+    if (!trimmed) return
     if (password !== 'buzzyquizpitchounes') { setCreateError('Mot de passe incorrect'); return }
     setCreateError('')
-    setName(trimmed)
     setCreateLoading(true)
-    getSocket().emit('lobby:create', { playerName: trimmed })
+    getSocket().emit('lobby:create', { playerName: trimmed, avatarColor })
     setTimeout(() => setCreateLoading(false), 3000)
   }
 
@@ -113,11 +119,60 @@ export function HomePage() {
           </div>
         </motion.div>
 
+        {/* Profil joueur */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="w-full max-w-2xl mb-2"
+        >
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+            <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Ton profil</p>
+            <div className="flex items-center gap-4">
+              {/* Avatar preview */}
+              <div
+                className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center text-white font-bold text-lg select-none"
+                style={{ backgroundColor: avatarColor }}
+              >
+                {pseudo.trim()[0]?.toUpperCase() || '?'}
+              </div>
+              {/* Pseudo */}
+              <div className="flex-1 min-w-0">
+                <Input
+                  light
+                  placeholder="Ton pseudo"
+                  value={pseudo}
+                  onChange={(e) => { setPseudo(e.target.value); setPseudoError('') }}
+                  maxLength={20}
+                  error={pseudoError}
+                  autoComplete="off"
+                />
+              </div>
+            </div>
+            {/* Color picker */}
+            <div className="flex flex-wrap gap-2 mt-3">
+              {AVATAR_COLORS.map((color) => (
+                <button
+                  key={color}
+                  onClick={() => setAvatarColor(color)}
+                  className="w-7 h-7 rounded-full border-2 transition-transform hover:scale-110 cursor-pointer"
+                  style={{
+                    backgroundColor: color,
+                    borderColor: avatarColor === color ? color : 'transparent',
+                    outline: avatarColor === color ? `3px solid ${color}40` : 'none',
+                    outlineOffset: '2px',
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        </motion.div>
+
         {/* Formulaires */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.15 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
           className="w-full max-w-2xl grid grid-cols-1 md:grid-cols-2 gap-4"
         >
           {/* Rejoindre */}
@@ -135,16 +190,7 @@ export function HomePage() {
               maxLength={6}
               autoComplete="off"
             />
-            <Input
-              light
-              placeholder="Ton pseudo"
-              value={joinName}
-              onChange={(e) => setJoinName(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
-              maxLength={20}
-              error={joinError}
-              autoComplete="off"
-            />
+            {joinError && <p className="text-red-500 text-xs">{joinError}</p>}
             <Button onClick={handleJoin} loading={joinLoading} className="w-full">
               Rejoindre la partie
             </Button>
@@ -164,14 +210,6 @@ export function HomePage() {
               <h2 className="font-display text-xl font-bold text-slate-900">Créer une partie</h2>
               <p className="text-slate-400 text-sm mt-0.5">Hôte uniquement</p>
             </div>
-            <Input
-              light
-              placeholder="Ton pseudo"
-              value={createName}
-              onChange={(e) => setCreateName(e.target.value)}
-              maxLength={20}
-              autoComplete="off"
-            />
             <Input
               light
               placeholder="Mot de passe"

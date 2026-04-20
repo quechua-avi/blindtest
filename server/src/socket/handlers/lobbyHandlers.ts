@@ -11,13 +11,13 @@ function pickColor(index: number): string {
 }
 
 export function registerLobbyHandlers(io: IoServer, socket: IoSocket) {
-  socket.on('lobby:create', ({ playerName, settings }) => {
+  socket.on('lobby:create', ({ playerName, avatarColor, settings }) => {
     if (!playerName?.trim()) {
       socket.emit('lobby:error', { code: 'INVALID_NAME', message: 'Nom invalide' })
       return
     }
 
-    const color = pickColor(0)
+    const color = avatarColor && AVATAR_COLORS.includes(avatarColor) ? avatarColor : pickColor(0)
     const room = GameManager.createRoom(io, socket, playerName.trim(), color)
     if (settings) room.updateSettings(settings)
 
@@ -39,7 +39,7 @@ export function registerLobbyHandlers(io: IoServer, socket: IoSocket) {
     }
 
     const colorIndex = room.players.size
-    const color = pickColor(colorIndex)
+    const color = avatarColor && AVATAR_COLORS.includes(avatarColor) ? avatarColor : pickColor(colorIndex)
     const result = room.addPlayer(socket, playerName.trim(), color)
 
     if (typeof result === 'string') {

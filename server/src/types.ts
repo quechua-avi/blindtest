@@ -112,8 +112,8 @@ export interface ReactionEvent {
 
 // Événements Socket.io — Client → Serveur
 export interface ClientToServerEvents {
-  'lobby:create': (data: { playerName: string; settings?: Partial<GameSettings> }) => void
-  'lobby:join': (data: { roomCode: string; playerName: string }) => void
+  'lobby:create': (data: { playerName: string; avatarColor?: string; settings?: Partial<GameSettings> }) => void
+  'lobby:join': (data: { roomCode: string; playerName: string; avatarColor?: string }) => void
   'lobby:leave': () => void
   'lobby:kick': (data: { targetPlayerId: string }) => void
   'lobby:ready': (data: { isReady: boolean }) => void
