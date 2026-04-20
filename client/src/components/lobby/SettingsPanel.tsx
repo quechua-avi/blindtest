@@ -78,7 +78,6 @@ export function SettingsPanel({ settings, isHost, onChange }: SettingsPanelProps
         <div className="grid grid-cols-2 gap-2">
           {([
             { value: 'classic', label: '🎵 Classique', desc: 'Devine titre ou artiste' },
-            { value: 'speedRound', label: '⚡ Speed Round', desc: 'Temps ultra court' },
             { value: 'teams', label: '👥 Équipes', desc: 'A vs B' },
             { value: 'soloVsAI', label: '🤖 Solo vs IA', desc: 'Affronte des robots' },
           ] as const).map(({ value, label, desc }) => (
@@ -95,36 +94,6 @@ export function SettingsPanel({ settings, isHost, onChange }: SettingsPanelProps
             >
               <div className="font-semibold text-sm text-white">{label}</div>
               <div className="text-xs text-slate-500">{desc}</div>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Difficulté */}
-      <div>
-        <label className="text-sm font-medium text-slate-400 block mb-3">Difficulté</label>
-        <div className="flex gap-2">
-          {([
-            { value: 'easy', label: '😌 Facile', time: '30s' },
-            { value: 'medium', label: '🎯 Moyen', time: '20s' },
-            { value: 'hard', label: '🔥 Difficile', time: '15s' },
-          ] as const).map(({ value, label, time }) => (
-            <button
-              key={value}
-              disabled={disabled}
-              onClick={() => {
-                const durations = { easy: 30, medium: 20, hard: 15 }
-                onChange({ difficulty: value, playDuration: durations[value] })
-              }}
-              className={`flex-1 py-2.5 rounded-xl text-sm font-semibold border transition-all ${
-                disabled ? 'cursor-default' : 'cursor-pointer'
-              } ${settings.difficulty === value
-                ? 'bg-primary/25 border-primary/50 text-primary-light'
-                : 'bg-transparent border-bg-border text-slate-500'
-              }`}
-            >
-              {label}
-              <span className="block text-xs mt-0.5 opacity-70">{time}</span>
             </button>
           ))}
         </div>

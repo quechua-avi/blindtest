@@ -188,7 +188,7 @@ export class GameRoom {
       const aiPlayer: Player = { id, name, avatarColor: color, isHost: false, isReady: true, isAI: true }
       this.players.set(id, aiPlayer)
       this.scores.set(id, createInitialScore(id, name, color, true))
-      this.aiPlayers.push(new AIPlayer(id, name, color, this.settings.difficulty))
+      this.aiPlayers.push(new AIPlayer(id, name, color))
     }
   }
 
@@ -353,7 +353,6 @@ export class GameRoom {
     this.correctGuessers.push({ playerId, guessTime })
 
     const points = calculatePoints(
-      this.settings.difficulty,
       timeRemaining,
       this.settings.playDuration,
       correctOrder

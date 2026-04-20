@@ -13,7 +13,6 @@ export const CONFIG = {
     genres: ['pop', 'hiphop', 'electronic', 'rnb', 'french', 'latin'] as const,
     decades: ['2000s', '2010s', '2020s'] as const,
     rounds: 10,
-    difficulty: 'medium' as const,
     answerMode: 'text' as const,
     playDuration: 20,
     maxPlayers: 8,

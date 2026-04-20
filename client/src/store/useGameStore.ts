@@ -92,7 +92,6 @@ const DEFAULT_SETTINGS: GameSettings = {
   genres: ['pop', 'hiphop', 'electronic', 'rnb', 'french', 'latin'],
   decades: ['2000s', '2010s', '2020s'],
   rounds: 10,
-  difficulty: 'medium',
   answerMode: 'text',
   playDuration: 20,
   maxPlayers: 8,

@@ -1,27 +1,21 @@
-import type { Song, Difficulty } from '../types'
+import type { Song } from '../types'
 
-const DIFFICULTY_PARAMS: Record<Difficulty, { minDelay: number; maxDelay: number; accuracy: number }> = {
-  easy: { minDelay: 12, maxDelay: 25, accuracy: 0.5 },   // répond tard, pas toujours bien
-  medium: { minDelay: 5, maxDelay: 18, accuracy: 0.7 },
-  hard: { minDelay: 2, maxDelay: 10, accuracy: 0.9 },
-}
+const AI_PARAMS = { minDelay: 5, maxDelay: 18, accuracy: 0.7 }
 
 export class AIPlayer {
   readonly id: string
   readonly name: string
   readonly avatarColor: string
-  private difficulty: Difficulty
   private timer: NodeJS.Timeout | null = null
 
-  constructor(id: string, name: string, avatarColor: string, difficulty: Difficulty) {
+  constructor(id: string, name: string, avatarColor: string) {
     this.id = id
     this.name = name
     this.avatarColor = avatarColor
-    this.difficulty = difficulty
   }
 
   scheduleAnswer(song: Song, timeLimit: number, onAnswer: (answer: string) => void) {
-    const params = DIFFICULTY_PARAMS[this.difficulty]
+    const params = AI_PARAMS
     const willAnswer = Math.random() < params.accuracy
 
     if (!willAnswer) return

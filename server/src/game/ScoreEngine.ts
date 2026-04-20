@@ -1,10 +1,6 @@
-import type { Difficulty, PlayerScore } from '../types'
+import type { PlayerScore } from '../types'
 
-const BASE_POINTS: Record<Difficulty, number> = {
-  easy: 500,
-  medium: 1000,
-  hard: 2000,
-}
+const BASE_POINTS = 1000
 
 const FIRST_BONUS = 1.5
 const SECOND_BONUS = 1.2
@@ -17,12 +13,11 @@ const STREAK_BONUS: Array<[number, number]> = [
 ]
 
 export function calculatePoints(
-  difficulty: Difficulty,
   timeRemaining: number,
   timeLimit: number,
   correctOrder: number // 0-based index (0 = first to guess)
 ): number {
-  const base = BASE_POINTS[difficulty]
+  const base = BASE_POINTS
   const speedRatio = Math.max(MIN_SCORE_RATIO, timeRemaining / timeLimit)
   const speedPoints = Math.round(base * speedRatio)
 
