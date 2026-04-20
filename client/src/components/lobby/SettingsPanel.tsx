@@ -78,6 +78,7 @@ export function SettingsPanel({ settings, isHost, onChange }: SettingsPanelProps
         <div className="grid grid-cols-2 gap-2">
           {([
             { value: 'classic', label: '🎵 Classique', desc: 'Devine titre ou artiste' },
+            { value: 'buzzer', label: '🔔 Buzzer', desc: 'Premier à buzzer répond' },
             { value: 'teams', label: '👥 Équipes', desc: 'A vs B' },
             { value: 'soloVsAI', label: '🤖 Solo vs IA', desc: 'Affronte des robots' },
           ] as const).map(({ value, label, desc }) => (

@@ -1,6 +1,6 @@
 export type Genre = 'pop' | 'hiphop' | 'electronic' | 'rnb' | 'french' | 'latin'
 export type Decade = '2000s' | '2010s' | '2020s'
-export type GameMode = 'classic' | 'teams' | 'soloVsAI'
+export type GameMode = 'classic' | 'teams' | 'soloVsAI' | 'buzzer'
 export type AnswerMode = 'text' | 'multipleChoice'
 export type RoomStatus = 'lobby' | 'playing' | 'paused' | 'ended'
 export type AnswerMatchType = 'exact' | 'fuzzy' | 'partial'
@@ -122,6 +122,7 @@ export interface ClientToServerEvents {
   'lobby:assignTeam': (data: { playerId: string; teamId: 'A' | 'B' }) => void
   'game:start': () => void
   'game:submitAnswer': (data: { answer: string; timestamp: number }) => void
+  'game:buzz': () => void
   'game:skipSong': () => void
   'game:pause': (data: { paused: boolean }) => void
   'game:end': () => void
@@ -154,6 +155,9 @@ export interface ServerToClientEvents {
   'game:wrongAnswer': (data: { playerId: string; attemptsLeft: number }) => void
   'game:roundEnd': (data: RoundReveal) => void
   'game:paused': (data: { paused: boolean }) => void
+  'game:buzzed': (data: { playerId: string; playerName: string; avatarColor: string }) => void
+  'game:buzzWrong': (data: { playerId: string }) => void
+  'game:buzzTimeout': (data: { playerId: string }) => void
   'game:ended': (data: { finalResults: GameResults }) => void
   'chat:message': (data: ChatMessage) => void
   'chat:reaction': (data: ReactionEvent) => void

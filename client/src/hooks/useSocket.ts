@@ -94,6 +94,18 @@ export function useSocketSetup() {
       toast(paused ? '⏸ Partie en pause' : '▶ Partie reprise', { duration: 2000 })
     })
 
+    socket.on('game:buzzed', (data) => {
+      store.onBuzzed(data)
+    })
+
+    socket.on('game:buzzWrong', ({ playerId }) => {
+      store.onBuzzWrong(playerId, socket.id ?? null)
+    })
+
+    socket.on('game:buzzTimeout', ({ playerId }) => {
+      store.onBuzzTimeout(playerId, socket.id ?? null)
+    })
+
     socket.on('game:ended', ({ finalResults }) => {
       store.onGameEnded(finalResults)
       navigate('/results')

@@ -11,6 +11,7 @@ import { ReactionOverlay } from '../components/game/ReactionOverlay'
 import { HostControls } from '../components/game/HostControls'
 import { WaveformVisualizer } from '../components/game/WaveformVisualizer'
 import { RoundReveal } from '../components/game/RoundReveal'
+import { BuzzerPanel } from '../components/game/BuzzerPanel'
 import { ChatPanel } from '../components/game/ChatPanel'
 import { Badge } from '../components/ui/Badge'
 import { GENRE_LABELS, GENRE_COLORS, DECADE_LABELS } from '../types/game'
@@ -18,7 +19,7 @@ import type { Genre } from '../types/game'
 
 export function GamePage() {
   const navigate = useNavigate()
-  const { status, currentRound, settings, pendingSong } = useGameStore()
+  const { status, currentRound, settings, pendingSong, activeBuzz } = useGameStore()
   const { playSong, stopSong } = useAudioPlayerContext()
 
   useEffect(() => {
@@ -40,6 +41,16 @@ export function GamePage() {
       stopSong()
     }
   }, [status, stopSong])
+
+  // Buzzer mode : pause/reprise audio selon l'état du buzz
+  useEffect(() => {
+    if (settings.mode !== 'buzzer') return
+    if (activeBuzz) {
+      stopSong()
+    } else if (pendingSong && status === 'playing') {
+      playSong(pendingSong.previewUrl)
+    }
+  }, [activeBuzz]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const isPlaying = status === 'playing'
   const isReveal = status === 'roundEnd'
@@ -86,8 +97,13 @@ export function GamePage() {
               </div>
             </div>
 
-            {/* Input ou choix multiple */}
-            {settings.answerMode === 'text' ? <AnswerInput /> : <MultipleChoice key={currentRound?.roundNumber} />}
+            {/* Input, choix multiple, ou buzzer */}
+            {settings.mode === 'buzzer'
+              ? <BuzzerPanel />
+              : settings.answerMode === 'text'
+                ? <AnswerInput />
+                : <MultipleChoice key={currentRound?.roundNumber} />
+            }
           </>
         )}
 

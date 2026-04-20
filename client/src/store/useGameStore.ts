@@ -40,6 +40,8 @@ interface GameStore {
   attemptsLeft: number
   correctGuesserIds: string[]
   revealedSong: RevealedSong | null
+  activeBuzz: { playerId: string; playerName: string; avatarColor: string } | null
+  isBuzzedOut: boolean
 
   // Scores
   leaderboard: PlayerScore[]
@@ -82,6 +84,9 @@ interface GameStore {
   onWrongAnswer: (attemptsLeft: number) => void
   onRoundEnd: (data: { song: Song; leaderboard: PlayerScore[]; correctGuessers: string[]; teamScores?: { A: number; B: number }; coverUrl?: string }) => void
   onGameEnded: (results: GameResults) => void
+  onBuzzed: (data: { playerId: string; playerName: string; avatarColor: string }) => void
+  onBuzzWrong: (playerId: string, myPlayerId: string | null) => void
+  onBuzzTimeout: (playerId: string, myPlayerId: string | null) => void
   onChatMessage: (msg: ChatMessage) => void
   onReaction: (reaction: ReactionEvent) => void
   reset: () => void
@@ -111,6 +116,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   attemptsLeft: 3,
   correctGuesserIds: [],
   revealedSong: null,
+  activeBuzz: null,
+  isBuzzedOut: false,
   leaderboard: [],
   scoreFeed: [],
   teamScores: null,
@@ -190,8 +197,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       attemptsLeft: 3,
       correctGuesserIds: [],
       revealedSong: null,
+      activeBuzz: null,
+      isBuzzedOut: false,
       scoreFeed: [],
-      pendingSong: null, // Réinitialiser avant l'arrivée de la nouvelle preview
+      pendingSong: null,
     })
   },
 
@@ -246,6 +255,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
     })
   },
 
+  onBuzzed: (data) => set({ activeBuzz: data }),
+
+  onBuzzWrong: (playerId, myPlayerId) => set((s) => ({
+    activeBuzz: null,
+    isBuzzedOut: playerId === myPlayerId ? true : s.isBuzzedOut,
+    myAnswerResult: playerId === myPlayerId ? 'wrong' : s.myAnswerResult,
+  })),
+
+  onBuzzTimeout: (playerId, myPlayerId) => set((s) => ({
+    activeBuzz: null,
+    isBuzzedOut: playerId === myPlayerId ? true : s.isBuzzedOut,
+    myAnswerResult: playerId === myPlayerId ? 'wrong' : s.myAnswerResult,
+  })),
+
   onChatMessage: (msg) => {
     set((s) => ({ messages: [...s.messages.slice(-49), msg] }))
   },
@@ -273,6 +296,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       attemptsLeft: 3,
       correctGuesserIds: [],
       revealedSong: null,
+      activeBuzz: null,
+      isBuzzedOut: false,
       leaderboard: [],
       scoreFeed: [],
       teamScores: null,

@@ -47,6 +47,9 @@ export class GameRoom {
   private roundTimer: NodeJS.Timeout | null = null
   private tickTimer: NodeJS.Timeout | null = null
   private cleanupTimer: NodeJS.Timeout | null = null
+  private buzzerTimer: NodeJS.Timeout | null = null
+  private buzzedPlayerId: string | null = null
+  private buzzedOutPlayers: Set<string> = new Set()
   private isPaused = false
   private pausedTimeRemaining = 0
   private gameStartedAt = 0
@@ -206,6 +209,8 @@ export class GameRoom {
     this.hasAnswered = new Set()
     this.wrongAttempts = new Map()
     this.isPaused = false
+    this.buzzedPlayerId = null
+    this.buzzedOutPlayers = new Set()
     this.roundStartedAt = Date.now()
 
     const choices =
@@ -317,6 +322,36 @@ export class GameRoom {
 
   // ─── Réponse joueur ────────────────────────────
 
+  handleBuzz(playerId: string) {
+    if (!this.currentSong || this.status !== 'playing') return
+    if (this.settings.mode !== 'buzzer') return
+    if (this.buzzedPlayerId !== null) return
+    if (this.buzzedOutPlayers.has(playerId) || this.hasAnswered.has(playerId)) return
+
+    const player = this.players.get(playerId)
+    if (!player || player.isAI) return
+
+    this.buzzedPlayerId = playerId
+    this.isPaused = true
+
+    this.io.to(this.code).emit('game:buzzed', {
+      playerId,
+      playerName: player.name,
+      avatarColor: player.avatarColor,
+    })
+
+    this.buzzerTimer = setTimeout(() => {
+      if (this.buzzedPlayerId !== playerId) return
+      this.buzzedPlayerId = null
+      this.buzzedOutPlayers.add(playerId)
+      this.isPaused = false
+      this.buzzerTimer = null
+      this.io.to(this.code).emit('game:buzzTimeout', { playerId })
+      const previewUrl = this.previewUrls.get(this.currentSong!.id)
+      if (previewUrl) this.io.to(this.code).emit('game:playSong', { previewUrl })
+    }, 15000)
+  }
+
   handleAnswer(
     playerId: string,
     answer: string,
@@ -325,9 +360,26 @@ export class GameRoom {
     if (!this.currentSong || this.status !== 'playing') return { correct: false }
     if (this.hasAnswered.has(playerId)) return { correct: false }
 
+    // En mode buzzer, seul le joueur qui a buzzé peut répondre
+    if (this.settings.mode === 'buzzer' && this.buzzedPlayerId !== playerId) return { correct: false }
+
     const result = checkAnswer(answer, this.currentSong)
 
     if (!result.correct) {
+      if (this.settings.mode === 'buzzer') {
+        if (this.buzzerTimer) { clearTimeout(this.buzzerTimer); this.buzzerTimer = null }
+        this.buzzedPlayerId = null
+        this.buzzedOutPlayers.add(playerId)
+        this.hasAnswered.add(playerId)
+        this.isPaused = false
+        this.io.to(this.code).emit('game:buzzWrong', { playerId })
+        const score = this.scores.get(playerId)
+        if (score) this.scores.set(playerId, applyWrongAnswer(score))
+        const previewUrl = this.previewUrls.get(this.currentSong.id)
+        if (previewUrl) this.io.to(this.code).emit('game:playSong', { previewUrl })
+        return { correct: false }
+      }
+
       const maxAttempts = this.settings.answerMode === 'multipleChoice' ? 1 : this.MAX_ATTEMPTS
       const attempts = (this.wrongAttempts.get(playerId) ?? 0) + 1
       this.wrongAttempts.set(playerId, attempts)
@@ -342,6 +394,13 @@ export class GameRoom {
         if (score) this.scores.set(playerId, applyWrongAnswer(score))
       }
       return { correct: false }
+    }
+
+    // Bonne réponse en mode buzzer : annuler le timer
+    if (this.settings.mode === 'buzzer') {
+      if (this.buzzerTimer) { clearTimeout(this.buzzerTimer); this.buzzerTimer = null }
+      this.buzzedPlayerId = null
+      this.isPaused = false
     }
 
     this.hasAnswered.add(playerId)
@@ -426,6 +485,7 @@ export class GameRoom {
   private clearTimers() {
     if (this.roundTimer) { clearTimeout(this.roundTimer); this.roundTimer = null }
     if (this.tickTimer) { clearInterval(this.tickTimer); this.tickTimer = null }
+    if (this.buzzerTimer) { clearTimeout(this.buzzerTimer); this.buzzerTimer = null }
     for (const ai of this.aiPlayers) ai.cancelScheduled()
   }
 

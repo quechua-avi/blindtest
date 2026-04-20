@@ -1,6 +1,6 @@
 export type Genre = 'pop' | 'hiphop' | 'electronic' | 'rnb' | 'french' | 'latin'
 export type Decade = '2000s' | '2010s' | '2020s'
-export type GameMode = 'classic' | 'teams' | 'soloVsAI'
+export type GameMode = 'classic' | 'teams' | 'soloVsAI' | 'buzzer'
 export type AnswerMode = 'text' | 'multipleChoice'
 export type RoomStatus = 'lobby' | 'playing' | 'paused' | 'ended'
 export type AnswerMatchType = 'exact' | 'fuzzy' | 'partial'

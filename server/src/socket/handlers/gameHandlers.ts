@@ -24,6 +24,12 @@ export function registerGameHandlers(io: IoServer, socket: IoSocket) {
     room.handleAnswer(socket.id, answer, timestamp)
   })
 
+  socket.on('game:buzz', () => {
+    const room = GameManager.getRoomByPlayerId(socket.id)
+    if (!room) return
+    room.handleBuzz(socket.id)
+  })
+
   socket.on('game:skipSong', () => {
     const room = GameManager.getRoomByPlayerId(socket.id)
     if (!room) return
