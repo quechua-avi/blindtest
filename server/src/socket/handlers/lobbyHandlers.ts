@@ -18,7 +18,7 @@ export function registerLobbyHandlers(io: IoServer, socket: IoSocket) {
     }
 
     const color = avatarColor && AVATAR_COLORS.includes(avatarColor) ? avatarColor : pickColor(0)
-    const room = GameManager.createRoom(io, socket, playerName.trim(), color)
+    const room = GameManager.createRoom(io, socket, playerName.trim(), color, socket.data.userId)
     if (settings) room.updateSettings(settings)
 
     socket.join(room.code)
@@ -40,7 +40,7 @@ export function registerLobbyHandlers(io: IoServer, socket: IoSocket) {
 
     const colorIndex = room.players.size
     const color = avatarColor && AVATAR_COLORS.includes(avatarColor) ? avatarColor : pickColor(colorIndex)
-    const result = room.addPlayer(socket, playerName.trim(), color)
+    const result = room.addPlayer(socket, playerName.trim(), color, socket.data.userId)
 
     if (typeof result === 'string') {
       socket.emit('lobby:error', { code: 'JOIN_FAILED', message: result })

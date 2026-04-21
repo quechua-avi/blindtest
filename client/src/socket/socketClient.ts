@@ -9,14 +9,23 @@ let socket: Socket | null = null
 
 export function getSocket(): Socket {
   if (!socket) {
+    const token = getStoredToken()
     socket = io(SERVER_URL, {
       autoConnect: false,
       reconnection: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 1000,
+      auth: token ? { token } : {},
     })
   }
   return socket
+}
+
+export function resetSocket() {
+  if (socket) {
+    socket.disconnect()
+    socket = null
+  }
 }
 
 export function connectSocket() {
@@ -25,4 +34,14 @@ export function connectSocket() {
 
 export function disconnectSocket() {
   getSocket().disconnect()
+}
+
+function getStoredToken(): string | null {
+  try {
+    const raw = localStorage.getItem('beatblind-auth')
+    if (!raw) return null
+    return JSON.parse(raw)?.state?.token ?? null
+  } catch {
+    return null
+  }
 }

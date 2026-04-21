@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
 import { getSocket } from '../socket/socketClient'
 import { usePlayerStore, AVATAR_COLORS } from '../store/usePlayerStore'
+import { useAuthStore } from '../store/useAuthStore'
 import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
 
@@ -18,6 +20,8 @@ const BARS = [0.35, 0.7, 1, 0.55, 0.85, 0.45, 0.9, 0.65, 1, 0.5, 0.75, 0.4]
 
 export function HomePage() {
   const { name, avatarColor, setName, setAvatarColor } = usePlayerStore()
+  const { user, logout } = useAuthStore()
+  const navigate = useNavigate()
   const [pseudo, setPseudo]           = useState(name)
   const [roomCode, setRoomCode]       = useState('')
   const [password, setPassword]       = useState('')
@@ -73,6 +77,32 @@ export function HomePage() {
           <span className="font-display text-xl font-extrabold text-slate-900">
             Beat<span className="text-primary">Blind</span>
           </span>
+        </div>
+        <div className="flex items-center gap-2">
+          {user ? (
+            <>
+              <div
+                className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold"
+                style={{ backgroundColor: user.avatarColor }}
+              >
+                {user.username[0]?.toUpperCase()}
+              </div>
+              <span className="text-sm font-semibold text-slate-700 hidden sm:block">{user.username}</span>
+              <button
+                onClick={() => logout()}
+                className="text-xs text-slate-400 hover:text-slate-600 border border-slate-200 rounded-lg px-2.5 py-1 cursor-pointer transition-colors"
+              >
+                Déconnexion
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => navigate('/auth')}
+              className="text-xs font-semibold text-primary border border-primary/30 rounded-lg px-3 py-1.5 hover:bg-primary/5 cursor-pointer transition-colors"
+            >
+              Connexion
+            </button>
+          )}
         </div>
       </header>
 

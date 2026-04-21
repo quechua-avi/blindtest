@@ -33,6 +33,7 @@ export interface Player {
   isReady: boolean
   isAI?: boolean
   teamId?: 'A' | 'B'
+  userId?: number
 }
 
 export interface PlayerScore {
@@ -48,6 +49,7 @@ export interface PlayerScore {
   bestStreak: number
   isAI?: boolean
   teamId?: 'A' | 'B'
+  userId?: number
 }
 
 export interface RoundState {

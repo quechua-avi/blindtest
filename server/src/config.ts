@@ -1,6 +1,7 @@
 export const CONFIG = {
   PORT: parseInt(process.env.PORT ?? '3001', 10),
   ADMIN_SECRET: process.env.ADMIN_SECRET ?? 'blindtest-admin-2024',
+  JWT_SECRET: process.env.JWT_SECRET ?? 'beatblind-jwt-dev-secret-change-in-prod',
   // En prod, mettre l'URL Netlify dans la variable d'env CLIENT_URL sur Railway
   // ex: https://beatblind.netlify.app
   // Accepte aussi plusieurs origines séparées par une virgule

@@ -4,12 +4,16 @@ import { Server } from 'socket.io'
 import cors from 'cors'
 import path from 'path'
 import fs from 'fs'
+import jwt from 'jsonwebtoken'
 import type { ClientToServerEvents, ServerToClientEvents } from './types'
 import { CONFIG } from './config'
 import { SONG_LIBRARY } from './songs/songLibrary'
 import { registerLobbyHandlers } from './socket/handlers/lobbyHandlers'
 import { registerGameHandlers } from './socket/handlers/gameHandlers'
 import { registerChatHandlers } from './socket/handlers/chatHandlers'
+import { authRouter } from './auth/authRoutes'
+import './db/database'  // init SQLite
+import { db } from './db/database'
 
 const app = express()
 
@@ -32,6 +36,9 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() })
 })
 
+// Auth routes
+app.use('/api/auth', authRouter)
+
 // Admin — liste des chansons avec URL Deezer
 app.get('/api/admin/songs', (req: Request, res: Response) => {
   if (req.query.secret !== CONFIG.ADMIN_SECRET) {
@@ -46,7 +53,33 @@ app.get('/api/admin/songs', (req: Request, res: Response) => {
   res.json({ total: songs.length, songs })
 })
 
-// Socket.io
+// Admin — liste des utilisateurs
+app.get('/api/admin/users', (req: Request, res: Response) => {
+  if (req.query.secret !== CONFIG.ADMIN_SECRET) {
+    res.status(401).json({ error: 'Unauthorized' })
+    return
+  }
+  const users = db.prepare(`
+    SELECT u.id, u.email, u.username, u.avatar_color, u.created_at, u.last_login,
+           s.games_played, s.games_won, s.total_score, s.best_score, s.correct_answers, s.best_streak
+    FROM users u LEFT JOIN user_stats s ON s.user_id = u.id
+    ORDER BY u.created_at DESC
+  `).all()
+  res.json({ total: (users as unknown[]).length, users })
+})
+
+// Socket.io — auth middleware (optionnel, permet de lier userId)
+io.use((socket, next) => {
+  const token = socket.handshake.auth?.token
+  if (token) {
+    try {
+      const payload = jwt.verify(token, CONFIG.JWT_SECRET) as { userId: number }
+      socket.data.userId = payload.userId
+    } catch {}
+  }
+  next()
+})
+
 io.on('connection', (socket) => {
   console.log(`[Socket] Connexion: ${socket.id}`)
 

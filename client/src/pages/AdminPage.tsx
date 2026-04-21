@@ -18,6 +18,21 @@ interface AdminSong {
   deezerSearchUrl: string
 }
 
+interface AdminUser {
+  id: number
+  email: string
+  username: string
+  avatar_color: string
+  created_at: number
+  last_login: number | null
+  games_played: number
+  games_won: number
+  total_score: number
+  best_score: number
+  correct_answers: number
+  best_streak: number
+}
+
 const GENRE_ORDER: Genre[] = ['pop', 'hiphop', 'electronic', 'rnb', 'french', 'latin', 'jul']
 const DECADE_ORDER: Decade[] = ['2000s', '2010s', '2020s']
 
@@ -25,8 +40,10 @@ export function AdminPage() {
   const [secret, setSecret] = useState(() => sessionStorage.getItem(ADMIN_SECRET_KEY) ?? '')
   const [input, setInput] = useState('')
   const [songs, setSongs] = useState<AdminSong[]>([])
+  const [users, setUsers] = useState<AdminUser[]>([])
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [tab, setTab] = useState<'songs' | 'users'>('songs')
   const [filterGenre, setFilterGenre] = useState<Genre | 'all'>('all')
   const [filterDecade, setFilterDecade] = useState<Decade | 'all'>('all')
   const [search, setSearch] = useState('')
@@ -35,24 +52,28 @@ export function AdminPage() {
   const isAuthed = !!secret && songs.length > 0
 
   useEffect(() => {
-    if (secret) fetchSongs(secret)
+    if (secret) fetchAll(secret)
   }, [])
 
-  async function fetchSongs(s: string) {
+  async function fetchAll(s: string) {
     setLoading(true)
     setError('')
     try {
-      const res = await fetch(`/api/admin/songs?secret=${encodeURIComponent(s)}`)
-      if (res.status === 401) {
+      const [songsRes, usersRes] = await Promise.all([
+        fetch(`/api/admin/songs?secret=${encodeURIComponent(s)}`),
+        fetch(`/api/admin/users?secret=${encodeURIComponent(s)}`),
+      ])
+      if (songsRes.status === 401) {
         setError('Mot de passe incorrect')
         sessionStorage.removeItem(ADMIN_SECRET_KEY)
         setSecret('')
-      } else {
-        const data = await res.json()
-        setSongs(data.songs)
-        sessionStorage.setItem(ADMIN_SECRET_KEY, s)
-        setSecret(s)
+        return
       }
+      const [songsData, usersData] = await Promise.all([songsRes.json(), usersRes.json()])
+      setSongs(songsData.songs)
+      setUsers(usersData.users ?? [])
+      sessionStorage.setItem(ADMIN_SECRET_KEY, s)
+      setSecret(s)
     } catch {
       setError('Impossible de joindre le serveur')
     } finally {
@@ -114,13 +135,13 @@ export function AdminPage() {
             type="password"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && fetchSongs(input)}
+            onKeyDown={(e) => e.key === 'Enter' && fetchAll(input)}
             placeholder="Mot de passe..."
             className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100"
           />
           {error && <p className="text-red-500 text-sm text-center">{error}</p>}
           <motion.button
-            onClick={() => fetchSongs(input)}
+            onClick={() => fetchAll(input)}
             disabled={loading || !input}
             whileTap={{ scale: 0.95 }}
             whileHover={{ scale: 1.02 }}
@@ -140,8 +161,8 @@ export function AdminPage() {
         <div className="flex items-center gap-3">
           <span className="text-xl">🎵</span>
           <div>
-            <h1 className="text-lg font-bold text-slate-800">Bibliothèque musicale</h1>
-            <p className="text-slate-400 text-xs">{songs.length} chansons · Admin</p>
+            <h1 className="text-lg font-bold text-slate-800">BeatBlind Admin</h1>
+            <p className="text-slate-400 text-xs">{songs.length} chansons · {users.length} utilisateurs</p>
           </div>
         </div>
         <motion.button
@@ -154,8 +175,77 @@ export function AdminPage() {
         </motion.button>
       </div>
 
+      {/* Tabs */}
+      <div className="bg-white border-b border-slate-200 px-6">
+        <div className="flex gap-1">
+          {(['songs', 'users'] as const).map((t) => (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              className={`px-4 py-3 text-sm font-semibold border-b-2 transition-colors cursor-pointer ${
+                tab === t
+                  ? 'border-violet-600 text-violet-600'
+                  : 'border-transparent text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              {t === 'songs' ? `Chansons (${songs.length})` : `Utilisateurs (${users.length})`}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-5">
-        {/* Stats */}
+        {tab === 'users' && (
+          <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-slate-100 bg-slate-50 text-left">
+                    <th className="px-4 py-3 text-xs text-slate-400 uppercase tracking-wider font-semibold">Utilisateur</th>
+                    <th className="px-4 py-3 text-xs text-slate-400 uppercase tracking-wider font-semibold">Email</th>
+                    <th className="px-4 py-3 text-xs text-slate-400 uppercase tracking-wider font-semibold">Parties</th>
+                    <th className="px-4 py-3 text-xs text-slate-400 uppercase tracking-wider font-semibold">Victoires</th>
+                    <th className="px-4 py-3 text-xs text-slate-400 uppercase tracking-wider font-semibold">Score total</th>
+                    <th className="px-4 py-3 text-xs text-slate-400 uppercase tracking-wider font-semibold">Meilleur score</th>
+                    <th className="px-4 py-3 text-xs text-slate-400 uppercase tracking-wider font-semibold">Série max</th>
+                    <th className="px-4 py-3 text-xs text-slate-400 uppercase tracking-wider font-semibold">Inscrit le</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map((u) => (
+                    <tr key={u.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
+                            style={{ backgroundColor: u.avatar_color }}
+                          >
+                            {u.username[0]?.toUpperCase()}
+                          </div>
+                          <span className="font-medium text-slate-800">{u.username}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-slate-500">{u.email}</td>
+                      <td className="px-4 py-3 text-slate-700 font-semibold">{u.games_played ?? 0}</td>
+                      <td className="px-4 py-3 text-slate-700">{u.games_won ?? 0}</td>
+                      <td className="px-4 py-3 text-slate-700">{(u.total_score ?? 0).toLocaleString()}</td>
+                      <td className="px-4 py-3 text-slate-700">{(u.best_score ?? 0).toLocaleString()}</td>
+                      <td className="px-4 py-3 text-slate-700">{u.best_streak ?? 0}</td>
+                      <td className="px-4 py-3 text-slate-400 text-xs">
+                        {new Date((u.created_at ?? 0) * 1000).toLocaleDateString('fr-FR')}
+                      </td>
+                    </tr>
+                  ))}
+                  {users.length === 0 && (
+                    <tr><td colSpan={8} className="text-center text-slate-400 py-12">Aucun utilisateur inscrit</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+        {tab === 'songs' && (
+        <>{/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
           {GENRE_ORDER.map((g) => (
             <div
@@ -317,6 +407,8 @@ export function AdminPage() {
             )}
           </div>
         </div>
+        </>
+        )}
       </div>
     </div>
   )

@@ -23,10 +23,11 @@ class GameManagerClass {
     io: IoServer,
     socket: Socket,
     playerName: string,
-    avatarColor: string
+    avatarColor: string,
+    userId?: number
   ): GameRoom {
     const code = generateCode(new Set(this.rooms.keys()))
-    const room = new GameRoom(io, socket, playerName, avatarColor)
+    const room = new GameRoom(io, socket, playerName, avatarColor, userId)
     // Hack pour injecter le code (GameRoom ne peut pas le générer lui-même sans le manager)
     ;(room as any).code = code
     this.rooms.set(code, room)

@@ -9,6 +9,8 @@ import { LobbyPage } from './pages/LobbyPage'
 import { GamePage } from './pages/GamePage'
 import { ResultsPage } from './pages/ResultsPage'
 import { AdminPage } from './pages/AdminPage'
+import { AuthPage } from './pages/AuthPage'
+import { InstallBanner } from './components/ui/InstallBanner'
 
 interface AudioPlayerCtx {
   playSong: (previewUrl: string) => void
@@ -37,6 +39,7 @@ function AppRoutes() {
         <Route path="/game" element={<GamePage />} />
         <Route path="/results" element={<ResultsPage />} />
         <Route path="/admin" element={<AdminPage />} />
+        <Route path="/auth" element={<AuthPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AudioPlayerContext.Provider>
@@ -48,6 +51,7 @@ export function App() {
   return (
     <BrowserRouter>
       <AppRoutes />
+      <InstallBanner />
       <Toaster
         position="top-center"
         toastOptions={{

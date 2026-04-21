@@ -23,6 +23,7 @@ import {
   applyWrongAnswer,
 } from './ScoreEngine'
 import { AIPlayer } from './AIPlayer'
+import { updateUserStats } from '../auth/userService'
 
 type IoServer = Server<ClientToServerEvents, ServerToClientEvents>
 
@@ -60,7 +61,7 @@ export class GameRoom {
   private saboteurId: string | null = null
   private currentVotes: Map<string, string> = new Map() // voterId → targetId
 
-  constructor(io: IoServer, hostSocket: Socket, hostName: string, avatarColor: string) {
+  constructor(io: IoServer, hostSocket: Socket, hostName: string, avatarColor: string, userId?: number) {
     this.io = io
     this.code = ''  // sera défini par GameManager
     this.settings = {
@@ -74,14 +75,17 @@ export class GameRoom {
       avatarColor,
       isHost: true,
       isReady: false,
+      userId,
     }
     this.players.set(hostSocket.id, host)
-    this.scores.set(hostSocket.id, createInitialScore(hostSocket.id, hostName, avatarColor))
+    const hostScore = createInitialScore(hostSocket.id, hostName, avatarColor)
+    hostScore.userId = userId
+    this.scores.set(hostSocket.id, hostScore)
   }
 
   // ─── Joueurs ─────────────────────────────────
 
-  addPlayer(socket: Socket, name: string, avatarColor: string): Player | string {
+  addPlayer(socket: Socket, name: string, avatarColor: string, userId?: number): Player | string {
     if (this.status !== 'lobby') return 'La partie a déjà commencé'
     if (this.players.size >= this.settings.maxPlayers) return 'Salle pleine'
 
@@ -91,9 +95,12 @@ export class GameRoom {
       avatarColor,
       isHost: false,
       isReady: false,
+      userId,
     }
     this.players.set(socket.id, player)
-    this.scores.set(socket.id, createInitialScore(socket.id, name, avatarColor))
+    const score = createInitialScore(socket.id, name, avatarColor)
+    score.userId = userId
+    this.scores.set(socket.id, score)
     return player
   }
 
@@ -394,6 +401,21 @@ export class GameRoom {
     }
 
     this.io.to(this.code).emit('game:ended', { finalResults })
+
+    // Mise à jour des stats utilisateurs connectés
+    const winnerId = leaderboard[0]?.playerId
+    const statsUpdates = leaderboard
+      .filter((s) => s.userId != null && !s.isAI)
+      .map((s) => ({
+        userId: s.userId!,
+        score: s.score,
+        correctAnswers: s.correctAnswers,
+        bestStreak: s.bestStreak,
+        isWinner: s.playerId === winnerId,
+      }))
+    if (statsUpdates.length > 0) {
+      try { updateUserStats(statsUpdates) } catch (e) { console.error('[Stats] Erreur mise à jour:', e) }
+    }
 
     // Nettoyage différé
     this.cleanupTimer = setTimeout(() => {
