@@ -77,12 +77,11 @@ export function HomePage() {
           <span className="font-display text-xl font-extrabold text-slate-900">
             Beat<span className="text-primary">Blind</span>
           </span>
-        </div>
-        <div className="flex items-center gap-2">
+          <div className="flex-1" />
           {user ? (
-            <>
+            <div className="flex items-center gap-2">
               <div
-                className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold"
+                className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0"
                 style={{ backgroundColor: user.avatarColor }}
               >
                 {user.username[0]?.toUpperCase()}
@@ -94,7 +93,7 @@ export function HomePage() {
               >
                 Paramètres
               </button>
-            </>
+            </div>
           ) : (
             <button
               onClick={() => navigate('/auth')}
