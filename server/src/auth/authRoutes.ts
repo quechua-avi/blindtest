@@ -53,8 +53,10 @@ authRouter.post('/register', (req: Request, res: Response) => {
     const user = db.prepare('SELECT * FROM users WHERE id = ?').get(userId) as Record<string, unknown>
     res.status(201).json({ token: signToken(userId), user: sanitizeUser(user) })
   } catch (err: unknown) {
-    if ((err as { code?: string }).code === 'SQLITE_CONSTRAINT_UNIQUE') {
-      res.status(409).json({ error: 'Email déjà utilisé' })
+    const e = err as { code?: string; message?: string }
+    if (e.code === 'SQLITE_CONSTRAINT_UNIQUE') {
+      const msg = e.message?.includes('users.username') ? 'Pseudo déjà utilisé' : 'Email déjà utilisé'
+      res.status(409).json({ error: msg })
     } else {
       res.status(500).json({ error: 'Erreur serveur' })
     }
