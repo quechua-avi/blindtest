@@ -11,6 +11,7 @@ import type {
   ScoreFeedItem,
   Song,
   AnswerMatchType,
+  SaboteurReveal,
 } from '../types/game'
 
 type AppStatus = 'idle' | 'connecting' | 'lobby' | 'playing' | 'roundEnd' | 'results' | 'error'
@@ -54,6 +55,13 @@ interface GameStore {
   // Lecture audio en attente (stockée ici pour éviter la race condition)
   pendingSong: { previewUrl: string } | null
 
+  // Saboteur
+  isSaboteur: boolean
+  saboteurAnswer: string | null
+  saboteurVotesAgainstMe: Array<{ voterName: string; voterAvatarColor: string }>
+  myVote: string | null
+  saboteurReveal: SaboteurReveal | null
+
   // Chat
   messages: ChatMessage[]
   reactions: ReactionEvent[]
@@ -89,6 +97,9 @@ interface GameStore {
   onBuzzTimeout: (playerId: string, myPlayerId: string | null) => void
   onChatMessage: (msg: ChatMessage) => void
   onReaction: (reaction: ReactionEvent) => void
+  onYouAreSaboteur: (answer: string) => void
+  onSaboteurVoteUpdate: (votes: Array<{ voterName: string; voterAvatarColor: string }>) => void
+  setMyVote: (targetId: string | null) => void
   reset: () => void
 }
 
@@ -122,6 +133,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
   teamScores: null,
   finalResults: null,
   pendingSong: null,
+  isSaboteur: false,
+  saboteurAnswer: null,
+  saboteurVotesAgainstMe: [],
+  myVote: null,
+  saboteurReveal: null,
   messages: [],
   reactions: [],
 
@@ -200,6 +216,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       isBuzzedOut: false,
       scoreFeed: [],
       pendingSong: null,
+      isSaboteur: false,
+      saboteurAnswer: null,
     })
   },
 
@@ -251,6 +269,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       finalResults,
       leaderboard: finalResults.leaderboard,
       teamScores: finalResults.teamScores ?? null,
+      saboteurReveal: finalResults.saboteurReveal ?? null,
     })
   },
 
@@ -267,6 +286,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     isBuzzedOut: playerId === myPlayerId ? true : s.isBuzzedOut,
     myAnswerResult: playerId === myPlayerId ? 'wrong' : s.myAnswerResult,
   })),
+
+  onYouAreSaboteur: (answer) => set({ isSaboteur: true, saboteurAnswer: answer }),
+  onSaboteurVoteUpdate: (votes) => set({ saboteurVotesAgainstMe: votes }),
+  setMyVote: (targetId) => set({ myVote: targetId }),
 
   onChatMessage: (msg) => {
     set((s) => ({ messages: [...s.messages.slice(-49), msg] }))
@@ -302,6 +325,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
       teamScores: null,
       finalResults: null,
       pendingSong: null,
+      isSaboteur: false,
+      saboteurAnswer: null,
+      saboteurVotesAgainstMe: [],
+      myVote: null,
+      saboteurReveal: null,
       messages: [],
       reactions: [],
     })

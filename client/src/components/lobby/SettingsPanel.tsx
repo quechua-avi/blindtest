@@ -60,12 +60,13 @@ export function SettingsPanel({ settings, isHost, onChange, light }: SettingsPan
       {/* Mode de jeu */}
       <div>
         <label className={label}>Mode de jeu</label>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {([
             { value: 'classic',   label: '🎵 Classique',  desc: 'Devine titre ou artiste' },
             { value: 'buzzer',    label: '🔔 Buzzer',     desc: 'Premier à buzzer répond' },
             { value: 'teams',     label: '👥 Équipes',    desc: 'A vs B' },
             { value: 'soloVsAI',  label: '🤖 Solo vs IA', desc: 'Affronte des robots' },
+            { value: 'saboteur',  label: '🕵️ Saboteur',  desc: "Trouve l'imposteur · 4j min" },
           ] as const).map(({ value, label: lbl, desc }) => (
             <button
               key={value}

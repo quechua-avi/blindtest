@@ -111,6 +111,14 @@ export function useSocketSetup() {
       navigate('/results')
     })
 
+    // ─── Saboteur ──────────────────────────
+    socket.on('game:youAreSaboteur', ({ answer }) => {
+      store.onYouAreSaboteur(answer)
+    })
+    socket.on('game:saboteurVoteUpdate', ({ votes }) => {
+      store.onSaboteurVoteUpdate(votes)
+    })
+
     // ─── Chat ──────────────────────────────
     socket.on('chat:message', (msg) => store.onChatMessage(msg))
     socket.on('chat:reaction', (reaction) => store.onReaction(reaction))

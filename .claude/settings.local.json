@@ -6,7 +6,18 @@
       "Bash(npm.cmd --version)",
       "Bash(npm install *)",
       "Bash(cmd.exe /c \"where node\")",
-      "Bash(cmd.exe /c \"where npm\")"
+      "Bash(cmd.exe /c \"where npm\")",
+      "Bash(python3 -)",
+      "Bash(node -e ' *)",
+      "Bash(npx tsc *)",
+      "Bash(node_modules/.bin/tsc --noEmit -p server/tsconfig.json)",
+      "Bash(node_modules/.bin/tsc --noEmit -p client/tsconfig.json)",
+      "Bash(node_modules/.bin/tsc --noEmit)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(cmd.exe /c \"cd /d c:\\\\Users\\\\mfl01\\\\Documents\\\\Perso\\\\Blindt && dir server\\\\src\\\\songs\\\\\")",
+      "WebFetch(domain:fr.wikipedia.org)"
     ]
   }
 }

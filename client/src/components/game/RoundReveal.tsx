@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
+import { getSocket } from '../../socket/socketClient'
 import { useGameStore } from '../../store/useGameStore'
 import { Badge } from '../ui/Badge'
 import { GENRE_LABELS, GENRE_COLORS } from '../../types/game'
@@ -12,6 +13,11 @@ export function RoundReveal() {
   const settings = useGameStore((s) => s.settings)
   const teamScores = useGameStore((s) => s.teamScores)
   const currentRound = useGameStore((s) => s.currentRound)
+  const myPlayerId = useGameStore((s) => s.myPlayerId)
+  const isSaboteur = useGameStore((s) => s.isSaboteur)
+  const saboteurVotesAgainstMe = useGameStore((s) => s.saboteurVotesAgainstMe)
+  const myVote = useGameStore((s) => s.myVote)
+  const setMyVote = useGameStore((s) => s.setMyVote)
 
   const [countdown, setCountdown] = useState(BETWEEN_ROUNDS_DELAY)
 
@@ -23,11 +29,18 @@ export function RoundReveal() {
     return () => clearInterval(interval)
   }, [revealedSong])
 
+  const handleVote = (targetId: string) => {
+    setMyVote(targetId)
+    getSocket().emit('game:saboteurVote', { targetPlayerId: targetId })
+  }
+
   if (!revealedSong) return null
 
   const { song, correctGuessers, coverUrl } = revealedSong
   const winnerNames = correctGuessers.map((id) => players.find((p) => p.id === id)?.name).filter(Boolean)
   const isTeams = settings.mode === 'teams' && teamScores !== null
+  const isSaboteurMode = settings.mode === 'saboteur'
+  const otherPlayers = players.filter((p) => p.id !== myPlayerId)
 
   return (
     <motion.div
@@ -88,6 +101,58 @@ export function RoundReveal() {
           )}
         </div>
       </div>
+
+      {/* Saboteur : votes reçus (visible uniquement par le saboteur) */}
+      {isSaboteurMode && isSaboteur && (
+        <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4">
+          <p className="text-xs text-amber-400 font-semibold uppercase tracking-wider mb-3">
+            🕵️ Votes contre toi ({saboteurVotesAgainstMe.length})
+          </p>
+          {saboteurVotesAgainstMe.length === 0 ? (
+            <p className="text-slate-500 text-sm">Personne ne te soupçonne encore...</p>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {saboteurVotesAgainstMe.map((v) => (
+                <div key={v.voterName} className="flex items-center gap-1.5 bg-bg-surface rounded-full px-3 py-1">
+                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: v.voterAvatarColor }} />
+                  <span className="text-xs text-slate-300">{v.voterName}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Saboteur : panel de vote (pour les non-saboteurs) */}
+      {isSaboteurMode && !isSaboteur && (
+        <div className="bg-bg-card border border-bg-border rounded-2xl p-4">
+          <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-3">
+            🕵️ Qui est le saboteur ?
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {otherPlayers.map((p) => (
+              <button
+                key={p.id}
+                onClick={() => handleVote(p.id)}
+                className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
+                  myVote === p.id
+                    ? 'border-red-500/60 bg-red-500/10 text-red-300'
+                    : 'border-bg-border bg-bg-surface text-slate-300 hover:border-slate-500'
+                }`}
+              >
+                <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: p.avatarColor }} />
+                {p.name}
+                {myVote === p.id && <span className="text-red-400">✗</span>}
+              </button>
+            ))}
+          </div>
+          {myVote && (
+            <p className="text-xs text-slate-500 mt-2">
+              Vote enregistré · Tu peux en changer avant la fin du round
+            </p>
+          )}
+        </div>
+      )}
 
       {isTeams && (
         <div className="flex gap-3">

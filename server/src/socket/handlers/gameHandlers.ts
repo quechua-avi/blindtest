@@ -53,4 +53,10 @@ export function registerGameHandlers(io: IoServer, socket: IoSocket) {
     if (!host?.isHost) return
     room.endGame()
   })
+
+  socket.on('game:saboteurVote', ({ targetPlayerId }) => {
+    const room = GameManager.getRoomByPlayerId(socket.id)
+    if (!room) return
+    room.handleSaboteurVote(socket.id, targetPlayerId)
+  })
 }

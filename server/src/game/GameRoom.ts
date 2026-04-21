@@ -56,6 +56,9 @@ export class GameRoom {
   private songsPlayed: Array<{ song: Song; winners: string[] }> = []
   private aiPlayers: AIPlayer[] = []
   private io: IoServer
+  // Saboteur mode
+  private saboteurId: string | null = null
+  private currentVotes: Map<string, string> = new Map() // voterId → targetId
 
   constructor(io: IoServer, hostSocket: Socket, hostName: string, avatarColor: string) {
     this.io = io
@@ -140,12 +143,23 @@ export class GameRoom {
 
   startGame(): string | null {
     if (this.players.size < 1) return 'Pas assez de joueurs'
+
+    if (this.settings.mode === 'saboteur' && this.players.size < 4)
+      return 'Le mode Saboteur nécessite au moins 4 joueurs'
+
     this.playlist = selectSongs(this.settings)
     if (this.playlist.length === 0) return 'Aucune chanson disponible pour ces paramètres'
 
     // Réinitialiser les scores
     for (const [id, player] of this.players) {
       this.scores.set(id, createInitialScore(id, player.name, player.avatarColor, false, player.teamId))
+    }
+
+    // Désigner le saboteur aléatoirement
+    if (this.settings.mode === 'saboteur') {
+      const humanIds = [...this.players.keys()]
+      this.saboteurId = humanIds[Math.floor(Math.random() * humanIds.length)]
+      this.currentVotes = new Map()
     }
 
     // Ajouter l'IA si mode soloVsAI
@@ -227,6 +241,13 @@ export class GameRoom {
       startedAt: this.roundStartedAt,
     })
 
+    // Saboteur : envoyer la réponse secrètement
+    if (this.settings.mode === 'saboteur' && this.saboteurId && this.currentSong) {
+      this.io.to(this.saboteurId).emit('game:youAreSaboteur', {
+        answer: `${this.currentSong.title} — ${this.currentSong.artist}`,
+      })
+    }
+
     // Émettre l'URL de preview Deezer séparément (sans titre/artiste = anti-triche)
     const previewUrl = this.previewUrls.get(this.currentSong.id)
     if (previewUrl) {
@@ -286,6 +307,24 @@ export class GameRoom {
     this.endRound()
   }
 
+  handleSaboteurVote(voterId: string, targetId: string) {
+    if (this.settings.mode !== 'saboteur') return
+    if (!this.players.has(targetId) || voterId === targetId) return
+
+    this.currentVotes.set(voterId, targetId)
+
+    if (!this.saboteurId) return
+    const votersAgainstSaboteur = [...this.currentVotes.entries()]
+      .filter(([, t]) => t === this.saboteurId)
+      .map(([vid]) => {
+        const p = this.players.get(vid)
+        return p ? { voterName: p.name, voterAvatarColor: p.avatarColor } : null
+      })
+      .filter((v): v is { voterName: string; voterAvatarColor: string } => v !== null)
+
+    this.io.to(this.saboteurId).emit('game:saboteurVoteUpdate', { votes: votersAgainstSaboteur })
+  }
+
   pauseGame(paused: boolean) {
     this.isPaused = paused
     this.io.to(this.code).emit('game:paused', { paused })
@@ -294,6 +333,48 @@ export class GameRoom {
   endGame() {
     this.status = 'ended'
     this.clearTimers()
+
+    // Saboteur : calcul des votes et application des bonus/malus
+    let saboteurReveal: import('../types').SaboteurReveal | undefined
+    if (this.settings.mode === 'saboteur' && this.saboteurId) {
+      const voteCounts = new Map<string, number>()
+      for (const targetId of this.currentVotes.values()) {
+        voteCounts.set(targetId, (voteCounts.get(targetId) ?? 0) + 1)
+      }
+
+      let accusedId: string | null = null
+      let maxVotes = 0
+      for (const [pid, count] of voteCounts) {
+        if (count > maxVotes) { maxVotes = count; accusedId = pid }
+      }
+
+      const caught = accusedId === this.saboteurId
+      const saboteur = this.players.get(this.saboteurId)
+
+      if (saboteur) {
+        const saboteurScore = this.scores.get(this.saboteurId)
+        if (saboteurScore) {
+          saboteurScore.score = Math.max(0, saboteurScore.score + (caught ? -1000 : 2000))
+          this.scores.set(this.saboteurId, saboteurScore)
+        }
+
+        if (caught) {
+          for (const [voterId, targetId] of this.currentVotes) {
+            if (targetId === this.saboteurId) {
+              const s = this.scores.get(voterId)
+              if (s) { s.score += 500; this.scores.set(voterId, s) }
+            }
+          }
+        }
+
+        saboteurReveal = {
+          saboteurId: this.saboteurId,
+          saboteurName: saboteur.name,
+          saboteurAvatarColor: saboteur.avatarColor,
+          caught,
+        }
+      }
+    }
 
     const leaderboard = this.getLeaderboard()
     const gameDuration = Date.now() - this.gameStartedAt
@@ -309,6 +390,7 @@ export class GameRoom {
       gameDuration,
       teamScores,
       teamWinner,
+      saboteurReveal,
     }
 
     this.io.to(this.code).emit('game:ended', { finalResults })

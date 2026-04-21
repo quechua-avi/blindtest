@@ -19,7 +19,7 @@ import type { Genre } from '../types/game'
 
 export function GamePage() {
   const navigate = useNavigate()
-  const { status, currentRound, settings, pendingSong, activeBuzz } = useGameStore()
+  const { status, currentRound, settings, pendingSong, activeBuzz, isSaboteur, saboteurAnswer } = useGameStore()
   const { playSong, stopSong } = useAudioPlayerContext()
 
   useEffect(() => {
@@ -87,6 +87,16 @@ export function GamePage() {
 
       {/* Corps du jeu */}
       <main className="flex-1 flex flex-col items-center justify-center gap-6 px-4 pb-32 max-w-5xl mx-auto w-full">
+        {isPlaying && isSaboteur && saboteurAnswer && (
+          <div className="w-full max-w-lg mx-auto bg-amber-500/10 border border-amber-500/40 rounded-xl px-4 py-3 flex items-center gap-3">
+            <span className="text-xl">🕵️</span>
+            <div>
+              <p className="text-xs text-amber-400 font-semibold uppercase tracking-wider">Tu es le saboteur</p>
+              <p className="text-amber-200 font-bold">{saboteurAnswer}</p>
+            </div>
+          </div>
+        )}
+
         {isPlaying && (
           <>
             {/* Timer + Waveform */}

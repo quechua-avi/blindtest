@@ -1,6 +1,6 @@
 export type Genre = 'pop' | 'hiphop' | 'electronic' | 'rnb' | 'french' | 'latin' | 'jul'
 export type Decade = '2000s' | '2010s' | '2020s'
-export type GameMode = 'classic' | 'teams' | 'soloVsAI' | 'buzzer'
+export type GameMode = 'classic' | 'teams' | 'soloVsAI' | 'buzzer' | 'saboteur'
 export type AnswerMode = 'text' | 'multipleChoice'
 export type RoomStatus = 'lobby' | 'playing' | 'paused' | 'ended'
 export type AnswerMatchType = 'exact' | 'fuzzy' | 'partial'
@@ -68,6 +68,13 @@ export interface RoundReveal {
   coverUrl?: string
 }
 
+export interface SaboteurReveal {
+  saboteurId: string
+  saboteurName: string
+  saboteurAvatarColor: string
+  caught: boolean
+}
+
 export interface GameResults {
   leaderboard: PlayerScore[]
   mvp: {
@@ -79,6 +86,7 @@ export interface GameResults {
   gameDuration: number
   teamScores?: { A: number; B: number }
   teamWinner?: 'A' | 'B' | 'tie'
+  saboteurReveal?: SaboteurReveal
 }
 
 export interface RoomState {
@@ -125,6 +133,7 @@ export interface ClientToServerEvents {
   'game:skipSong': () => void
   'game:pause': (data: { paused: boolean }) => void
   'game:end': () => void
+  'game:saboteurVote': (data: { targetPlayerId: string }) => void
   'chat:message': (data: { text: string }) => void
   'chat:reaction': (data: { emoji: string }) => void
 }
@@ -158,6 +167,8 @@ export interface ServerToClientEvents {
   'game:buzzWrong': (data: { playerId: string }) => void
   'game:buzzTimeout': (data: { playerId: string }) => void
   'game:ended': (data: { finalResults: GameResults }) => void
+  'game:youAreSaboteur': (data: { answer: string }) => void
+  'game:saboteurVoteUpdate': (data: { votes: Array<{ voterName: string; voterAvatarColor: string }> }) => void
   'chat:message': (data: ChatMessage) => void
   'chat:reaction': (data: ReactionEvent) => void
 }
