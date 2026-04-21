@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
 import { GENRE_LABELS, GENRE_COLORS } from '../types/game'
 import type { Genre, Decade } from '../types/game'
 
@@ -37,6 +38,7 @@ const GENRE_ORDER: Genre[] = ['pop', 'hiphop', 'electronic', 'rnb', 'french', 'l
 const DECADE_ORDER: Decade[] = ['2000s', '2010s', '2020s']
 
 export function AdminPage() {
+  const navigate = useNavigate()
   const [secret, setSecret] = useState(() => sessionStorage.getItem(ADMIN_SECRET_KEY) ?? '')
   const [input, setInput] = useState('')
   const [songs, setSongs] = useState<AdminSong[]>([])
@@ -157,6 +159,12 @@ export function AdminPage() {
           >
             {loading ? 'Connexion...' : 'Accéder'}
           </motion.button>
+          <button
+            onClick={() => navigate('/')}
+            className="w-full text-center text-sm text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+          >
+            ← Retour à l'accueil
+          </button>
         </motion.div>
       </div>
     )
@@ -167,6 +175,13 @@ export function AdminPage() {
       {/* Header */}
       <div className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-3">
+          <button
+            onClick={() => navigate('/')}
+            className="text-slate-400 hover:text-slate-600 transition-colors cursor-pointer mr-1 text-lg"
+            title="Retour à l'accueil"
+          >
+            ←
+          </button>
           <span className="text-xl">🎵</span>
           <div>
             <h1 className="text-lg font-bold text-slate-800">BeatBlind Admin</h1>
