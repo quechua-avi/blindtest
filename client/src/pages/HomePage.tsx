@@ -99,7 +99,7 @@ export function HomePage() {
             Beat<span className="text-primary">Blind</span>
           </h1>
           <p className="text-slate-500 text-lg mb-6">
-            Blindtest musical multijoueur · <span className="font-semibold text-slate-700">615 titres</span> · 2000–2026
+            Blindtest musical multijoueur · <span className="font-semibold text-slate-700">986 titres</span> · 2000–2026
           </p>
 
           <div className="flex items-center justify-center gap-2 flex-wrap">

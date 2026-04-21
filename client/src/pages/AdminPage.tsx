@@ -99,29 +99,32 @@ export function AdminPage() {
 
   if (!isAuthed) {
     return (
-      <div className="min-h-screen bg-bg-base flex items-center justify-center p-4">
+      <div className="min-h-screen bg-slate-100 flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-bg-card border border-bg-border rounded-2xl p-8 w-full max-w-sm space-y-4"
+          className="bg-white border border-slate-200 rounded-2xl shadow-sm p-8 w-full max-w-sm space-y-4"
         >
-          <h1 className="text-2xl font-bold font-display text-white text-center">Admin</h1>
-          <p className="text-slate-400 text-sm text-center">Accès restreint</p>
+          <div className="text-center space-y-1">
+            <div className="text-3xl mb-2">🎵</div>
+            <h1 className="text-2xl font-bold text-slate-800">Blindtest Admin</h1>
+            <p className="text-slate-400 text-sm">Accès restreint</p>
+          </div>
           <input
             type="password"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && fetchSongs(input)}
             placeholder="Mot de passe..."
-            className="w-full bg-bg-surface border border-bg-border rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-primary"
+            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100"
           />
-          {error && <p className="text-red-400 text-sm text-center">{error}</p>}
+          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
           <motion.button
             onClick={() => fetchSongs(input)}
             disabled={loading || !input}
             whileTap={{ scale: 0.95 }}
             whileHover={{ scale: 1.02 }}
-            className="w-full py-3 bg-primary text-white rounded-xl font-semibold disabled:opacity-50 cursor-pointer"
+            className="w-full py-3 bg-violet-600 text-white rounded-xl font-semibold disabled:opacity-40 cursor-pointer hover:bg-violet-700 transition-colors"
           >
             {loading ? 'Connexion...' : 'Accéder'}
           </motion.button>
@@ -131,121 +134,129 @@ export function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen bg-bg-base text-white">
+    <div className="min-h-screen bg-slate-100 text-slate-800">
       {/* Header */}
-      <div className="bg-bg-card border-b border-bg-border px-6 py-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold font-display">Admin · Bibliothèque</h1>
-          <p className="text-slate-400 text-sm">{songs.length} chansons au total</p>
+      <div className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between shadow-sm">
+        <div className="flex items-center gap-3">
+          <span className="text-xl">🎵</span>
+          <div>
+            <h1 className="text-lg font-bold text-slate-800">Bibliothèque musicale</h1>
+            <p className="text-slate-400 text-xs">{songs.length} chansons · Admin</p>
+          </div>
         </div>
         <motion.button
           onClick={() => { sessionStorage.removeItem(ADMIN_SECRET_KEY); setSongs([]); setSecret('') }}
           whileTap={{ scale: 0.95 }}
-          className="text-xs text-slate-500 hover:text-slate-300 cursor-pointer"
+          whileHover={{ scale: 1.02 }}
+          className="text-xs text-slate-400 hover:text-slate-600 border border-slate-200 rounded-lg px-3 py-1.5 cursor-pointer transition-colors"
         >
           Déconnexion
         </motion.button>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+      <div className="max-w-7xl mx-auto px-4 py-6 space-y-5">
         {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
           {GENRE_ORDER.map((g) => (
             <div
               key={g}
-              className="bg-bg-card border border-bg-border rounded-xl p-3 flex items-center justify-between"
+              className="bg-white border border-slate-200 rounded-xl p-3 flex items-center justify-between shadow-sm"
               style={{ borderLeftColor: GENRE_COLORS[g], borderLeftWidth: 3 }}
             >
-              <span className="text-sm text-slate-300">{GENRE_LABELS[g]}</span>
+              <span className="text-sm text-slate-600">{GENRE_LABELS[g]}</span>
               <span className="text-lg font-bold" style={{ color: GENRE_COLORS[g] }}>
                 {stats.byGenre[g] ?? 0}
               </span>
             </div>
           ))}
           {DECADE_ORDER.map((d) => (
-            <div key={d} className="bg-bg-card border border-bg-border rounded-xl p-3 flex items-center justify-between">
-              <span className="text-sm text-slate-300">{d}</span>
-              <span className="text-lg font-bold text-slate-200">{stats.byDecade[d] ?? 0}</span>
+            <div key={d} className="bg-white border border-slate-200 rounded-xl p-3 flex items-center justify-between shadow-sm">
+              <span className="text-sm text-slate-600">{d}</span>
+              <span className="text-lg font-bold text-slate-700">{stats.byDecade[d] ?? 0}</span>
             </div>
           ))}
         </div>
 
         {/* Filtres */}
-        <div className="bg-bg-card border border-bg-border rounded-2xl p-4 space-y-3">
+        <div className="bg-white border border-slate-200 rounded-2xl p-4 space-y-3 shadow-sm">
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Rechercher titre, artiste, ID..."
-            className="w-full bg-bg-surface border border-bg-border rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-primary text-sm"
+            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 text-sm"
           />
           <div className="flex flex-wrap gap-2 items-center">
-            <span className="text-xs text-slate-500 uppercase tracking-wider">Genre :</span>
+            <span className="text-xs text-slate-400 uppercase tracking-wider font-semibold">Genre :</span>
             {(['all', ...GENRE_ORDER] as const).map((g) => (
               <motion.button
                 key={g}
                 onClick={() => setFilterGenre(g)}
                 whileTap={{ scale: 0.9 }}
-                className={`px-3 py-1 rounded-full text-xs font-semibold border transition-colors cursor-pointer ${
-                  filterGenre === g
-                    ? 'border-primary bg-primary/20 text-primary'
-                    : 'border-bg-border bg-bg-surface text-slate-400'
-                }`}
-                style={filterGenre === g && g !== 'all' ? { borderColor: GENRE_COLORS[g], color: GENRE_COLORS[g], backgroundColor: GENRE_COLORS[g] + '20' } : {}}
+                className="px-3 py-1 rounded-full text-xs font-semibold border transition-colors cursor-pointer"
+                style={
+                  filterGenre === g && g !== 'all'
+                    ? { borderColor: GENRE_COLORS[g], color: GENRE_COLORS[g], backgroundColor: GENRE_COLORS[g] + '15' }
+                    : filterGenre === g
+                    ? { borderColor: '#7c3aed', color: '#7c3aed', backgroundColor: '#ede9fe' }
+                    : { borderColor: '#e2e8f0', color: '#94a3b8', backgroundColor: 'transparent' }
+                }
               >
                 {g === 'all' ? 'Tous' : GENRE_LABELS[g]}
               </motion.button>
             ))}
           </div>
           <div className="flex flex-wrap gap-2 items-center">
-            <span className="text-xs text-slate-500 uppercase tracking-wider">Décennie :</span>
+            <span className="text-xs text-slate-400 uppercase tracking-wider font-semibold">Décennie :</span>
             {(['all', ...DECADE_ORDER] as const).map((d) => (
               <motion.button
                 key={d}
                 onClick={() => setFilterDecade(d)}
                 whileTap={{ scale: 0.9 }}
-                className={`px-3 py-1 rounded-full text-xs font-semibold border transition-colors cursor-pointer ${
+                className="px-3 py-1 rounded-full text-xs font-semibold border transition-colors cursor-pointer"
+                style={
                   filterDecade === d
-                    ? 'border-primary bg-primary/20 text-primary'
-                    : 'border-bg-border bg-bg-surface text-slate-400'
-                }`}
+                    ? { borderColor: '#7c3aed', color: '#7c3aed', backgroundColor: '#ede9fe' }
+                    : { borderColor: '#e2e8f0', color: '#94a3b8', backgroundColor: 'transparent' }
+                }
               >
                 {d === 'all' ? 'Toutes' : d}
               </motion.button>
             ))}
-            <span className="ml-auto text-xs text-slate-500">Trier :</span>
+            <span className="ml-auto text-xs text-slate-400 uppercase tracking-wider font-semibold">Trier :</span>
             {(['genre', 'title', 'artist', 'year'] as const).map((s) => (
               <motion.button
                 key={s}
                 onClick={() => setSortBy(s)}
                 whileTap={{ scale: 0.9 }}
-                className={`px-3 py-1 rounded-full text-xs font-semibold border transition-colors cursor-pointer ${
+                className="px-3 py-1 rounded-full text-xs font-semibold border transition-colors cursor-pointer"
+                style={
                   sortBy === s
-                    ? 'border-primary bg-primary/20 text-primary'
-                    : 'border-bg-border bg-bg-surface text-slate-400'
-                }`}
+                    ? { borderColor: '#7c3aed', color: '#7c3aed', backgroundColor: '#ede9fe' }
+                    : { borderColor: '#e2e8f0', color: '#94a3b8', backgroundColor: 'transparent' }
+                }
               >
                 {s === 'genre' ? 'Genre' : s === 'title' ? 'Titre' : s === 'artist' ? 'Artiste' : 'Année'}
               </motion.button>
             ))}
           </div>
-          <p className="text-xs text-slate-500">{filtered.length} résultat{filtered.length !== 1 ? 's' : ''}</p>
+          <p className="text-xs text-slate-400">{filtered.length} résultat{filtered.length !== 1 ? 's' : ''}</p>
         </div>
 
         {/* Table */}
-        <div className="bg-bg-card border border-bg-border rounded-2xl overflow-hidden">
+        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-bg-border text-left">
-                  <th className="px-4 py-3 text-xs text-slate-500 uppercase tracking-wider font-semibold w-8">#</th>
-                  <th className="px-4 py-3 text-xs text-slate-500 uppercase tracking-wider font-semibold">Titre</th>
-                  <th className="px-4 py-3 text-xs text-slate-500 uppercase tracking-wider font-semibold">Artiste</th>
-                  <th className="px-4 py-3 text-xs text-slate-500 uppercase tracking-wider font-semibold">Année</th>
-                  <th className="px-4 py-3 text-xs text-slate-500 uppercase tracking-wider font-semibold">Genre</th>
-                  <th className="px-4 py-3 text-xs text-slate-500 uppercase tracking-wider font-semibold">Décennie</th>
-                  <th className="px-4 py-3 text-xs text-slate-500 uppercase tracking-wider font-semibold">ID</th>
-                  <th className="px-4 py-3 text-xs text-slate-500 uppercase tracking-wider font-semibold">Deezer</th>
+                <tr className="border-b border-slate-100 bg-slate-50 text-left">
+                  <th className="px-4 py-3 text-xs text-slate-400 uppercase tracking-wider font-semibold w-8">#</th>
+                  <th className="px-4 py-3 text-xs text-slate-400 uppercase tracking-wider font-semibold">Titre</th>
+                  <th className="px-4 py-3 text-xs text-slate-400 uppercase tracking-wider font-semibold">Artiste</th>
+                  <th className="px-4 py-3 text-xs text-slate-400 uppercase tracking-wider font-semibold">Année</th>
+                  <th className="px-4 py-3 text-xs text-slate-400 uppercase tracking-wider font-semibold">Genre</th>
+                  <th className="px-4 py-3 text-xs text-slate-400 uppercase tracking-wider font-semibold">Décennie</th>
+                  <th className="px-4 py-3 text-xs text-slate-400 uppercase tracking-wider font-semibold">ID</th>
+                  <th className="px-4 py-3 text-xs text-slate-400 uppercase tracking-wider font-semibold">Deezer</th>
                 </tr>
               </thead>
               <tbody>
@@ -257,41 +268,41 @@ export function AdminPage() {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
-                      transition={{ duration: 0.15, delay: Math.min(i * 0.01, 0.3) }}
-                      className="border-b border-bg-border/50 hover:bg-bg-surface/50 transition-colors"
+                      transition={{ duration: 0.15, delay: Math.min(i * 0.008, 0.25) }}
+                      className="border-b border-slate-100 hover:bg-slate-50 transition-colors"
                     >
-                      <td className="px-4 py-3 text-slate-600 text-xs">{i + 1}</td>
-                      <td className="px-4 py-3 text-white font-medium">
+                      <td className="px-4 py-3 text-slate-300 text-xs">{i + 1}</td>
+                      <td className="px-4 py-3 text-slate-800 font-medium">
                         {song.title}
                         {song.alternativeTitles && song.alternativeTitles.length > 0 && (
-                          <div className="text-xs text-slate-600 mt-0.5">{song.alternativeTitles.join(', ')}</div>
+                          <div className="text-xs text-slate-400 mt-0.5">{song.alternativeTitles.join(', ')}</div>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-slate-300">
+                      <td className="px-4 py-3 text-slate-600">
                         {song.artist}
                         {song.alternativeArtists && song.alternativeArtists.length > 0 && (
-                          <div className="text-xs text-slate-600 mt-0.5">{song.alternativeArtists.join(', ')}</div>
+                          <div className="text-xs text-slate-400 mt-0.5">{song.alternativeArtists.join(', ')}</div>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-slate-400">{song.year}</td>
+                      <td className="px-4 py-3 text-slate-500">{song.year}</td>
                       <td className="px-4 py-3">
                         <span
                           className="px-2 py-0.5 rounded-full text-xs font-semibold"
-                          style={{ backgroundColor: GENRE_COLORS[song.genre] + '20', color: GENRE_COLORS[song.genre] }}
+                          style={{ backgroundColor: GENRE_COLORS[song.genre] + '18', color: GENRE_COLORS[song.genre] }}
                         >
                           {GENRE_LABELS[song.genre]}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-slate-400">{song.decade}</td>
+                      <td className="px-4 py-3 text-slate-500">{song.decade}</td>
                       <td className="px-4 py-3">
-                        <code className="text-xs text-slate-500 bg-bg-surface px-1.5 py-0.5 rounded">{song.id}</code>
+                        <code className="text-xs text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">{song.id}</code>
                       </td>
                       <td className="px-4 py-3">
                         <a
                           href={song.deezerWebUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-xs text-primary hover:underline"
+                          className="text-xs text-violet-600 hover:text-violet-800 hover:underline font-medium"
                         >
                           Deezer ↗
                         </a>
@@ -302,7 +313,7 @@ export function AdminPage() {
               </tbody>
             </table>
             {filtered.length === 0 && (
-              <p className="text-center text-slate-500 py-12">Aucune chanson trouvée</p>
+              <p className="text-center text-slate-400 py-12">Aucune chanson trouvée</p>
             )}
           </div>
         </div>
