@@ -28,6 +28,10 @@ authRouter.post('/register', (req: Request, res: Response) => {
     res.status(400).json({ error: 'Email, mot de passe et pseudo requis' })
     return
   }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email.trim())) {
+    res.status(400).json({ error: 'Adresse email invalide' })
+    return
+  }
   if (password.length < 6) {
     res.status(400).json({ error: 'Mot de passe trop court (6 caractères min)' })
     return

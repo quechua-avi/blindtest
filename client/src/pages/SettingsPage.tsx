@@ -96,9 +96,9 @@ export function SettingsPage() {
       })
       const data = await res.json()
       if (!res.ok) { setDeleteMsg(data.error); return }
-      logout()
       toast.success('Votre compte a bien été supprimé.', { duration: 4000 })
       navigate('/')
+      logout()
     } catch {
       setDeleteMsg('Erreur serveur')
     } finally {
