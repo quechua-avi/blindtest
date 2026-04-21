@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import toast from 'react-hot-toast'
 import { useAuthStore } from '../store/useAuthStore'
 import { usePlayerStore, AVATAR_COLORS } from '../store/usePlayerStore'
 
@@ -96,6 +97,7 @@ export function SettingsPage() {
       const data = await res.json()
       if (!res.ok) { setDeleteMsg(data.error); return }
       logout()
+      toast.success('Votre compte a bien été supprimé.', { duration: 4000 })
       navigate('/')
     } catch {
       setDeleteMsg('Erreur serveur')

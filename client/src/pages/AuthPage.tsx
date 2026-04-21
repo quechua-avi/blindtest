@@ -19,8 +19,13 @@ export function AuthPage() {
   const { setName, setAvatarColor } = usePlayerStore()
   const navigate = useNavigate()
 
+  const isValidEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim())
+
   const submit = async () => {
     setError('')
+    if (!isValidEmail(email)) { setError('Adresse email invalide'); return }
+    if (tab === 'register' && username.trim().length < 2) { setError('Pseudo trop court (2 caractères minimum)'); return }
+    if (tab === 'register' && password.length < 6) { setError('Mot de passe trop court (6 caractères minimum)'); return }
     setLoading(true)
     try {
       const endpoint = tab === 'login' ? '/api/auth/login' : '/api/auth/register'
