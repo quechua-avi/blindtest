@@ -131,10 +131,14 @@ export function RoundReveal() {
           </p>
           <div className="flex flex-wrap gap-2">
             {otherPlayers.map((p) => (
-              <button
+              <motion.button
                 key={p.id}
                 onClick={() => handleVote(p.id)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-sm font-semibold transition-all cursor-pointer ${
+                whileTap={{ scale: 0.92 }}
+                whileHover={{ scale: 1.04 }}
+                animate={myVote === p.id ? { scale: [1, 1.08, 1] } : {}}
+                transition={{ duration: 0.2 }}
+                className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-sm font-semibold transition-colors cursor-pointer ${
                   myVote === p.id
                     ? 'border-red-500/60 bg-red-500/10 text-red-300'
                     : 'border-bg-border bg-bg-surface text-slate-300 hover:border-slate-500'
@@ -143,7 +147,7 @@ export function RoundReveal() {
                 <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: p.avatarColor }} />
                 {p.name}
                 {myVote === p.id && <span className="text-red-400">✗</span>}
-              </button>
+              </motion.button>
             ))}
           </div>
           {myVote && (

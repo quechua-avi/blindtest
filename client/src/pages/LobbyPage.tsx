@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { QRCodeSVG } from 'qrcode.react'
 import { useState } from 'react'
 import { getSocket } from '../socket/socketClient'
@@ -108,12 +108,24 @@ export function LobbyPage() {
                 {currentCode}
               </div>
               <div className="flex items-center gap-2 justify-center sm:justify-start flex-wrap">
-                <button
+                <motion.button
                   onClick={copyLink}
+                  whileTap={{ scale: 0.94 }}
+                  whileHover={{ scale: 1.03 }}
                   className="inline-flex items-center gap-1.5 text-xs font-medium text-primary border border-primary/30 hover:border-primary/60 hover:bg-primary/5 px-3 py-1.5 rounded-lg transition-all"
                 >
-                  {linkCopied ? '✓ Lien copié !' : '📋 Copier le lien d\'invitation'}
-                </button>
+                  <AnimatePresence mode="wait">
+                    <motion.span
+                      key={linkCopied ? 'copied' : 'copy'}
+                      initial={{ opacity: 0, y: -6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 6 }}
+                      transition={{ duration: 0.15 }}
+                    >
+                      {linkCopied ? '✓ Lien copié !' : '📋 Copier le lien d\'invitation'}
+                    </motion.span>
+                  </AnimatePresence>
+                </motion.button>
                 <span className="text-slate-300 text-xs hidden sm:inline">·</span>
                 <span className="text-slate-400 text-xs">Ou scanne le QR code</span>
               </div>

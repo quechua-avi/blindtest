@@ -130,12 +130,16 @@ export function HomePage() {
             <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Ton profil</p>
             <div className="flex items-center gap-4">
               {/* Avatar preview */}
-              <div
+              <motion.div
+                key={avatarColor}
+                initial={{ scale: 0.7, opacity: 0.5 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 18 }}
                 className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center text-white font-bold text-lg select-none"
                 style={{ backgroundColor: avatarColor }}
               >
                 {pseudo.trim()[0]?.toUpperCase() || '?'}
-              </div>
+              </motion.div>
               {/* Pseudo */}
               <div className="flex-1 min-w-0">
                 <Input
@@ -152,10 +156,12 @@ export function HomePage() {
             {/* Color picker */}
             <div className="flex flex-wrap gap-2 mt-3">
               {AVATAR_COLORS.map((color) => (
-                <button
+                <motion.button
                   key={color}
                   onClick={() => setAvatarColor(color)}
-                  className="w-7 h-7 rounded-full border-2 transition-transform hover:scale-110 cursor-pointer"
+                  whileHover={{ scale: 1.2 }}
+                  whileTap={{ scale: 0.8 }}
+                  className="w-7 h-7 rounded-full border-2 cursor-pointer"
                   style={{
                     backgroundColor: color,
                     borderColor: avatarColor === color ? color : 'transparent',

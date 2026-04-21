@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion'
 import type { GameSettings, Genre } from '../../types/game'
 import { GENRE_LABELS, GENRE_COLORS } from '../../types/game'
 
@@ -37,12 +38,16 @@ export function SettingsPanel({ settings, isHost, onChange, light }: SettingsPan
             const active = settings.genres.includes(g)
             const color = GENRE_COLORS[g]
             return (
-              <button
+              <motion.button
                 key={g}
                 disabled={disabled}
                 onClick={() => onChange({ genres: toggle(settings.genres, g) })}
-                className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-all duration-200 ${
-                  disabled ? 'cursor-default' : 'cursor-pointer hover:opacity-90'
+                whileTap={disabled ? {} : { scale: 0.88 }}
+                whileHover={disabled ? {} : { scale: 1.06 }}
+                animate={active ? { scale: [1, 1.1, 1] } : {}}
+                transition={{ duration: 0.2 }}
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors duration-200 ${
+                  disabled ? 'cursor-default' : 'cursor-pointer'
                 }`}
                 style={{
                   backgroundColor: active ? color + '20' : 'transparent',
@@ -51,7 +56,7 @@ export function SettingsPanel({ settings, isHost, onChange, light }: SettingsPan
                 }}
               >
                 {GENRE_LABELS[g]}
-              </button>
+              </motion.button>
             )
           })}
         </div>
@@ -68,17 +73,19 @@ export function SettingsPanel({ settings, isHost, onChange, light }: SettingsPan
             { value: 'soloVsAI',  label: '🤖 Solo vs IA', desc: 'Affronte des robots' },
             { value: 'saboteur',  label: '🕵️ Saboteur',  desc: "Trouve l'imposteur · 4j min" },
           ] as const).map(({ value, label: lbl, desc }) => (
-            <button
+            <motion.button
               key={value}
               disabled={disabled}
               onClick={() => onChange({ mode: value, ...(value === 'buzzer' ? { answerMode: 'text' } : {}) })}
-              className={`p-3 rounded-xl border text-left transition-all duration-200 ${
+              whileTap={disabled ? {} : { scale: 0.94 }}
+              whileHover={disabled ? {} : { scale: 1.03 }}
+              className={`p-3 rounded-xl border text-left transition-colors duration-200 ${
                 disabled ? 'cursor-default' : 'cursor-pointer'
               } ${settings.mode === value ? activeBtn : inactiveBtn}`}
             >
               <div className={`font-semibold text-sm ${light ? 'text-slate-800' : 'text-white'}`}>{lbl}</div>
               <div className="text-xs text-slate-400">{desc}</div>
-            </button>
+            </motion.button>
           ))}
         </div>
       </div>
@@ -94,17 +101,19 @@ export function SettingsPanel({ settings, isHost, onChange, light }: SettingsPan
             const isBuzzerMode = settings.mode === 'buzzer'
             const isDisabledOption = disabled || (isBuzzerMode && value === 'multipleChoice')
             return (
-              <button
+              <motion.button
                 key={value}
                 disabled={isDisabledOption}
                 onClick={() => !isDisabledOption && onChange({ answerMode: value })}
-                className={`flex-1 p-3 rounded-xl border text-left transition-all ${
+                whileTap={isDisabledOption ? {} : { scale: 0.94 }}
+                whileHover={isDisabledOption ? {} : { scale: 1.03 }}
+                className={`flex-1 p-3 rounded-xl border text-left transition-colors ${
                   isDisabledOption ? 'cursor-default opacity-40' : 'cursor-pointer'
                 } ${settings.answerMode === value ? activeBtn : inactiveBtn}`}
               >
                 <div className={`text-sm font-semibold ${light ? 'text-slate-800' : 'text-white'}`}>{lbl}</div>
                 <div className="text-xs text-slate-400">{desc}</div>
-              </button>
+              </motion.button>
             )
           })}
         </div>
@@ -115,16 +124,18 @@ export function SettingsPanel({ settings, isHost, onChange, light }: SettingsPan
         <label className={label}>Nombre de rounds</label>
         <div className="flex gap-2">
           {[5, 10, 15, 20].map((n) => (
-            <button
+            <motion.button
               key={n}
               disabled={disabled}
               onClick={() => onChange({ rounds: n })}
-              className={`flex-1 py-2.5 rounded-xl text-sm font-bold border transition-all ${
+              whileTap={disabled ? {} : { scale: 0.90 }}
+              whileHover={disabled ? {} : { scale: 1.06 }}
+              className={`flex-1 py-2.5 rounded-xl text-sm font-bold border transition-colors ${
                 disabled ? 'cursor-default' : 'cursor-pointer'
               } ${settings.rounds === n ? activeBtn : inactiveBtn}`}
             >
               {n}
-            </button>
+            </motion.button>
           ))}
         </div>
       </div>

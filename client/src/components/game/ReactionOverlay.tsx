@@ -42,13 +42,16 @@ function ReactionBar() {
     <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-30">
       <div className="flex gap-2 bg-bg-card border border-bg-border rounded-2xl px-3 py-2 shadow-lg">
         {ALLOWED_REACTIONS.map((emoji) => (
-          <button
+          <motion.button
             key={emoji}
             onClick={() => sendReaction(emoji)}
-            className="text-2xl hover:scale-125 transition-transform cursor-pointer p-1"
+            whileHover={{ scale: 1.3 }}
+            whileTap={{ scale: 0.75, rotate: 15 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 14 }}
+            className="text-2xl cursor-pointer p-1"
           >
             {emoji}
-          </button>
+          </motion.button>
         ))}
       </div>
     </div>

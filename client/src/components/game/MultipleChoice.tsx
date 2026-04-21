@@ -55,7 +55,11 @@ export function MultipleChoice() {
         return (
           <motion.button
             key={i}
-            whileTap={disabled ? {} : { scale: 0.97 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.06, type: 'spring', stiffness: 300, damping: 24 }}
+            whileTap={disabled ? {} : { scale: 0.96 }}
+            whileHover={disabled ? {} : { scale: 1.02 }}
             onClick={() => handleChoice(choice)}
             disabled={disabled}
             className={className}
