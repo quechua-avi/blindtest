@@ -10,6 +10,7 @@ import { GamePage } from './pages/GamePage'
 import { ResultsPage } from './pages/ResultsPage'
 import { AdminPage } from './pages/AdminPage'
 import { AuthPage } from './pages/AuthPage'
+import { SettingsPage } from './pages/SettingsPage'
 import { InstallBanner } from './components/ui/InstallBanner'
 
 interface AudioPlayerCtx {
@@ -40,6 +41,7 @@ function AppRoutes() {
         <Route path="/results" element={<ResultsPage />} />
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/auth" element={<AuthPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AudioPlayerContext.Provider>

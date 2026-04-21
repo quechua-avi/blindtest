@@ -108,6 +108,14 @@ export function AdminPage() {
     })
   }, [songs, filterGenre, filterDecade, search, sortBy])
 
+  const deleteUser = async (userId: number, username: string) => {
+    if (!confirm(`Supprimer le compte de "${username}" ? Cette action est irréversible.`)) return
+    try {
+      const res = await fetch(`/api/admin/users/${userId}?secret=${encodeURIComponent(secret)}`, { method: 'DELETE' })
+      if (res.ok) setUsers((prev) => prev.filter((u) => u.id !== userId))
+    } catch {}
+  }
+
   const stats = useMemo(() => {
     const byGenre: Record<string, number> = {}
     const byDecade: Record<string, number> = {}
@@ -209,6 +217,7 @@ export function AdminPage() {
                     <th className="px-4 py-3 text-xs text-slate-400 uppercase tracking-wider font-semibold">Meilleur score</th>
                     <th className="px-4 py-3 text-xs text-slate-400 uppercase tracking-wider font-semibold">Série max</th>
                     <th className="px-4 py-3 text-xs text-slate-400 uppercase tracking-wider font-semibold">Inscrit le</th>
+                    <th className="px-4 py-3 text-xs text-slate-400 uppercase tracking-wider font-semibold w-10"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -234,10 +243,19 @@ export function AdminPage() {
                       <td className="px-4 py-3 text-slate-400 text-xs">
                         {new Date((u.created_at ?? 0) * 1000).toLocaleDateString('fr-FR')}
                       </td>
+                      <td className="px-4 py-3">
+                        <motion.button
+                          onClick={() => deleteUser(u.id, u.username)}
+                          whileTap={{ scale: 0.9 }}
+                          className="text-xs text-red-400 hover:text-red-600 hover:bg-red-50 px-2 py-1 rounded-lg cursor-pointer transition-colors"
+                        >
+                          Supprimer
+                        </motion.button>
+                      </td>
                     </tr>
                   ))}
                   {users.length === 0 && (
-                    <tr><td colSpan={8} className="text-center text-slate-400 py-12">Aucun utilisateur inscrit</td></tr>
+                    <tr><td colSpan={9} className="text-center text-slate-400 py-12">Aucun utilisateur inscrit</td></tr>
                   )}
                 </tbody>
               </table>

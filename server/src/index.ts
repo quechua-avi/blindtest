@@ -68,6 +68,18 @@ app.get('/api/admin/users', (req: Request, res: Response) => {
   res.json({ total: (users as unknown[]).length, users })
 })
 
+// Admin — supprimer un utilisateur
+app.delete('/api/admin/users/:id', (req: Request, res: Response) => {
+  if (req.query.secret !== CONFIG.ADMIN_SECRET) {
+    res.status(401).json({ error: 'Unauthorized' })
+    return
+  }
+  const userId = parseInt(req.params.id, 10)
+  if (isNaN(userId)) { res.status(400).json({ error: 'ID invalide' }); return }
+  db.prepare('DELETE FROM users WHERE id = ?').run(userId)
+  res.json({ ok: true })
+})
+
 // Socket.io — auth middleware (optionnel, permet de lier userId)
 io.use((socket, next) => {
   const token = socket.handshake.auth?.token

@@ -89,10 +89,10 @@ export function HomePage() {
               </div>
               <span className="text-sm font-semibold text-slate-700 hidden sm:block">{user.username}</span>
               <button
-                onClick={() => logout()}
+                onClick={() => navigate('/settings')}
                 className="text-xs text-slate-400 hover:text-slate-600 border border-slate-200 rounded-lg px-2.5 py-1 cursor-pointer transition-colors"
               >
-                Déconnexion
+                Paramètres
               </button>
             </>
           ) : (

@@ -101,3 +101,39 @@ authRouter.put('/me', authMiddleware, (req: AuthRequest, res: Response) => {
   const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.userId) as Record<string, unknown>
   res.json({ user: sanitizeUser(user) })
 })
+
+// PUT /api/auth/me/password — change password
+authRouter.put('/me/password', authMiddleware, (req: AuthRequest, res: Response) => {
+  const { currentPassword, newPassword } = req.body ?? {}
+  if (!currentPassword || !newPassword) {
+    res.status(400).json({ error: 'Mot de passe actuel et nouveau requis' })
+    return
+  }
+  if (newPassword.length < 6) {
+    res.status(400).json({ error: 'Nouveau mot de passe trop court (6 caractères min)' })
+    return
+  }
+  const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.userId) as Record<string, unknown> | undefined
+  if (!user || !bcrypt.compareSync(currentPassword, user.password as string)) {
+    res.status(401).json({ error: 'Mot de passe actuel incorrect' })
+    return
+  }
+  db.prepare('UPDATE users SET password = ? WHERE id = ?').run(bcrypt.hashSync(newPassword, 10), req.userId)
+  res.json({ ok: true })
+})
+
+// DELETE /api/auth/me — delete own account
+authRouter.delete('/me', authMiddleware, (req: AuthRequest, res: Response) => {
+  const { password } = req.body ?? {}
+  if (!password) {
+    res.status(400).json({ error: 'Mot de passe requis pour confirmer la suppression' })
+    return
+  }
+  const user = db.prepare('SELECT * FROM users WHERE id = ?').get(req.userId) as Record<string, unknown> | undefined
+  if (!user || !bcrypt.compareSync(password, user.password as string)) {
+    res.status(401).json({ error: 'Mot de passe incorrect' })
+    return
+  }
+  db.prepare('DELETE FROM users WHERE id = ?').run(req.userId)
+  res.json({ ok: true })
+})
