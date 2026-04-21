@@ -8,6 +8,7 @@ import { JoinPage } from './pages/JoinPage'
 import { LobbyPage } from './pages/LobbyPage'
 import { GamePage } from './pages/GamePage'
 import { ResultsPage } from './pages/ResultsPage'
+import { AdminPage } from './pages/AdminPage'
 
 interface AudioPlayerCtx {
   playSong: (previewUrl: string) => void
@@ -35,6 +36,7 @@ function AppRoutes() {
         <Route path="/lobby/:code" element={<LobbyPage />} />
         <Route path="/game" element={<GamePage />} />
         <Route path="/results" element={<ResultsPage />} />
+        <Route path="/admin" element={<AdminPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AudioPlayerContext.Provider>

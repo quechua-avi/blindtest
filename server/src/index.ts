@@ -6,6 +6,7 @@ import path from 'path'
 import fs from 'fs'
 import type { ClientToServerEvents, ServerToClientEvents } from './types'
 import { CONFIG } from './config'
+import { SONG_LIBRARY } from './songs/songLibrary'
 import { registerLobbyHandlers } from './socket/handlers/lobbyHandlers'
 import { registerGameHandlers } from './socket/handlers/gameHandlers'
 import { registerChatHandlers } from './socket/handlers/chatHandlers'
@@ -29,6 +30,20 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents>(httpServer, {
 // Health check
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() })
+})
+
+// Admin — liste des chansons avec URL Deezer
+app.get('/api/admin/songs', (req: Request, res: Response) => {
+  if (req.query.secret !== CONFIG.ADMIN_SECRET) {
+    res.status(401).json({ error: 'Unauthorized' })
+    return
+  }
+  const songs = SONG_LIBRARY.map((s) => ({
+    ...s,
+    deezerSearchUrl: `https://api.deezer.com/search?q=artist:"${encodeURIComponent(s.artist.replace(/ ft\.?.+$/i, '').trim())}" track:"${encodeURIComponent(s.title)}"&limit=3&output=jsonp`,
+    deezerWebUrl: `https://www.deezer.com/search/${encodeURIComponent(`${s.title} ${s.artist}`)}`,
+  }))
+  res.json({ total: songs.length, songs })
 })
 
 // Socket.io
