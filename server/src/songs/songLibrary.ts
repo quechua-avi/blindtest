@@ -1448,4 +1448,113 @@ export const SONG_LIBRARY: Song[] = [
   { id: 'jul-superstar-2022', title: 'Superstar', artist: 'Jul', year: 2022, genre: 'jul', decade: '2020s' },
   { id: 'jul-la-faille-2023', title: 'La faille', artist: 'Jul', year: 2023, genre: 'jul', decade: '2020s' },
   { id: 'jul-namek-2023', title: 'Namek', artist: 'Jul ft. Omah Lay', year: 2023, genre: 'jul', decade: '2020s', alternativeArtists: ['Jul', 'Omah Lay'] },
+
+  // ═══════════════════════════════════════════════════════════
+  // POP — 2000s (v5)
+  // ═══════════════════════════════════════════════════════════
+  { id: 'pop5a-mrbright-2003', title: 'Mr. Brightside', artist: 'The Killers', year: 2003, genre: 'pop', decade: '2000s' },
+  { id: 'pop5a-beautifulgirls-2007', title: 'Beautiful Girls', artist: 'Sean Kingston', year: 2007, genre: 'pop', decade: '2000s' },
+  { id: 'pop5a-fixu-2005', title: 'Fix You', artist: 'Coldplay', year: 2005, genre: 'pop', decade: '2000s' },
+  { id: 'pop5a-yellow-2000', title: 'Yellow', artist: 'Coldplay', year: 2000, genre: 'pop', decade: '2000s' },
+  { id: 'pop5a-stacymom-2003', title: "Stacy's Mom", artist: 'Fountains of Wayne', year: 2003, genre: 'pop', decade: '2000s', alternativeTitles: ['Stacys Mom'] },
+
+  // ═══════════════════════════════════════════════════════════
+  // POP — 2010s (v5)
+  // ═══════════════════════════════════════════════════════════
+  { id: 'pop5b-pumpedup-2010', title: 'Pumped Up Kicks', artist: 'Foster the People', year: 2010, genre: 'pop', decade: '2010s' },
+  { id: 'pop5b-takemechurch-2013', title: 'Take Me to Church', artist: 'Hozier', year: 2013, genre: 'pop', decade: '2010s' },
+  { id: 'pop5b-lethergo-2012', title: 'Let Her Go', artist: 'Passenger', year: 2012, genre: 'pop', decade: '2010s' },
+  { id: 'pop5b-demons-2012', title: 'Demons', artist: 'Imagine Dragons', year: 2012, genre: 'pop', decade: '2010s' },
+  { id: 'pop5b-pillowtalk-2016', title: 'PILLOWTALK', artist: 'Zayn', year: 2016, genre: 'pop', decade: '2010s', alternativeTitles: ['Pillowtalk'] },
+  { id: 'pop5b-hymnweekend-2015', title: 'Hymn for the Weekend', artist: 'Coldplay', year: 2015, genre: 'pop', decade: '2010s' },
+  { id: 'pop5b-workfromhome-2016', title: 'Work from Home', artist: 'Fifth Harmony ft. Ty Dolla $ign', year: 2016, genre: 'pop', decade: '2010s', alternativeArtists: ['Fifth Harmony', 'Ty Dolla Sign'] },
+  { id: 'pop5b-skyfull-2014', title: 'A Sky Full of Stars', artist: 'Coldplay', year: 2014, genre: 'pop', decade: '2010s' },
+
+  // ═══════════════════════════════════════════════════════════
+  // POP — 2020s (v5)
+  // ═══════════════════════════════════════════════════════════
+  { id: 'pop5c-abcdefu-2021', title: 'abcdefu', artist: 'GAYLE', year: 2021, genre: 'pop', decade: '2020s', alternativeTitles: ['ABCDEFU'] },
+  { id: 'pop5c-wdtab-2022', title: "We Don't Talk About Bruno", artist: 'Encanto', year: 2022, genre: 'pop', decade: '2020s', alternativeTitles: ['We Dont Talk About Bruno'] },
+  { id: 'pop5c-runninguphill-2022', title: 'Running Up That Hill', artist: 'Kate Bush', year: 2022, genre: 'pop', decade: '2020s', alternativeTitles: ['Running Up That Hill (A Deal with God)'] },
+  { id: 'pop5c-dynamite-2020', title: 'Dynamite', artist: 'BTS', year: 2020, genre: 'pop', decade: '2020s' },
+  { id: 'pop5c-butter-2021', title: 'Butter', artist: 'BTS', year: 2021, genre: 'pop', decade: '2020s' },
+  { id: 'pop5c-mood-2020', title: 'Mood', artist: '24kGoldn ft. iann dior', year: 2020, genre: 'pop', decade: '2020s', alternativeArtists: ['24kGoldn', 'iann dior'] },
+  { id: 'pop5c-myuniverse-2021', title: 'My Universe', artist: 'Coldplay & BTS', year: 2021, genre: 'pop', decade: '2020s', alternativeArtists: ['Coldplay', 'BTS'] },
+  { id: 'pop5c-beggin-2021', title: "Beggin'", artist: 'Maneskin', year: 2021, genre: 'pop', decade: '2020s', alternativeTitles: ['Beggin'] },
+
+  // ═══════════════════════════════════════════════════════════
+  // HIP-HOP — 2010s (v5)
+  // ═══════════════════════════════════════════════════════════
+  { id: 'hh5a-panda-2016', title: 'Panda', artist: 'Desiigner', year: 2016, genre: 'hiphop', decade: '2010s' },
+  { id: 'hh5a-blackbeatles-2016', title: 'Black Beatles', artist: 'Rae Sremmurd ft. Gucci Mane', year: 2016, genre: 'hiphop', decade: '2010s', alternativeArtists: ['Rae Sremmurd', 'Gucci Mane'] },
+  { id: 'hh5a-tshirt-migos-2017', title: 'T-Shirt', artist: 'Migos', year: 2017, genre: 'hiphop', decade: '2010s' },
+
+  // ═══════════════════════════════════════════════════════════
+  // HIP-HOP — 2020s (v5)
+  // ═══════════════════════════════════════════════════════════
+  { id: 'hh5b-euphoria-2024', title: 'euphoria', artist: 'Kendrick Lamar', year: 2024, genre: 'hiphop', decade: '2020s', alternativeTitles: ['Euphoria'] },
+  { id: 'hh5b-sprinter-2023', title: 'Sprinter', artist: 'Central Cee & Dave', year: 2023, genre: 'hiphop', decade: '2020s', alternativeArtists: ['Central Cee', 'Dave'] },
+  { id: 'hh5b-ap-pop-smoke-2020', title: 'AP', artist: 'Pop Smoke', year: 2020, genre: 'hiphop', decade: '2020s' },
+  { id: 'hh5b-whatspoppin-2020', title: "What's Poppin", artist: 'Jack Harlow', year: 2020, genre: 'hiphop', decade: '2020s', alternativeTitles: ["What's Poppin'"] },
+
+  // ═══════════════════════════════════════════════════════════
+  // ELECTRONIC — 2010s (v5)
+  // ═══════════════════════════════════════════════════════════
+  { id: 'el5a-ratherbe-2014', title: 'Rather Be', artist: 'Clean Bandit ft. Jess Glynne', year: 2014, genre: 'electronic', decade: '2010s', alternativeArtists: ['Clean Bandit', 'Jess Glynne'] },
+  { id: 'el5a-rockabye-2016', title: 'Rockabye', artist: 'Clean Bandit ft. Sean Paul & Anne-Marie', year: 2016, genre: 'electronic', decade: '2010s', alternativeArtists: ['Clean Bandit', 'Sean Paul', 'Anne-Marie'] },
+  { id: 'el5a-body-loudlux-2017', title: 'Body', artist: 'Loud Luxury ft. brando', year: 2017, genre: 'electronic', decade: '2010s', alternativeArtists: ['Loud Luxury'] },
+
+  // ═══════════════════════════════════════════════════════════
+  // ELECTRONIC — 2020s (v5)
+  // ═══════════════════════════════════════════════════════════
+  { id: 'el5b-byside-2022', title: 'By Your Side', artist: 'Calvin Harris ft. Tom Grennan', year: 2022, genre: 'electronic', decade: '2020s', alternativeArtists: ['Calvin Harris', 'Tom Grennan'] },
+  { id: 'el5b-promises-2022', title: 'Promises', artist: 'Calvin Harris & Sam Smith', year: 2022, genre: 'electronic', decade: '2020s', alternativeArtists: ['Calvin Harris', 'Sam Smith'] },
+  { id: 'el5b-1035-2022', title: '10:35', artist: 'Tiësto & Tate McRae', year: 2022, genre: 'electronic', decade: '2020s', alternativeArtists: ['Tiesto', 'Tate McRae'] },
+  { id: 'el5b-dontforget-2022', title: "Don't Forget My Love", artist: 'Diplo & Miguel', year: 2022, genre: 'electronic', decade: '2020s', alternativeArtists: ['Diplo', 'Miguel'] },
+
+  // ═══════════════════════════════════════════════════════════
+  // R&B — 2010s (v5)
+  // ═══════════════════════════════════════════════════════════
+  { id: 'rnb5a-girlonfire-2012', title: 'Girl on Fire', artist: 'Alicia Keys', year: 2012, genre: 'rnb', decade: '2010s' },
+  { id: 'rnb5a-lovemeharder-2014', title: 'Love Me Harder', artist: 'Ariana Grande ft. The Weeknd', year: 2014, genre: 'rnb', decade: '2010s', alternativeArtists: ['Ariana Grande', 'The Weeknd'] },
+  { id: 'rnb5a-getu-2017', title: 'Get You', artist: 'Daniel Caesar ft. Kali Uchis', year: 2017, genre: 'rnb', decade: '2010s', alternativeArtists: ['Daniel Caesar', 'Kali Uchis'] },
+  { id: 'rnb5a-bloodline-2019', title: 'Bloodline', artist: 'Ariana Grande', year: 2019, genre: 'rnb', decade: '2010s' },
+
+  // ═══════════════════════════════════════════════════════════
+  // R&B — 2020s (v5)
+  // ═══════════════════════════════════════════════════════════
+  { id: 'rnb5b-softlife-2023', title: 'Soft Life', artist: 'PinkPantheress', year: 2023, genre: 'rnb', decade: '2020s' },
+  { id: 'rnb5b-boysaliar-2023', title: "Boy's a liar Pt. 2", artist: 'PinkPantheress & Ice Spice', year: 2023, genre: 'rnb', decade: '2020s', alternativeArtists: ['PinkPantheress', 'Ice Spice'], alternativeTitles: ["Boys a liar", "Boy's a liar"] },
+  { id: 'rnb5b-moscamel-2022', title: 'Moscow Mule', artist: 'Bad Bunny', year: 2022, genre: 'rnb', decade: '2020s' },
+
+  // ═══════════════════════════════════════════════════════════
+  // MUSIQUE FRANÇAISE — 2010s (v5)
+  // ═══════════════════════════════════════════════════════════
+  { id: 'fr5a-claraluc-grenade-2019', title: 'La grenade', artist: 'Clara Luciani', year: 2019, genre: 'french', decade: '2010s' },
+  { id: 'fr5a-prayerinc-2014', title: 'Prayer in C', artist: 'Lilly Wood & The Prick & Robin Schulz', year: 2014, genre: 'french', decade: '2010s', alternativeArtists: ['Lilly Wood', 'Robin Schulz', 'Lilly Wood and The Prick'] },
+  { id: 'fr5a-frero-sirenes-2014', title: 'Le Chant des Sirènes', artist: 'Frero Delavega', year: 2014, genre: 'french', decade: '2010s', alternativeTitles: ['Le Chant des Sirenes'] },
+
+  // ═══════════════════════════════════════════════════════════
+  // MUSIQUE FRANÇAISE — 2020s (v5)
+  // ═══════════════════════════════════════════════════════════
+  { id: 'fr5b-slimane-avanttoi-2024', title: 'Avant toi', artist: 'Slimane', year: 2024, genre: 'french', decade: '2020s' },
+  { id: 'fr5b-barbara-voila-2021', title: 'Voilà', artist: 'Barbara Pravi', year: 2021, genre: 'french', decade: '2020s', alternativeTitles: ['Voila'] },
+  { id: 'fr5b-franglish-nuit-2021', title: 'Cette nuit', artist: 'Franglish', year: 2021, genre: 'french', decade: '2020s' },
+  { id: 'fr5b-kendji-color-2022', title: 'Color Gitano', artist: 'Kendji Girac', year: 2022, genre: 'french', decade: '2020s' },
+  { id: 'fr5b-lous-amigo-2021', title: 'Amigo', artist: 'Lous and the Yakuza', year: 2021, genre: 'french', decade: '2020s' },
+
+  // ═══════════════════════════════════════════════════════════
+  // LATIN — 2010s (v5)
+  // ═══════════════════════════════════════════════════════════
+  { id: 'lat5a-sinpijama-2018', title: 'Sin Pijama', artist: 'Becky G ft. Natti Natasha', year: 2018, genre: 'latin', decade: '2010s', alternativeArtists: ['Becky G', 'Natti Natasha'] },
+  { id: 'lat5a-criminal-2017', title: 'Criminal', artist: 'Natti Natasha ft. Ozuna', year: 2017, genre: 'latin', decade: '2010s', alternativeArtists: ['Natti Natasha', 'Ozuna'] },
+  { id: 'lat5a-itakeria-2018', title: 'Itakería', artist: 'Ozuna ft. Anuel AA & J Balvin', year: 2018, genre: 'latin', decade: '2010s', alternativeArtists: ['Ozuna', 'Anuel AA', 'J Balvin'], alternativeTitles: ['Itakeria'] },
+
+  // ═══════════════════════════════════════════════════════════
+  // LATIN — 2020s (v5)
+  // ═══════════════════════════════════════════════════════════
+  { id: 'lat5b-quevedo-bzrp52-2022', title: 'Quevedo: Bzrp Music Sessions Vol. 52', artist: 'Bizarrap & Quevedo', year: 2022, genre: 'latin', decade: '2020s', alternativeArtists: ['Bizarrap', 'Quevedo'], alternativeTitles: ['BZRP Session 52', 'Quevedo Session', 'Quevedo Bzrp'] },
+  { id: 'lat5b-jumpa-2022', title: 'La Jumpa', artist: 'Arcangel & Bad Bunny', year: 2022, genre: 'latin', decade: '2020s', alternativeArtists: ['Arcangel', 'Bad Bunny'] },
+  { id: 'lat5b-pesopluma-bzrp55-2023', title: 'Peso Pluma: Bzrp Music Sessions Vol. 55', artist: 'Bizarrap & Peso Pluma', year: 2023, genre: 'latin', decade: '2020s', alternativeArtists: ['Bizarrap', 'Peso Pluma'], alternativeTitles: ['BZRP Session 55', 'Peso Pluma Session', 'Peso Pluma Bzrp'] },
+  { id: 'lat5b-neverita-2022', title: 'Neverita', artist: 'Bad Bunny', year: 2022, genre: 'latin', decade: '2020s' },
 ]
