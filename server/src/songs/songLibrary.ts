@@ -413,7 +413,7 @@ export const SONG_LIBRARY: Song[] = [
   { id: 'hh-2000s-lazyboy-2003', title: "Soldier", artist: "Destiny's Child", year: 2004, genre: 'hiphop', decade: '2000s', alternativeArtists: ['Destinys Child'] },
   { id: 'hh-2000s-twista-2004', title: 'Slow Jamz', artist: 'Kanye West ft. Twista', year: 2004, genre: 'hiphop', decade: '2000s', alternativeArtists: ['Kanye West', 'Twista', 'Jamie Foxx'] },
   { id: 'hh-2000s-beautiful-2003', title: 'Beautiful', artist: 'Snoop Dogg', year: 2003, genre: 'hiphop', decade: '2000s' },
-  { id: 'hh-2000s-neverenough-2003', title: 'Never Enough', artist: '50 Cent', year: 2003, genre: 'hiphop', decade: '2000s', alternativeTitles: ['In da Club'] },
+  { id: 'hh-2000s-neverenough-2003', title: 'Never Enough', artist: '50 Cent', year: 2003, genre: 'hiphop', decade: '2000s' },
 
   // ═══════════════════════════════════════════
   // HIP-HOP — 2010s (suite)
@@ -836,7 +836,7 @@ export const SONG_LIBRARY: Song[] = [
   { id: 'pop2-cantgetyou-2001', title: "Can't Get You Out of My Head", artist: 'Kylie Minogue', year: 2001, genre: 'pop', decade: '2000s', alternativeTitles: ['Cant Get You Out of My Head'] },
   { id: 'pop2-maneater-2006', title: 'Maneater', artist: 'Nelly Furtado', year: 2006, genre: 'pop', decade: '2000s' },
   { id: 'pop2-justlikeapill-2001', title: 'Just Like a Pill', artist: 'Pink', year: 2001, genre: 'pop', decade: '2000s', alternativeArtists: ['P!nk'] },
-  { id: 'pop2-fallin-2001', title: "Fallin'", artist: 'Alicia Keys', year: 2001, genre: 'pop', decade: '2000s', alternativeTitles: ['Falling'] },
+  { id: 'pop2-dontcha-2005', title: "Don't Cha", artist: 'The Pussycat Dolls ft. Busta Rhymes', year: 2005, genre: 'pop', decade: '2000s', alternativeArtists: ['The Pussycat Dolls'] },
   { id: 'pop2-bootylicious-2001', title: 'Bootylicious', artist: "Destiny's Child", year: 2001, genre: 'pop', decade: '2000s' },
   { id: 'pop2-biggirlsdontcry-2006', title: "Big Girls Don't Cry", artist: 'Fergie', year: 2006, genre: 'pop', decade: '2000s', alternativeTitles: ['Big Girls Dont Cry'] },
 
@@ -865,7 +865,7 @@ export const SONG_LIBRARY: Song[] = [
   // ═══════════════════════════════════════════════════════════
   { id: 'hh2-lollipop-2008', title: 'Lollipop', artist: 'Lil Wayne', year: 2008, genre: 'hiphop', decade: '2000s' },
   { id: 'hh2-crankthat-2007', title: 'Crank That', artist: 'Soulja Boy', year: 2007, genre: 'hiphop', decade: '2000s', alternativeTitles: ['Crank That (Soulja Boy)'] },
-  { id: 'hh2-dropit-2004', title: "Drop It Like It's Hot", artist: 'Snoop Dogg ft. Pharrell', year: 2004, genre: 'hiphop', decade: '2000s', alternativeArtists: ['Snoop Dogg', 'Pharrell'] },
+  { id: 'hh2-aintnuthinbutag-1999', title: "Ain't Nuthin' but a G Thang", artist: 'Dr. Dre ft. Snoop Dogg', year: 1993, genre: 'hiphop', decade: '2000s', alternativeArtists: ['Dr. Dre', 'Snoop Dogg'], alternativeTitles: ['Nuthin But a G Thang'] },
   { id: 'hh2-low-2007', title: 'Low', artist: 'Flo Rida ft. T-Pain', year: 2007, genre: 'hiphop', decade: '2000s', alternativeArtists: ['Flo Rida', 'T-Pain'] },
   { id: 'hh2-whatever-2008', title: 'Whatever You Like', artist: 'T.I.', year: 2008, genre: 'hiphop', decade: '2000s' },
   { id: 'hh2-standup-2003', title: 'Stand Up', artist: 'Ludacris', year: 2003, genre: 'hiphop', decade: '2000s' },
@@ -873,7 +873,7 @@ export const SONG_LIBRARY: Song[] = [
   // ═══════════════════════════════════════════════════════════
   // HIP-HOP — 2010s (v2)
   // ═══════════════════════════════════════════════════════════
-  { id: 'hh2-godsplan-2018', title: "God's Plan", artist: 'Drake', year: 2018, genre: 'hiphop', decade: '2010s' },
+  { id: 'hh2-toosie-2020', title: 'Toosie Slide', artist: 'Drake', year: 2020, genre: 'hiphop', decade: '2010s' },
   { id: 'hh2-middlechild-2019', title: 'Middle Child', artist: 'J. Cole', year: 2019, genre: 'hiphop', decade: '2010s' },
   { id: 'hh2-birthdaysong-2012', title: 'Birthday Song', artist: '2 Chainz ft. Kanye West', year: 2012, genre: 'hiphop', decade: '2010s', alternativeArtists: ['2 Chainz', 'Kanye West'] },
   { id: 'hh2-idfwu-2014', title: "I Don't F**k With You", artist: 'Big Sean', year: 2014, genre: 'hiphop', decade: '2010s', alternativeTitles: ['IDFWU'] },

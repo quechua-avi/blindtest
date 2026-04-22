@@ -47,10 +47,12 @@ export async function fetchDeezerPreview(title: string, artist: string): Promise
   // Nettoyer le titre et l'artiste pour la recherche
   const cleanTitle = normalize(title)
   const cleanArtist = normalize(artist)
-  const query = encodeURIComponent(`${cleanTitle} ${cleanArtist}`)
+
+  // Utiliser les opérateurs de champ Deezer pour une recherche précise
+  const query = `artist:"${cleanArtist}" track:"${cleanTitle}"`
+  const url = `https://api.deezer.com/search?q=${encodeURIComponent(query)}&limit=5&output=json`
 
   try {
-    const url = `https://api.deezer.com/search?q=${query}&limit=5&output=json`
     const res = await fetch(url, { signal: AbortSignal.timeout(5000) })
     if (!res.ok) {
       console.warn(`[Deezer] HTTP ${res.status} pour "${title}" - ${artist}`)
@@ -61,8 +63,13 @@ export async function fetchDeezerPreview(title: string, artist: string): Promise
     const json = await res.json() as DeezerSearchResponse
     const tracks = json.data ?? []
 
-    // Trouver le meilleur résultat (avec preview non-vide)
-    const match = tracks.find((t) => t.preview && t.preview.length > 0)
+    // Vérifier que le résultat correspond bien au titre cherché
+    const match = tracks.find((t) => {
+      if (!t.preview || t.preview.length === 0) return false
+      const resultTitle = normalize(t.title)
+      return resultTitle.includes(cleanTitle) || cleanTitle.includes(resultTitle)
+    }) ?? tracks.find((t) => t.preview && t.preview.length > 0)
+
     if (!match) {
       console.warn(`[Deezer] Aucune preview pour "${title}" - ${artist}`)
       previewCache.set(cacheKey, null)
