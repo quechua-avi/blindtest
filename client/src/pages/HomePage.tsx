@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { getSocket } from '../socket/socketClient'
@@ -28,8 +28,16 @@ export function HomePage() {
   const [pseudoError, setPseudoError] = useState('')
   const [joinError, setJoinError]     = useState('')
   const [createError, setCreateError] = useState('')
-  const [joinLoading, setJoinLoading]     = useState(false)
-  const [createLoading, setCreateLoading] = useState(false)
+  const [joinLoading, setJoinLoading]         = useState(false)
+  const [createLoading, setCreateLoading]     = useState(false)
+  const [requirePassword, setRequirePassword] = useState(true)
+
+  useEffect(() => {
+    fetch('/api/settings')
+      .then((r) => r.json())
+      .then((d) => setRequirePassword(d.requireRoomPassword ?? true))
+      .catch(() => {})
+  }, [])
 
   const savePseudo = (): string | null => {
     const trimmed = pseudo.trim()
@@ -53,10 +61,10 @@ export function HomePage() {
   const handleCreate = () => {
     const trimmed = savePseudo()
     if (!trimmed) return
-    if (password !== 'buzzyquizpitchounes') { setCreateError('Mot de passe incorrect'); return }
+    if (requirePassword && !password.trim()) { setCreateError('Mot de passe requis'); return }
     setCreateError('')
     setCreateLoading(true)
-    getSocket().emit('lobby:create', { playerName: trimmed, avatarColor })
+    getSocket().emit('lobby:create', { playerName: trimmed, avatarColor, password: password.trim() || undefined })
     setTimeout(() => setCreateLoading(false), 3000)
   }
 
@@ -245,15 +253,20 @@ export function HomePage() {
               <h2 className="font-display text-xl font-bold text-slate-900">Créer une partie</h2>
               <p className="text-slate-400 text-sm mt-0.5">Hôte uniquement</p>
             </div>
-            <Input
-              light
-              placeholder="Mot de passe"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
-              error={createError}
-            />
+            {requirePassword && (
+              <Input
+                light
+                placeholder="Mot de passe"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
+                error={createError}
+              />
+            )}
+            {!requirePassword && createError && (
+              <p className="text-red-500 text-sm">{createError}</p>
+            )}
             <Button
               onClick={handleCreate}
               loading={createLoading}

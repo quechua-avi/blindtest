@@ -45,7 +45,11 @@ export function AdminPage() {
   const [users, setUsers] = useState<AdminUser[]>([])
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [tab, setTab] = useState<'songs' | 'users'>('songs')
+  const [tab, setTab] = useState<'songs' | 'users' | 'settings'>('songs')
+  const [requireRoomPassword, setRequireRoomPassword] = useState(true)
+  const [roomPassword, setRoomPassword]               = useState('')
+  const [settingsSaved, setSettingsSaved]             = useState(false)
+  const [settingsLoading, setSettingsLoading]         = useState(false)
   const [filterGenre, setFilterGenre] = useState<Genre | 'all'>('all')
   const [filterDecade, setFilterDecade] = useState<Decade | 'all'>('all')
   const [search, setSearch] = useState('')
@@ -61,9 +65,10 @@ export function AdminPage() {
     setLoading(true)
     setError('')
     try {
-      const [songsRes, usersRes] = await Promise.all([
+      const [songsRes, usersRes, settingsRes] = await Promise.all([
         fetch(`/api/admin/songs?secret=${encodeURIComponent(s)}`),
         fetch(`/api/admin/users?secret=${encodeURIComponent(s)}`),
+        fetch(`/api/admin/settings?secret=${encodeURIComponent(s)}`),
       ])
       if (songsRes.status === 401) {
         setError('Mot de passe incorrect')
@@ -71,9 +76,11 @@ export function AdminPage() {
         setSecret('')
         return
       }
-      const [songsData, usersData] = await Promise.all([songsRes.json(), usersRes.json()])
+      const [songsData, usersData, settingsData] = await Promise.all([songsRes.json(), usersRes.json(), settingsRes.json()])
       setSongs(songsData.songs)
       setUsers(usersData.users ?? [])
+      setRequireRoomPassword(settingsData.requireRoomPassword ?? true)
+      setRoomPassword(settingsData.roomPassword ?? '')
       sessionStorage.setItem(ADMIN_SECRET_KEY, s)
       setSecret(s)
     } catch {
@@ -81,6 +88,26 @@ export function AdminPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  async function saveSettings() {
+    setSettingsLoading(true)
+    setSettingsSaved(false)
+    try {
+      const res = await fetch(`/api/admin/settings?secret=${encodeURIComponent(secret)}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ requireRoomPassword, roomPassword }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        setRequireRoomPassword(data.requireRoomPassword)
+        setRoomPassword(data.roomPassword)
+        setSettingsSaved(true)
+        setTimeout(() => setSettingsSaved(false), 2500)
+      }
+    } catch {}
+    setSettingsLoading(false)
   }
 
   const filtered = useMemo(() => {
@@ -201,7 +228,7 @@ export function AdminPage() {
       {/* Tabs */}
       <div className="bg-white border-b border-slate-200 px-6">
         <div className="flex gap-1">
-          {(['songs', 'users'] as const).map((t) => (
+          {(['songs', 'users', 'settings'] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -211,13 +238,77 @@ export function AdminPage() {
                   : 'border-transparent text-slate-500 hover:text-slate-700'
               }`}
             >
-              {t === 'songs' ? `Chansons (${songs.length})` : `Utilisateurs (${users.length})`}
+              {t === 'songs' ? `Chansons (${songs.length})` : t === 'users' ? `Utilisateurs (${users.length})` : 'Paramètres'}
             </button>
           ))}
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-5">
+        {tab === 'settings' && (
+          <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 max-w-lg space-y-6">
+            <div>
+              <h2 className="text-base font-bold text-slate-800 mb-1">Création de parties</h2>
+              <p className="text-slate-400 text-sm">Contrôle qui peut créer une nouvelle salle.</p>
+            </div>
+
+            {/* Toggle mot de passe requis */}
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-sm font-semibold text-slate-700">Mot de passe requis</p>
+                <p className="text-xs text-slate-400 mt-0.5">Si activé, les joueurs doivent entrer un mot de passe pour créer une partie.</p>
+              </div>
+              <button
+                onClick={() => setRequireRoomPassword((v) => !v)}
+                className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none ${
+                  requireRoomPassword ? 'bg-violet-600' : 'bg-slate-200'
+                }`}
+              >
+                <span
+                  className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform duration-200 ${
+                    requireRoomPassword ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+
+            {/* Champ mot de passe */}
+            {requireRoomPassword && (
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Mot de passe actuel</label>
+                <input
+                  type="text"
+                  value={roomPassword}
+                  onChange={(e) => setRoomPassword(e.target.value)}
+                  placeholder="Minimum 4 caractères"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 text-sm font-mono"
+                />
+                <p className="text-xs text-slate-400 mt-1">Partagez ce mot de passe uniquement avec les hôtes autorisés.</p>
+              </div>
+            )}
+
+            <div className="flex items-center gap-3">
+              <motion.button
+                onClick={saveSettings}
+                disabled={settingsLoading || (requireRoomPassword && roomPassword.trim().length < 4)}
+                whileTap={{ scale: 0.95 }}
+                className="px-5 py-2.5 bg-violet-600 text-white rounded-xl text-sm font-semibold disabled:opacity-40 hover:bg-violet-700 transition-colors cursor-pointer"
+              >
+                {settingsLoading ? 'Enregistrement...' : 'Enregistrer'}
+              </motion.button>
+              {settingsSaved && (
+                <motion.span
+                  initial={{ opacity: 0, x: -4 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0 }}
+                  className="text-sm text-green-600 font-semibold"
+                >
+                  ✓ Sauvegardé
+                </motion.span>
+              )}
+            </div>
+          </div>
+        )}
         {tab === 'users' && (
           <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
             <div className="overflow-x-auto">

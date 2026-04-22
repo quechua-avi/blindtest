@@ -39,6 +39,45 @@ app.get('/health', (_req, res) => {
 // Auth routes
 app.use('/api/auth', authRouter)
 
+// Helpers settings
+function getSetting(key: string): string | undefined {
+  const row = db.prepare('SELECT value FROM app_settings WHERE key = ?').get(key) as { value: string } | undefined
+  return row?.value
+}
+function setSetting(key: string, value: string) {
+  db.prepare('INSERT OR REPLACE INTO app_settings (key, value) VALUES (?, ?)').run(key, value)
+}
+
+// GET /api/settings — public, retourne si le mot de passe est requis pour créer une salle
+app.get('/api/settings', (_req: Request, res: Response) => {
+  res.json({ requireRoomPassword: getSetting('require_room_password') === '1' })
+})
+
+// GET /api/admin/settings — paramètres complets (admin)
+app.get('/api/admin/settings', (req: Request, res: Response) => {
+  if (req.query.secret !== CONFIG.ADMIN_SECRET) { res.status(401).json({ error: 'Unauthorized' }); return }
+  res.json({
+    requireRoomPassword: getSetting('require_room_password') === '1',
+    roomPassword: getSetting('room_password') ?? '',
+  })
+})
+
+// PUT /api/admin/settings — modifier les paramètres
+app.put('/api/admin/settings', (req: Request, res: Response) => {
+  if (req.query.secret !== CONFIG.ADMIN_SECRET) { res.status(401).json({ error: 'Unauthorized' }); return }
+  const { requireRoomPassword, roomPassword } = req.body ?? {}
+  if (typeof requireRoomPassword === 'boolean') {
+    setSetting('require_room_password', requireRoomPassword ? '1' : '0')
+  }
+  if (typeof roomPassword === 'string' && roomPassword.trim().length >= 4) {
+    setSetting('room_password', roomPassword.trim())
+  }
+  res.json({
+    requireRoomPassword: getSetting('require_room_password') === '1',
+    roomPassword: getSetting('room_password') ?? '',
+  })
+})
+
 // Admin — liste des chansons avec URL Deezer
 app.get('/api/admin/songs', (req: Request, res: Response) => {
   if (req.query.secret !== CONFIG.ADMIN_SECRET) {

@@ -2,6 +2,12 @@ import type { Server, Socket } from 'socket.io'
 import type { ClientToServerEvents, ServerToClientEvents } from '../../types'
 import { GameManager } from '../../game/GameManager'
 import { AVATAR_COLORS } from '../avatarColors'
+import { db } from '../../db/database'
+
+function getSetting(key: string): string | undefined {
+  const row = db.prepare('SELECT value FROM app_settings WHERE key = ?').get(key) as { value: string } | undefined
+  return row?.value
+}
 
 type IoServer = Server<ClientToServerEvents, ServerToClientEvents>
 type IoSocket = Socket<ClientToServerEvents, ServerToClientEvents>
@@ -11,10 +17,19 @@ function pickColor(index: number): string {
 }
 
 export function registerLobbyHandlers(io: IoServer, socket: IoSocket) {
-  socket.on('lobby:create', ({ playerName, avatarColor, settings }) => {
+  socket.on('lobby:create', ({ playerName, avatarColor, settings, password }) => {
     if (!playerName?.trim()) {
       socket.emit('lobby:error', { code: 'INVALID_NAME', message: 'Nom invalide' })
       return
+    }
+
+    const requirePassword = getSetting('require_room_password') === '1'
+    if (requirePassword) {
+      const expectedPassword = getSetting('room_password') ?? ''
+      if (!password || password !== expectedPassword) {
+        socket.emit('lobby:error', { code: 'WRONG_PASSWORD', message: 'Mot de passe incorrect' })
+        return
+      }
     }
 
     const color = avatarColor && AVATAR_COLORS.includes(avatarColor) ? avatarColor : pickColor(0)

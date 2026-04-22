@@ -11,6 +11,14 @@ db.pragma('journal_mode = WAL')
 db.pragma('foreign_keys = ON')
 
 db.exec(`
+  CREATE TABLE IF NOT EXISTS app_settings (
+    key   TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+  );
+
+  INSERT OR IGNORE INTO app_settings (key, value) VALUES ('require_room_password', '1');
+  INSERT OR IGNORE INTO app_settings (key, value) VALUES ('room_password', 'buzzyquizpitchounes');
+
   CREATE TABLE IF NOT EXISTS users (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     email       TEXT    NOT NULL UNIQUE COLLATE NOCASE,
