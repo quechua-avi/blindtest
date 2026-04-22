@@ -15,6 +15,8 @@ import { selectSongs, generateChoices } from '../songs/songSelector'
 import { SONG_LIBRARY } from '../songs/songLibrary'
 import { fetchDeezerPreview } from '../songs/deezerLookup'
 import { checkAnswer } from '../matching/fuzzyMatch'
+
+const SINGLE_ARTIST_GENRES = new Set(['jul'])
 import {
   calculatePoints,
   getStreakBonus,
@@ -466,7 +468,8 @@ export class GameRoom {
     // En mode buzzer, seul le joueur qui a buzzé peut répondre
     if (this.settings.mode === 'buzzer' && this.buzzedPlayerId !== playerId) return { correct: false }
 
-    const result = checkAnswer(answer, this.currentSong)
+    const titleOnly = SINGLE_ARTIST_GENRES.has(this.currentSong.genre)
+    const result = checkAnswer(answer, this.currentSong, { titleOnly })
 
     if (!result.correct) {
       if (this.settings.mode === 'buzzer') {

@@ -27,7 +27,7 @@ function levenshtein(a: string, b: string): number {
   return dp[m][n]
 }
 
-export function checkAnswer(input: string, song: Song): AnswerCheckResult {
+export function checkAnswer(input: string, song: Song, options?: { titleOnly?: boolean }): AnswerCheckResult {
   const norm = normalize(input)
   if (norm.length < 2) return { correct: false }
 
@@ -36,7 +36,6 @@ export function checkAnswer(input: string, song: Song): AnswerCheckResult {
   if (norm === combined) return { correct: true, matched: 'exact', matchedField: 'title' }
 
   const titleTargets = [song.title, ...(song.alternativeTitles ?? [])].map(normalize)
-  const artistTargets = [song.artist, ...(song.alternativeArtists ?? [])].map(normalize)
 
   // Check title
   for (const target of titleTargets) {
@@ -51,12 +50,15 @@ export function checkAnswer(input: string, song: Song): AnswerCheckResult {
     }
   }
 
-  // Check artist
-  for (const target of artistTargets) {
-    if (target === norm) return { correct: true, matched: 'exact', matchedField: 'artist' }
-    const threshold = Math.max(1, Math.floor(target.length / 5))
-    if (levenshtein(norm, target) <= threshold) {
-      return { correct: true, matched: 'fuzzy', matchedField: 'artist' }
+  // Check artist (désactivé pour les genres mono-artiste)
+  if (!options?.titleOnly) {
+    const artistTargets = [song.artist, ...(song.alternativeArtists ?? [])].map(normalize)
+    for (const target of artistTargets) {
+      if (target === norm) return { correct: true, matched: 'exact', matchedField: 'artist' }
+      const threshold = Math.max(1, Math.floor(target.length / 5))
+      if (levenshtein(norm, target) <= threshold) {
+        return { correct: true, matched: 'fuzzy', matchedField: 'artist' }
+      }
     }
   }
 
