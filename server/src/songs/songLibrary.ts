@@ -558,7 +558,7 @@ export const SONG_LIBRARY: Song[] = [
   // ═══════════════════════════════════════════
   // FRENCH — 2020s (suite)
   // ═══════════════════════════════════════════
-  { id: 'fr-2020s-tayc-nypensplusmin', title: "N'y pense plus", artist: 'Tayc', year: 2020, genre: 'french', decade: '2020s', alternativeTitles: ['Ny pense plus'] },
+  { id: 'fr-2020s-vitaslimane-caira-2021', title: 'Ça ira', artist: 'Vitaa & Slimane', year: 2021, genre: 'french', decade: '2020s', alternativeTitles: ['Ca ira'] },
   { id: 'fr-2020s-slimane-monamour', title: 'Mon amour', artist: 'Slimane', year: 2022, genre: 'french', decade: '2020s' },
   { id: 'fr-2020s-tiakola-lameuf', title: 'La Meuf', artist: 'Tiakola', year: 2023, genre: 'french', decade: '2020s' },
   { id: 'fr-2020s-zahodesagazan', title: 'La symphonie des éclairs', artist: 'Zaho de Sagazan', year: 2022, genre: 'french', decade: '2020s', alternativeTitles: ['La symphonie des eclairs'] },
@@ -1018,11 +1018,11 @@ export const SONG_LIBRARY: Song[] = [
   { id: 'rapfr-rohff-fiertedesnotes-2004', title: 'La fierté des nôtres', artist: 'Rohff', year: 2004, genre: 'french', decade: '2000s', alternativeTitles: ['La fierte des notres', 'Fierte des notres'] },
   { id: 'rapfr-booba-tombepouelle-2004', title: 'Tombé pour elle', artist: 'Booba', year: 2004, genre: 'french', decade: '2000s', alternativeTitles: ['Tombe pour elle'] },
   { id: 'rapfr-keryjames-ombre-2008', title: 'À l\'ombre du show business', artist: 'Kery James', year: 2008, genre: 'french', decade: '2000s', alternativeTitles: ['A l ombre du show business', 'Ombre du show business'] },
-  { id: 'rapfr-sefyu-quiSuisJe-2007', title: 'Qui suis-je', artist: 'Sefyu', year: 2007, genre: 'french', decade: '2000s', alternativeTitles: ['Qui suis je'] },
+  { id: 'rapfr-rimk-delbilal-2009', title: 'Del Bilal', artist: "Rim'K", year: 2009, genre: 'french', decade: '2000s', alternativeArtists: ['Rimk'] },
   { id: 'rapfr-lafouine-loin-2008', title: 'Loin de ma base', artist: 'La Fouine', year: 2008, genre: 'french', decade: '2000s' },
-  { id: 'rapfr-113-tonton-2003', title: 'Tonton du bled', artist: '113', year: 2003, genre: 'french', decade: '2000s' },
+  { id: 'rapfr-booba-tsc-2002', title: 'T.S.C.', artist: 'Booba', year: 2002, genre: 'french', decade: '2000s' },
   { id: 'rapfr-iam-nessous-2003', title: 'Nés sous la même étoile', artist: 'IAM', year: 2003, genre: 'french', decade: '2000s', alternativeTitles: ['Nes sous la meme etoile'] },
-  { id: 'rapfr-disiz-plombs-2003', title: 'Je pète les plombs', artist: 'Disiz la Peste', year: 2003, genre: 'french', decade: '2000s', alternativeTitles: ['Je pete les plombs'] },
+  { id: 'rapfr-boulbi-lafouine-2008', title: 'Boulbi', artist: 'La Fouine', year: 2008, genre: 'french', decade: '2000s' },
 
   // ═══════════════════════════════════════════════════════════
   // RAP FRANÇAIS — 2010s
@@ -1171,7 +1171,7 @@ export const SONG_LIBRARY: Song[] = [
   // ═══════════════════════════════════════════
   // MUSIQUE FRANÇAISE — 2000s (v3)
   // ═══════════════════════════════════════════
-  { id: 'fr3-cherche-2001', title: 'Parce qu\'on vient de loin', artist: 'Corneille', year: 2002, genre: 'french', decade: '2000s', alternativeTitles: ['Parce qu on vient de loin'] },
+  { id: 'fr3-rohff-solange-2008', title: 'Solange', artist: 'Rohff', year: 2008, genre: 'french', decade: '2000s' },
   { id: 'fr3-maurane-2000', title: "J'aurais voulu", artist: 'Florent Pagny', year: 2003, genre: 'french', decade: '2000s' },
   { id: 'fr3-corneille-seul-2003', title: 'Seul au monde', artist: 'Corneille', year: 2003, genre: 'french', decade: '2000s' },
   { id: 'fr3-zazie-2001', title: 'Trop longtemps', artist: 'Zazie', year: 2001, genre: 'french', decade: '2000s' },
@@ -1184,7 +1184,7 @@ export const SONG_LIBRARY: Song[] = [
   { id: 'fr3-kendji-andalouse-2014', title: 'Andalouse', artist: 'Kendji Girac', year: 2014, genre: 'french', decade: '2010s' },
   { id: 'fr3-aya-comportement-2017', title: 'Comportement', artist: 'Aya Nakamura', year: 2017, genre: 'french', decade: '2010s' },
   { id: 'fr3-vegedream-coupe-2018', title: 'Ramenez la coupe à la maison', artist: 'Vegedream', year: 2018, genre: 'french', decade: '2010s', alternativeTitles: ['Ramenez la coupe'] },
-  { id: 'fr3-hatik-angela-2018', title: 'Angela', artist: 'Hatik', year: 2018, genre: 'french', decade: '2010s' },
+  { id: 'fr3-naps-fuego-2018', title: 'Fuego', artist: 'Naps', year: 2018, genre: 'french', decade: '2010s' },
   { id: 'fr3-tayc-npenseplspas-2019', title: "N'y pense plus", artist: 'Tayc', year: 2019, genre: 'french', decade: '2010s', alternativeTitles: ['Ny pense plus'] },
   { id: 'fr3-dadju-reine-2018', title: 'Reine', artist: 'Dadju', year: 2018, genre: 'french', decade: '2010s' },
   { id: 'fr3-maiteregims-estce-2017', title: 'Est-ce que tu m\'aimes', artist: 'Maître Gims', year: 2017, genre: 'french', decade: '2010s', alternativeArtists: ['Gims'], alternativeTitles: ['Est ce que tu m aimes'] },
