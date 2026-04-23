@@ -37,7 +37,6 @@ export function createInitialScore(
   playerId: string,
   playerName: string,
   avatarColor: string,
-  isAI = false,
   teamId?: 'A' | 'B'
 ): PlayerScore {
   return {
@@ -51,7 +50,6 @@ export function createInitialScore(
     totalGuessTime: 0,
     streak: 0,
     bestStreak: 0,
-    isAI,
     teamId,
   }
 }

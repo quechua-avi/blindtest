@@ -33,7 +33,7 @@ export function PlayerList({ players, myPlayerId, isHost, onKick, onAssignTeam, 
                 : 'bg-bg-surface border-bg-border'
             }`}
           >
-            <Avatar name={player.name} color={player.avatarColor} isHost={player.isHost} isAI={player.isAI} />
+            <Avatar name={player.name} color={player.avatarColor} isHost={player.isHost} />
 
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
@@ -42,9 +42,6 @@ export function PlayerList({ players, myPlayerId, isHost, onKick, onAssignTeam, 
                 </span>
                 {player.id === myPlayerId && (
                   <span className="text-xs text-primary bg-primary/10 px-2 py-0.5 rounded-full">Toi</span>
-                )}
-                {player.isAI && (
-                  <span className="text-xs text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">IA</span>
                 )}
               </div>
               {showTeams && player.teamId && (
@@ -55,7 +52,7 @@ export function PlayerList({ players, myPlayerId, isHost, onKick, onAssignTeam, 
             </div>
 
             <div className="flex items-center gap-2">
-              {showTeams && isHost && !player.isAI && (
+              {showTeams && isHost && (
                 <div className="flex gap-1">
                   <button
                     onClick={() => onAssignTeam?.(player.id, 'A')}
@@ -76,14 +73,12 @@ export function PlayerList({ players, myPlayerId, isHost, onKick, onAssignTeam, 
                 </div>
               )}
 
-              {!player.isAI && (
-                <span
-                  className={`w-2 h-2 rounded-full flex-shrink-0 ${player.isReady ? 'bg-emerald-400' : light ? 'bg-slate-300' : 'bg-slate-600'}`}
-                  title={player.isReady ? 'Prêt' : 'Pas prêt'}
-                />
-              )}
+              <span
+                className={`w-2 h-2 rounded-full flex-shrink-0 ${player.isReady ? 'bg-emerald-400' : light ? 'bg-slate-300' : 'bg-slate-600'}`}
+                title={player.isReady ? 'Prêt' : 'Pas prêt'}
+              />
 
-              {isHost && player.id !== myPlayerId && !player.isAI && (
+              {isHost && player.id !== myPlayerId && (
                 <Button variant="ghost" size="sm" onClick={() => onKick?.(player.id)} className="text-red-400 hover:text-red-500 p-1">
                   ✕
                 </Button>

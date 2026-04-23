@@ -70,7 +70,6 @@ export function SettingsPanel({ settings, isHost, onChange, light }: SettingsPan
             { value: 'classic',   label: '🎵 Classique',  desc: 'Devine titre ou artiste' },
             { value: 'buzzer',    label: '🔔 Buzzer',     desc: 'Premier à buzzer répond' },
             { value: 'teams',     label: '👥 Équipes',    desc: 'A vs B' },
-            { value: 'soloVsAI',  label: '🤖 Solo vs IA', desc: 'Affronte des robots' },
             { value: 'saboteur',  label: '🕵️ Saboteur',  desc: "Trouve l'imposteur · 4j min" },
           ] as const).map(({ value, label: lbl, desc }) => (
             <motion.button

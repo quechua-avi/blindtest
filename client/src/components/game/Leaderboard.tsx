@@ -46,7 +46,7 @@ function TeamSection({
             }`}
           >
             <span className="text-sm w-5 text-center flex-shrink-0 text-slate-500">{rank + 1}</span>
-            <Avatar name={player.playerName} color={player.avatarColor} size="sm" isAI={player.isAI} />
+            <Avatar name={player.playerName} color={player.avatarColor} size="sm"  />
             <div className="flex-1 min-w-0">
               <p className={`font-semibold text-sm truncate ${isMe ? textClass : 'text-white'}`}>
                 {player.playerName}{isMe && ' (toi)'}
@@ -125,7 +125,7 @@ export function Leaderboard({ compact = false }: { compact?: boolean }) {
                 {rank < 3 ? MEDALS[rank] : <span className="text-slate-500 text-sm font-bold">{rank + 1}</span>}
               </span>
 
-              <Avatar name={player.playerName} color={player.avatarColor} size="sm" isAI={player.isAI} />
+              <Avatar name={player.playerName} color={player.avatarColor} size="sm"  />
 
               <div className="flex-1 min-w-0">
                 <p className={`font-semibold text-sm truncate ${isMe ? 'text-primary-light' : 'text-white'}`}>

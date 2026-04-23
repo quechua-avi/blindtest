@@ -43,7 +43,7 @@ export function LobbyPage() {
   const currentCode = roomCode ?? code ?? ''
   const joinUrl = typeof window !== 'undefined' ? `${window.location.origin}/join/${currentCode}` : ''
   const me = players.find((p) => p.id === myPlayerId)
-  const nonHostHumans = players.filter((p) => !p.isHost && !p.isAI)
+  const nonHostHumans = players.filter((p) => !p.isHost)
   const allReady = nonHostHumans.every((p) => p.isReady)
 
   const copyLink = () => {

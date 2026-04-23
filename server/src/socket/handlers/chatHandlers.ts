@@ -12,7 +12,7 @@ export function registerChatHandlers(io: IoServer, socket: IoSocket) {
     const room = GameManager.getRoomByPlayerId(socket.id)
     if (!room) return
     const player = room.players.get(socket.id)
-    if (!player || player.isAI) return
+    if (!player) return
 
     const sanitized = text.slice(0, 200).trim()
     if (!sanitized) return
@@ -29,7 +29,7 @@ export function registerChatHandlers(io: IoServer, socket: IoSocket) {
     const room = GameManager.getRoomByPlayerId(socket.id)
     if (!room) return
     const player = room.players.get(socket.id)
-    if (!player || player.isAI) return
+    if (!player) return
 
     if (!ALLOWED_EMOJIS.includes(emoji)) return
 

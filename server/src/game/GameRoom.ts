@@ -24,7 +24,6 @@ import {
   applyCorrectAnswer,
   applyWrongAnswer,
 } from './ScoreEngine'
-import { AIPlayer } from './AIPlayer'
 import { updateUserStats } from '../auth/userService'
 
 type IoServer = Server<ClientToServerEvents, ServerToClientEvents>
@@ -57,7 +56,6 @@ export class GameRoom {
   private pausedTimeRemaining = 0
   private gameStartedAt = 0
   private songsPlayed: Array<{ song: Song; winners: string[] }> = []
-  private aiPlayers: AIPlayer[] = []
   private io: IoServer
   // Saboteur mode
   private saboteurId: string | null = null
@@ -161,7 +159,7 @@ export class GameRoom {
 
     // Réinitialiser les scores
     for (const [id, player] of this.players) {
-      this.scores.set(id, createInitialScore(id, player.name, player.avatarColor, false, player.teamId))
+      this.scores.set(id, createInitialScore(id, player.name, player.avatarColor, player.teamId))
     }
 
     // Désigner le saboteur aléatoirement
@@ -169,11 +167,6 @@ export class GameRoom {
       const humanIds = [...this.players.keys()]
       this.saboteurId = humanIds[Math.floor(Math.random() * humanIds.length)]
       this.currentVotes = new Map()
-    }
-
-    // Ajouter l'IA si mode soloVsAI
-    if (this.settings.mode === 'soloVsAI') {
-      this.addAIPlayers()
     }
 
     this.status = 'playing'
@@ -201,20 +194,6 @@ export class GameRoom {
     )
     const found = this.previewUrls.size
     console.log(`[Deezer] ${found}/${this.playlist.length} previews trouvées`)
-  }
-
-  private addAIPlayers() {
-    const aiNames = ['🤖 RoboBlind', '🎵 MelodAI', '🎸 AutoGroove']
-    const aiColors = ['#10b981', '#f59e0b', '#06b6d4']
-    for (let i = 0; i < 2; i++) {
-      const id = `ai-${i}-${this.code}`
-      const name = aiNames[i]
-      const color = aiColors[i]
-      const aiPlayer: Player = { id, name, avatarColor: color, isHost: false, isReady: true, isAI: true }
-      this.players.set(id, aiPlayer)
-      this.scores.set(id, createInitialScore(id, name, color, true))
-      this.aiPlayers.push(new AIPlayer(id, name, color))
-    }
   }
 
   // ─── Round lifecycle ──────────────────────────
@@ -273,15 +252,6 @@ export class GameRoom {
       this.io.to(this.code).emit('game:tick', { timeRemaining })
       if (timeRemaining <= 0) this.endRound()
     }, 1000)
-
-    // IA : planifier les réponses
-    for (const ai of this.aiPlayers) {
-      ai.scheduleAnswer(this.currentSong, this.settings.playDuration, (answer) => {
-        if (this.status === 'playing' && this.currentSong) {
-          this.handleAnswer(ai.id, answer, Date.now())
-        }
-      })
-    }
 
     // Sécurité : fin forcée après playDuration + 1s
     this.roundTimer = setTimeout(() => this.endRound(), (this.settings.playDuration + 1) * 1000)
@@ -407,7 +377,7 @@ export class GameRoom {
     // Mise à jour des stats utilisateurs connectés
     const winnerId = leaderboard[0]?.playerId
     const statsUpdates = leaderboard
-      .filter((s) => s.userId != null && !s.isAI)
+      .filter((s) => s.userId != null)
       .map((s) => ({
         userId: s.userId!,
         score: s.score,
@@ -434,7 +404,7 @@ export class GameRoom {
     if (this.buzzedOutPlayers.has(playerId) || this.hasAnswered.has(playerId)) return
 
     const player = this.players.get(playerId)
-    if (!player || player.isAI) return
+    if (!player) return
 
     this.buzzedPlayerId = playerId
     this.isPaused = true
@@ -491,8 +461,7 @@ export class GameRoom {
       this.wrongAttempts.set(playerId, attempts)
       const attemptsLeft = Math.max(0, maxAttempts - attempts)
       if (attemptsLeft === 0) this.hasAnswered.add(playerId)
-      const player = this.players.get(playerId)
-      if (player && !player.isAI) {
+      if (this.players.has(playerId)) {
         this.io.to(playerId).emit('game:wrongAnswer', { playerId, attemptsLeft })
       }
       if (attemptsLeft === 0) {
@@ -543,8 +512,8 @@ export class GameRoom {
     }
 
     // Si tous ont répondu → fin anticipée du round
-    const humanCount = [...this.players.values()].filter((p) => !p.isAI).length
-    if (this.correctGuessers.length >= humanCount + this.aiPlayers.length) {
+    const humanCount = this.players.size
+    if (this.correctGuessers.length >= humanCount) {
       setTimeout(() => this.endRound(), 1500)
     }
 
@@ -592,7 +561,6 @@ export class GameRoom {
     if (this.roundTimer) { clearTimeout(this.roundTimer); this.roundTimer = null }
     if (this.tickTimer) { clearInterval(this.tickTimer); this.tickTimer = null }
     if (this.buzzerTimer) { clearTimeout(this.buzzerTimer); this.buzzerTimer = null }
-    for (const ai of this.aiPlayers) ai.cancelScheduled()
   }
 
   destroy() {
@@ -601,6 +569,6 @@ export class GameRoom {
   }
 
   get isEmpty(): boolean {
-    return [...this.players.values()].filter((p) => !p.isAI).length === 0
+    return this.players.size === 0
   }
 }

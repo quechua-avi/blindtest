@@ -1,6 +1,6 @@
 export type Genre = 'pop' | 'hiphop' | 'electronic' | 'rnb' | 'french' | 'latin' | 'jul'
 export type Decade = '2000s' | '2010s' | '2020s'
-export type GameMode = 'classic' | 'teams' | 'soloVsAI' | 'buzzer' | 'saboteur'
+export type GameMode = 'classic' | 'teams' | 'buzzer' | 'saboteur'
 export type AnswerMode = 'text' | 'multipleChoice'
 export type RoomStatus = 'lobby' | 'playing' | 'paused' | 'ended'
 export type AnswerMatchType = 'exact' | 'fuzzy' | 'partial'
@@ -29,7 +29,6 @@ export interface Player {
   avatarColor: string
   isHost: boolean
   isReady: boolean
-  isAI?: boolean
   teamId?: 'A' | 'B'
 }
 
@@ -43,7 +42,6 @@ export interface PlayerScore {
   averageGuessTime: number
   streak: number
   bestStreak: number
-  isAI?: boolean
   teamId?: 'A' | 'B'
 }
 

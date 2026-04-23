@@ -3,7 +3,6 @@ interface AvatarProps {
   color: string
   size?: 'sm' | 'md' | 'lg'
   isHost?: boolean
-  isAI?: boolean
 }
 
 const sizeMap = {
@@ -12,8 +11,8 @@ const sizeMap = {
   lg: 'w-14 h-14 text-xl',
 }
 
-export function Avatar({ name, color, size = 'md', isHost, isAI }: AvatarProps) {
-  const initials = isAI ? '🤖' : name.slice(0, 2).toUpperCase()
+export function Avatar({ name, color, size = 'md', isHost }: AvatarProps) {
+  const initials = name.slice(0, 2).toUpperCase()
   return (
     <div className="relative inline-block">
       <div

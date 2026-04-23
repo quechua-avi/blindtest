@@ -8,6 +8,7 @@ import jwt from 'jsonwebtoken'
 import type { ClientToServerEvents, ServerToClientEvents } from './types'
 import { CONFIG } from './config'
 import { SONG_LIBRARY } from './songs/songLibrary'
+import { STREAMCLASH_SONGS } from './songs/streamclashSongs'
 import { registerLobbyHandlers } from './socket/handlers/lobbyHandlers'
 import { registerGameHandlers } from './socket/handlers/gameHandlers'
 import { registerChatHandlers } from './socket/handlers/chatHandlers'
@@ -76,6 +77,34 @@ app.put('/api/admin/settings', (req: Request, res: Response) => {
     requireRoomPassword: getSetting('require_room_password') === '1',
     roomPassword: getSetting('room_password') ?? '',
   })
+})
+
+// ─── StreamClash ───────────────────────────────────────────────────────────────
+// Cache des pochettes Deezer pour le catalogue StreamClash
+const streamclashCoverCache = new Map<string, string>()
+let streamclashCoversPrefetched = false
+
+async function prefetchStreamclashCovers() {
+  if (streamclashCoversPrefetched) return
+  streamclashCoversPrefetched = true
+  await Promise.all(
+    STREAMCLASH_SONGS.map(async (song) => {
+      if (streamclashCoverCache.has(song.id)) return
+      const result = await fetchDeezerPreview(song.title, song.artist)
+      if (result?.coverUrl) streamclashCoverCache.set(song.id, result.coverUrl)
+    })
+  )
+  console.log(`[StreamClash] ${streamclashCoverCache.size}/${STREAMCLASH_SONGS.length} pochettes chargées`)
+}
+
+app.get('/api/streamclash/songs', async (_req: Request, res: Response) => {
+  // Lancer le prefetch en arrière-plan si pas encore fait
+  prefetchStreamclashCovers()
+  const songs = STREAMCLASH_SONGS.map((s) => ({
+    ...s,
+    coverUrl: streamclashCoverCache.get(s.id),
+  }))
+  res.json(songs)
 })
 
 // Admin — liste des chansons avec URL Deezer

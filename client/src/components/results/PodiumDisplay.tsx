@@ -30,7 +30,7 @@ export function PodiumDisplay({ leaderboard }: PodiumDisplayProps) {
             transition={{ delay, type: 'spring', stiffness: 200 }}
             className="flex flex-col items-center gap-2"
           >
-            <Avatar name={player.playerName} color={player.avatarColor} size="lg" isAI={player.isAI} />
+            <Avatar name={player.playerName} color={player.avatarColor} size="lg" />
             <p className="text-white font-bold text-sm text-center max-w-[80px] truncate">{player.playerName}</p>
             <p className="text-slate-400 text-xs font-bold">{player.score.toLocaleString()} pts</p>
             <motion.div
