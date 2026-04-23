@@ -14,25 +14,22 @@ interface Song {
 interface HistoryEntry {
   songA: Song
   songB: Song
-  vote: 'A' | 'B' | null
+  vote: 'A' | 'B'
   winner: 'A' | 'B'
   wasCorrect: boolean
 }
 
 type Phase = 'loading' | 'lobby' | 'playing' | 'reveal' | 'results'
 
-const VOTE_DURATION = 12
 const REVEAL_MS = 3200
 const ROUND_OPTIONS = [5, 10, 15]
-
-// ─── Formatage ─────────────────────────────────────────────────────────────
 
 function formatStreams(n: number): string {
   if (n >= 1000) return `${(n / 1000).toFixed(1).replace('.', ',')} Mrd`
   return `${n} M`
 }
 
-// ─── Composant carte chanson ────────────────────────────────────────────────
+// ─── Carte chanson ─────────────────────────────────────────────────────────
 
 function SongCard({
   song,
@@ -49,10 +46,9 @@ function SongCard({
   isWinner: boolean
   onClick: () => void
 }) {
-  const isPlaying = phase === 'playing'
   const isReveal = phase === 'reveal'
+  const canVote = phase === 'playing' && voted === null
   const isSelected = voted === side
-  const canVote = isPlaying && voted === null
 
   const borderClass = isReveal
     ? isWinner
@@ -79,7 +75,7 @@ function SongCard({
         </span>
       </div>
 
-      {/* Couronne si gagnant */}
+      {/* Couronne gagnant */}
       {isReveal && isWinner && (
         <motion.div
           initial={{ opacity: 0, scale: 0.5, y: -10 }}
@@ -115,7 +111,7 @@ function SongCard({
         <p className="text-slate-400 text-xs truncate">{song.artist}</p>
       </div>
 
-      {/* Streams (révélés après vote) */}
+      {/* Streams révélés après vote */}
       <AnimatePresence>
         {isReveal && (
           <motion.div
@@ -139,39 +135,6 @@ function SongCard({
   )
 }
 
-// ─── Anneau de timer ────────────────────────────────────────────────────────
-
-function TimerRing({ timeLeft, total }: { timeLeft: number; total: number }) {
-  const radius = 22
-  const circumference = 2 * Math.PI * radius
-  const progress = timeLeft / total
-  const strokeDashoffset = circumference * (1 - progress)
-  const color = timeLeft <= 3 ? '#ef4444' : timeLeft <= 6 ? '#f59e0b' : '#8b5cf6'
-
-  return (
-    <div className="relative flex items-center justify-center w-14 h-14">
-      <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 56 56">
-        <circle cx="28" cy="28" r={radius} fill="none" stroke="#1e1e2e" strokeWidth="4" />
-        <circle
-          cx="28"
-          cy="28"
-          r={radius}
-          fill="none"
-          stroke={color}
-          strokeWidth="4"
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          strokeDashoffset={strokeDashoffset}
-          style={{ transition: 'stroke-dashoffset 1s linear, stroke 0.3s' }}
-        />
-      </svg>
-      <span className={`text-lg font-black tabular-nums`} style={{ color }}>
-        {timeLeft}
-      </span>
-    </div>
-  )
-}
-
 // ─── Page principale ────────────────────────────────────────────────────────
 
 export function StreamClashPage() {
@@ -183,7 +146,6 @@ export function StreamClashPage() {
   const [rounds, setRounds] = useState<[Song, Song][]>([])
   const [roundIdx, setRoundIdx] = useState(0)
   const [vote, setVote] = useState<'A' | 'B' | null>(null)
-  const [timeLeft, setTimeLeft] = useState(VOTE_DURATION)
   const [score, setScore] = useState(0)
   const [streak, setStreak] = useState(0)
   const [correct, setCorrect] = useState(0)
@@ -219,24 +181,7 @@ export function StreamClashPage() {
       .catch(() => setPhase('lobby'))
   }, [])
 
-  // Timer décrémental (redémarre à chaque nouveau round)
-  useEffect(() => {
-    if (phase !== 'playing') return
-    setTimeLeft(VOTE_DURATION)
-    const id = setInterval(() => {
-      setTimeLeft((t) => (t > 0 ? t - 1 : 0))
-    }, 1000)
-    return () => clearInterval(id)
-  }, [phase, roundIdx]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Timeout : révéler quand le timer atteint 0
-  useEffect(() => {
-    if (timeLeft === 0 && phaseRef.current === 'playing' && voteRef.current === null) {
-      doReveal(null)
-    }
-  }, [timeLeft]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  const doReveal = useCallback((userVote: 'A' | 'B' | null) => {
+  const doReveal = useCallback((userVote: 'A' | 'B') => {
     if (phaseRef.current !== 'playing') return
     const idx = roundIdxRef.current
     const pair = roundsRef.current[idx]
@@ -244,7 +189,7 @@ export function StreamClashPage() {
 
     const [sA, sB] = pair
     const winner: 'A' | 'B' = sA.streams >= sB.streams ? 'A' : 'B'
-    const wasCorrect = userVote !== null && userVote === winner
+    const wasCorrect = userVote === winner
 
     const currentStreak = streakRef.current
     const newStreak = wasCorrect ? currentStreak + 1 : 0
@@ -346,7 +291,6 @@ export function StreamClashPage() {
           animate={{ opacity: 1, y: 0 }}
           className="w-full max-w-md space-y-8"
         >
-          {/* Header */}
           <div className="text-center space-y-3">
             <div className="text-5xl mb-2">⚡</div>
             <h1 className="font-display text-4xl font-black text-white tracking-tight">
@@ -355,12 +299,9 @@ export function StreamClashPage() {
             <p className="text-slate-400 text-base">
               Rap français · Quelle chanson a le plus de streams ?
             </p>
-            <p className="text-xs text-slate-600 italic">
-              Données Spotify approximatives
-            </p>
+            <p className="text-xs text-slate-600 italic">Données Spotify approximatives</p>
           </div>
 
-          {/* Sélection de rounds */}
           <div className="bg-bg-card border border-bg-border rounded-2xl p-5 space-y-4">
             <label className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">
               Nombre de manches
@@ -383,7 +324,6 @@ export function StreamClashPage() {
             </div>
           </div>
 
-          {/* Bouton démarrer */}
           <motion.button
             onClick={startGame}
             whileHover={{ scale: 1.03 }}
@@ -393,7 +333,6 @@ export function StreamClashPage() {
             Jouer seul
           </motion.button>
 
-          {/* Retour */}
           <button
             onClick={() => navigate('/')}
             className="w-full text-center text-sm text-slate-600 hover:text-slate-400 transition-colors cursor-pointer"
@@ -414,7 +353,6 @@ export function StreamClashPage() {
           animate={{ opacity: 1, scale: 1 }}
           className="w-full max-w-lg space-y-6"
         >
-          {/* Score */}
           <div className="text-center space-y-2">
             <div className="text-4xl">{pct >= 80 ? '🔥' : pct >= 60 ? '👏' : pct >= 40 ? '🎵' : '💀'}</div>
             <h2 className="font-display text-3xl font-black text-white">
@@ -425,7 +363,6 @@ export function StreamClashPage() {
             </p>
           </div>
 
-          {/* Historique */}
           <div className="bg-bg-card border border-bg-border rounded-2xl p-4 space-y-2 max-h-80 overflow-y-auto">
             {history.map((entry, i) => (
               <div
@@ -451,7 +388,6 @@ export function StreamClashPage() {
             ))}
           </div>
 
-          {/* Actions */}
           <div className="flex gap-3">
             <motion.button
               onClick={startGame}
@@ -473,7 +409,7 @@ export function StreamClashPage() {
     )
   }
 
-  // ─── Phase playing / reveal ─────────────────────────────────────────────────
+  // ─── Phase playing / reveal ──────────────────────────────────────────────
 
   const winner: 'A' | 'B' | null =
     phase === 'reveal' && songA && songB
@@ -523,15 +459,10 @@ export function StreamClashPage() {
 
       {/* Corps du jeu */}
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-6 gap-5 max-w-2xl mx-auto w-full">
-        {/* Question + timer */}
-        <div className="flex items-center justify-between w-full">
-          <div>
-            <p className="text-white font-bold text-lg leading-tight">Quelle chanson a le plus de streams ?</p>
-            <p className="text-slate-500 text-xs mt-0.5">Rap français · Spotify</p>
-          </div>
-          {phase === 'playing' && (
-            <TimerRing timeLeft={timeLeft} total={VOTE_DURATION} />
-          )}
+        {/* Question */}
+        <div className="w-full">
+          <p className="text-white font-bold text-lg leading-tight">Quelle chanson a le plus de streams ?</p>
+          <p className="text-slate-500 text-xs mt-0.5">Rap français · Spotify</p>
         </div>
 
         {/* Feedback après vote */}
@@ -545,9 +476,7 @@ export function StreamClashPage() {
               className={`w-full rounded-xl px-4 py-3 text-center ${
                 wasCorrect
                   ? 'bg-emerald-500/15 border border-emerald-500/30'
-                  : vote === null
-                    ? 'bg-slate-800 border border-slate-700'
-                    : 'bg-red-500/15 border border-red-500/30'
+                  : 'bg-red-500/15 border border-red-500/30'
               }`}
             >
               {wasCorrect ? (
@@ -555,8 +484,6 @@ export function StreamClashPage() {
                   ✅ Bonne réponse !{' '}
                   {streak >= 2 && <span className="text-amber-400">🔥 Combo ×{streak}</span>}
                 </p>
-              ) : vote === null ? (
-                <p className="text-slate-500 font-bold">⏱ Trop lent…</p>
               ) : (
                 <p className="text-red-400 font-bold">
                   ❌ Raté — c'était le{' '}
@@ -579,10 +506,9 @@ export function StreamClashPage() {
               onClick={() => handleVote('A')}
             />
 
-            {/* VS séparateur */}
             <div className="flex flex-col items-center justify-center gap-1 flex-shrink-0">
               <div className="w-px h-full bg-slate-800" />
-              <span className="text-slate-600 font-black text-xs tracking-widest rotate-0 py-2">VS</span>
+              <span className="text-slate-600 font-black text-xs tracking-widest py-2">VS</span>
               <div className="w-px h-full bg-slate-800" />
             </div>
 
@@ -597,8 +523,7 @@ export function StreamClashPage() {
           </div>
         )}
 
-        {/* Indication clic */}
-        {phase === 'playing' && vote === null && (
+        {phase === 'playing' && (
           <p className="text-slate-600 text-xs animate-pulse">Clique sur la carte de ton choix</p>
         )}
       </main>
