@@ -14,6 +14,7 @@ import { RoundReveal } from '../components/game/RoundReveal'
 import { BuzzerPanel } from '../components/game/BuzzerPanel'
 import { ChatPanel } from '../components/game/ChatPanel'
 import { Badge } from '../components/ui/Badge'
+import { StreamClashGame } from '../components/game/StreamClashGame'
 import { GENRE_LABELS, GENRE_COLORS } from '../types/game'
 import type { Genre } from '../types/game'
 
@@ -54,6 +55,10 @@ export function GamePage() {
 
   const isPlaying = status === 'playing'
   const isReveal = status === 'roundEnd'
+
+  if (settings.mode === 'streamclash') {
+    return <StreamClashGame />
+  }
 
   return (
     <div className="min-h-screen bg-bg flex flex-col">

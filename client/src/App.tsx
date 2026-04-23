@@ -11,7 +11,6 @@ import { ResultsPage } from './pages/ResultsPage'
 import { AdminPage } from './pages/AdminPage'
 import { AuthPage } from './pages/AuthPage'
 import { SettingsPage } from './pages/SettingsPage'
-import { StreamClashPage } from './pages/StreamClashPage'
 import { InstallBanner } from './components/ui/InstallBanner'
 
 interface AudioPlayerCtx {
@@ -43,7 +42,6 @@ function AppRoutes() {
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/auth" element={<AuthPage />} />
         <Route path="/settings" element={<SettingsPage />} />
-        <Route path="/streamclash" element={<StreamClashPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AudioPlayerContext.Provider>

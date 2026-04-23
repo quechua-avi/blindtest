@@ -59,4 +59,10 @@ export function registerGameHandlers(io: IoServer, socket: IoSocket) {
     if (!room) return
     room.handleSaboteurVote(socket.id, targetPlayerId)
   })
+
+  socket.on('streamclash:vote', ({ side }) => {
+    const room = GameManager.getRoomByPlayerId(socket.id)
+    if (!room) return
+    room.handleScVote(socket.id, side)
+  })
 }

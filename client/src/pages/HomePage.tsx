@@ -278,40 +278,6 @@ export function HomePage() {
           </div>
         </motion.div>
 
-        {/* StreamClash */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.35 }}
-          className="w-full max-w-2xl mt-2"
-        >
-          <motion.button
-            onClick={() => navigate('/streamclash')}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            className="w-full bg-white border border-slate-200 shadow-sm rounded-2xl p-5 flex items-center gap-4 cursor-pointer hover:border-primary/30 hover:shadow-md transition-all group"
-          >
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-violet-700 flex items-center justify-center text-2xl flex-shrink-0 shadow-lg shadow-violet-500/20">
-              ⚡
-            </div>
-            <div className="text-left flex-1 min-w-0">
-              <p className="font-display font-bold text-slate-900 text-base group-hover:text-primary transition-colors">
-                Stream<span className="text-primary">Clash</span>
-              </p>
-              <p className="text-slate-400 text-sm mt-0.5">
-                Rap français · Quelle chanson est la plus streamée ?
-              </p>
-            </div>
-            <svg
-              className="w-4 h-4 text-slate-300 group-hover:text-primary transition-colors flex-shrink-0"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </motion.button>
-        </motion.div>
       </section>
 
       {/* Footer */}

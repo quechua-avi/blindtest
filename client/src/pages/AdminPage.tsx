@@ -19,6 +19,15 @@ interface AdminSong {
   deezerSearchUrl: string
 }
 
+interface AdminRoom {
+  code: string
+  status: string
+  players: Array<{ id: string; name: string; avatarColor: string; isHost: boolean }>
+  settings: { mode: string; genres: string[]; rounds: number; answerMode: string }
+  currentRound: number
+  totalRounds: number
+}
+
 interface AdminUser {
   id: number
   email: string
@@ -45,7 +54,8 @@ export function AdminPage() {
   const [users, setUsers] = useState<AdminUser[]>([])
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [tab, setTab] = useState<'songs' | 'users' | 'settings'>('songs')
+  const [tab, setTab] = useState<'songs' | 'users' | 'settings' | 'rooms'>('songs')
+  const [rooms, setRooms] = useState<AdminRoom[]>([])
   const [requireRoomPassword, setRequireRoomPassword] = useState(true)
   const [roomPassword, setRoomPassword]               = useState('')
   const [settingsSaved, setSettingsSaved]             = useState(false)
@@ -65,10 +75,11 @@ export function AdminPage() {
     setLoading(true)
     setError('')
     try {
-      const [songsRes, usersRes, settingsRes] = await Promise.all([
+      const [songsRes, usersRes, settingsRes, roomsRes] = await Promise.all([
         fetch(`/api/admin/songs?secret=${encodeURIComponent(s)}`),
         fetch(`/api/admin/users?secret=${encodeURIComponent(s)}`),
         fetch(`/api/admin/settings?secret=${encodeURIComponent(s)}`),
+        fetch(`/api/admin/rooms?secret=${encodeURIComponent(s)}`),
       ])
       if (songsRes.status === 401) {
         setError('Mot de passe incorrect')
@@ -76,9 +87,10 @@ export function AdminPage() {
         setSecret('')
         return
       }
-      const [songsData, usersData, settingsData] = await Promise.all([songsRes.json(), usersRes.json(), settingsRes.json()])
+      const [songsData, usersData, settingsData, roomsData] = await Promise.all([songsRes.json(), usersRes.json(), settingsRes.json(), roomsRes.json()])
       setSongs(songsData.songs)
       setUsers(usersData.users ?? [])
+      setRooms(roomsData.rooms ?? [])
       setRequireRoomPassword(settingsData.requireRoomPassword ?? true)
       setRoomPassword(settingsData.roomPassword ?? '')
       sessionStorage.setItem(ADMIN_SECRET_KEY, s)
@@ -228,23 +240,96 @@ export function AdminPage() {
       {/* Tabs */}
       <div className="bg-white border-b border-slate-200 px-6">
         <div className="flex gap-1">
-          {(['songs', 'users', 'settings'] as const).map((t) => (
+          {(['songs', 'users', 'rooms', 'settings'] as const).map((t) => (
             <button
               key={t}
-              onClick={() => setTab(t)}
+              onClick={() => {
+                setTab(t)
+                if (t === 'rooms') {
+                  fetch(`/api/admin/rooms?secret=${encodeURIComponent(secret)}`).then(r => r.json()).then(d => setRooms(d.rooms ?? [])).catch(() => {})
+                }
+              }}
               className={`px-4 py-3 text-sm font-semibold border-b-2 transition-colors cursor-pointer ${
                 tab === t
                   ? 'border-violet-600 text-violet-600'
                   : 'border-transparent text-slate-500 hover:text-slate-700'
               }`}
             >
-              {t === 'songs' ? `Chansons (${songs.length})` : t === 'users' ? `Utilisateurs (${users.length})` : 'Paramètres'}
+              {t === 'songs' ? `Chansons (${songs.length})` : t === 'users' ? `Utilisateurs (${users.length})` : t === 'rooms' ? `Salles (${rooms.length})` : 'Paramètres'}
             </button>
           ))}
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-5">
+        {tab === 'rooms' && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-base font-bold text-slate-800">Salles actives ({rooms.length})</h2>
+              <button
+                onClick={() => fetch(`/api/admin/rooms?secret=${encodeURIComponent(secret)}`).then(r => r.json()).then(d => setRooms(d.rooms ?? [])).catch(() => {})}
+                className="text-xs text-violet-600 border border-violet-200 rounded-lg px-3 py-1.5 cursor-pointer hover:bg-violet-50 transition-colors"
+              >
+                ↻ Actualiser
+              </button>
+            </div>
+            {rooms.length === 0 ? (
+              <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-8 text-center text-slate-400 text-sm">
+                Aucune salle active
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                {rooms.map((room) => {
+                  const STATUS_LABELS: Record<string, string> = { lobby: 'Lobby', playing: 'En jeu', paused: 'En pause', ended: 'Terminée' }
+                  const STATUS_COLORS: Record<string, string> = { lobby: 'bg-slate-100 text-slate-500', playing: 'bg-emerald-100 text-emerald-700', paused: 'bg-amber-100 text-amber-700', ended: 'bg-red-100 text-red-600' }
+                  const MODE_LABELS: Record<string, string> = { classic: '🎵 Classique', buzzer: '🔔 Buzzer', teams: '👥 Équipes', saboteur: '🕵️ Saboteur', streamclash: '⚡ StreamClash' }
+                  return (
+                    <div key={room.code} className="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="font-display font-bold text-slate-900 text-xl tracking-widest">{room.code}</p>
+                          <p className="text-xs text-slate-400 mt-0.5">{MODE_LABELS[room.settings.mode] ?? room.settings.mode}</p>
+                        </div>
+                        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${STATUS_COLORS[room.status] ?? 'bg-slate-100 text-slate-500'}`}>
+                          {STATUS_LABELS[room.status] ?? room.status}
+                        </span>
+                      </div>
+
+                      {room.status === 'playing' && (
+                        <div className="flex items-center gap-2 text-xs text-slate-500">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                          Round {room.currentRound}/{room.totalRounds}
+                        </div>
+                      )}
+
+                      <div>
+                        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                          Joueurs ({room.players.length})
+                        </p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {room.players.map((p) => (
+                            <div key={p.id} className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-full px-2.5 py-1">
+                              <div
+                                className="w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center text-white text-[9px] font-bold"
+                                style={{ backgroundColor: p.avatarColor }}
+                              >
+                                {p.name[0]?.toUpperCase()}
+                              </div>
+                              <span className="text-xs text-slate-700 font-medium">
+                                {p.name}{p.isHost ? ' 👑' : ''}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
         {tab === 'settings' && (
           <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 max-w-lg space-y-6">
             <div>

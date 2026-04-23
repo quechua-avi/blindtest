@@ -12,6 +12,8 @@ import type {
   Song,
   AnswerMatchType,
   SaboteurReveal,
+  StreamClashSongPublic,
+  StreamClashRevealData,
 } from '../types/game'
 
 type AppStatus = 'idle' | 'connecting' | 'lobby' | 'playing' | 'roundEnd' | 'results' | 'error'
@@ -62,6 +64,17 @@ interface GameStore {
   myVote: string | null
   saboteurReveal: SaboteurReveal | null
 
+  // StreamClash
+  scRoundNumber: number
+  scTotalRounds: number
+  scSongA: StreamClashSongPublic | null
+  scSongB: StreamClashSongPublic | null
+  scVotesA: number
+  scVotesB: number
+  scTotalPlayers: number
+  myScVote: 'A' | 'B' | null
+  scReveal: StreamClashRevealData | null
+
   // Chat
   messages: ChatMessage[]
   reactions: ReactionEvent[]
@@ -100,6 +113,10 @@ interface GameStore {
   onYouAreSaboteur: (answer: string) => void
   onSaboteurVoteUpdate: (votes: Array<{ voterName: string; voterAvatarColor: string }>) => void
   setMyVote: (targetId: string | null) => void
+  onScRoundStart: (data: { roundNumber: number; totalRounds: number; songA: StreamClashSongPublic; songB: StreamClashSongPublic; timeLimit: number }) => void
+  onScVoteUpdate: (data: { votesA: number; votesB: number; totalPlayers: number }) => void
+  onScVoteResult: (data: StreamClashRevealData) => void
+  setMyScVote: (side: 'A' | 'B') => void
   reset: () => void
 }
 
@@ -138,6 +155,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
   saboteurVotesAgainstMe: [],
   myVote: null,
   saboteurReveal: null,
+  scRoundNumber: 0,
+  scTotalRounds: 0,
+  scSongA: null,
+  scSongB: null,
+  scVotesA: 0,
+  scVotesB: 0,
+  scTotalPlayers: 0,
+  myScVote: null,
+  scReveal: null,
   messages: [],
   reactions: [],
 
@@ -291,6 +317,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
   onSaboteurVoteUpdate: (votes) => set({ saboteurVotesAgainstMe: votes }),
   setMyVote: (targetId) => set({ myVote: targetId }),
 
+  onScRoundStart: (data) => set((s) => ({
+    status: 'playing',
+    scRoundNumber: data.roundNumber,
+    scTotalRounds: data.totalRounds,
+    scSongA: data.songA,
+    scSongB: data.songB,
+    scVotesA: 0,
+    scVotesB: 0,
+    scTotalPlayers: s.players.length,
+    myScVote: null,
+    scReveal: null,
+  })),
+
+  onScVoteUpdate: ({ votesA, votesB, totalPlayers }) => set({ scVotesA: votesA, scVotesB: votesB, scTotalPlayers: totalPlayers }),
+
+  onScVoteResult: (data) => set({ scReveal: data }),
+
+  setMyScVote: (side) => set({ myScVote: side }),
+
   onChatMessage: (msg) => {
     set((s) => ({ messages: [...s.messages.slice(-49), msg] }))
   },
@@ -330,6 +375,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       saboteurVotesAgainstMe: [],
       myVote: null,
       saboteurReveal: null,
+      scRoundNumber: 0,
+      scTotalRounds: 0,
+      scSongA: null,
+      scSongB: null,
+      scVotesA: 0,
+      scVotesB: 0,
+      scTotalPlayers: 0,
+      myScVote: null,
+      scReveal: null,
       messages: [],
       reactions: [],
     })

@@ -1,6 +1,6 @@
 export type Genre = 'pop' | 'hiphop' | 'electronic' | 'rnb' | 'french' | 'latin' | 'jul'
 export type Decade = '2000s' | '2010s' | '2020s'
-export type GameMode = 'classic' | 'teams' | 'buzzer' | 'saboteur'
+export type GameMode = 'classic' | 'teams' | 'buzzer' | 'saboteur' | 'streamclash'
 export type AnswerMode = 'text' | 'multipleChoice'
 export type RoomStatus = 'lobby' | 'playing' | 'paused' | 'ended'
 export type AnswerMatchType = 'exact' | 'fuzzy' | 'partial'
@@ -115,6 +115,23 @@ export interface ScoreFeedItem {
   points: number
   matchType: AnswerMatchType
   timestamp: number
+}
+
+export interface StreamClashSongPublic {
+  id: string
+  title: string
+  artist: string
+  year: number
+  coverUrl?: string
+}
+
+export interface StreamClashRevealData {
+  songA: StreamClashSongPublic & { streams: number }
+  songB: StreamClashSongPublic & { streams: number }
+  winner: 'A' | 'B'
+  votesA: number
+  votesB: number
+  leaderboard: PlayerScore[]
 }
 
 export const GENRE_LABELS: Record<Genre, string> = {

@@ -13,6 +13,8 @@ import type {
 import { CONFIG } from '../config'
 import { selectSongs, generateChoices } from '../songs/songSelector'
 import { SONG_LIBRARY } from '../songs/songLibrary'
+import { STREAMCLASH_SONGS } from '../songs/streamclashSongs'
+import type { StreamClashSong } from '../songs/streamclashSongs'
 import { fetchDeezerPreview } from '../songs/deezerLookup'
 import { checkAnswer } from '../matching/fuzzyMatch'
 
@@ -60,6 +62,12 @@ export class GameRoom {
   // Saboteur mode
   private saboteurId: string | null = null
   private currentVotes: Map<string, string> = new Map() // voterId → targetId
+  // StreamClash mode
+  private scPairs: [StreamClashSong, StreamClashSong][] = []
+  private scVotes: Map<string, 'A' | 'B'> = new Map()
+  private scRoundIndex = -1
+  private scCoverUrls: Map<string, string> = new Map()
+  private scRevealed = false
 
   constructor(io: IoServer, hostSocket: Socket, hostName: string, avatarColor: string, userId?: number) {
     this.io = io
@@ -153,6 +161,8 @@ export class GameRoom {
 
     if (this.settings.mode === 'saboteur' && this.players.size < 4)
       return 'Le mode Saboteur nécessite au moins 4 joueurs'
+
+    if (this.settings.mode === 'streamclash') return this.startStreamClash()
 
     this.playlist = selectSongs(this.settings)
     if (this.playlist.length === 0) return 'Aucune chanson disponible pour ces paramètres'
@@ -282,6 +292,10 @@ export class GameRoom {
   }
 
   skipRound() {
+    if (this.settings.mode === 'streamclash') {
+      if (!this.scRevealed) this.revealScRound()
+      return
+    }
     this.clearTimers()
     this.endRound()
   }
@@ -520,6 +534,129 @@ export class GameRoom {
     return { correct: true, points }
   }
 
+  // ─── StreamClash ──────────────────────────────
+
+  private startStreamClash(): string | null {
+    const shuffled = [...STREAMCLASH_SONGS].sort(() => Math.random() - 0.5)
+    this.scPairs = []
+    const maxRounds = Math.min(this.settings.rounds, Math.floor(shuffled.length / 2))
+    for (let i = 0; i + 1 < shuffled.length && this.scPairs.length < maxRounds; i += 2) {
+      this.scPairs.push([shuffled[i], shuffled[i + 1]])
+    }
+    if (this.scPairs.length === 0) return 'Pas assez de chansons StreamClash'
+
+    for (const [id, player] of this.players) {
+      this.scores.set(id, createInitialScore(id, player.name, player.avatarColor))
+    }
+
+    this.status = 'playing'
+    this.scRoundIndex = -1
+    this.scVotes = new Map()
+    this.scRevealed = false
+    this.gameStartedAt = Date.now()
+    this.songsPlayed = []
+
+    this.prefetchScCovers().then(() => this.startNextScRound())
+    return null
+  }
+
+  private async prefetchScCovers(): Promise<void> {
+    const songs = this.scPairs.flat()
+    await Promise.all(
+      songs.map(async (song) => {
+        if (this.scCoverUrls.has(song.id)) return
+        const result = await fetchDeezerPreview(song.title, song.artist)
+        if (result?.coverUrl) this.scCoverUrls.set(song.id, result.coverUrl)
+      })
+    )
+    console.log(`[StreamClash] ${this.scCoverUrls.size}/${songs.length} pochettes chargées`)
+  }
+
+  private startNextScRound() {
+    this.scRoundIndex++
+    if (this.scRoundIndex >= this.scPairs.length) {
+      this.endGame()
+      return
+    }
+
+    this.scVotes = new Map()
+    this.scRevealed = false
+
+    const [sA, sB] = this.scPairs[this.scRoundIndex]
+    this.io.to(this.code).emit('streamclash:roundStart', {
+      roundNumber: this.scRoundIndex + 1,
+      totalRounds: this.scPairs.length,
+      songA: { id: sA.id, title: sA.title, artist: sA.artist, year: sA.year, coverUrl: this.scCoverUrls.get(sA.id) },
+      songB: { id: sB.id, title: sB.title, artist: sB.artist, year: sB.year, coverUrl: this.scCoverUrls.get(sB.id) },
+      timeLimit: 20,
+    })
+
+    this.roundTimer = setTimeout(() => {
+      if (!this.scRevealed) this.revealScRound()
+    }, 20 * 1000)
+  }
+
+  handleScVote(playerId: string, side: 'A' | 'B') {
+    if (this.settings.mode !== 'streamclash') return
+    if (this.scRevealed) return
+    if (this.scVotes.has(playerId)) return
+    if (!this.players.has(playerId)) return
+
+    this.scVotes.set(playerId, side)
+
+    const votesA = [...this.scVotes.values()].filter(v => v === 'A').length
+    const votesB = this.scVotes.size - votesA
+    this.io.to(this.code).emit('streamclash:voteUpdate', { votesA, votesB, totalPlayers: this.players.size })
+
+    if (this.scVotes.size >= this.players.size) {
+      if (this.roundTimer) { clearTimeout(this.roundTimer); this.roundTimer = null }
+      this.revealScRound()
+    }
+  }
+
+  private revealScRound() {
+    if (this.scRevealed) return
+    this.scRevealed = true
+    if (this.roundTimer) { clearTimeout(this.roundTimer); this.roundTimer = null }
+
+    const [sA, sB] = this.scPairs[this.scRoundIndex]
+    const winner: 'A' | 'B' = sA.streams >= sB.streams ? 'A' : 'B'
+
+    const votesA = [...this.scVotes.values()].filter(v => v === 'A').length
+    const votesB = this.scVotes.size - votesA
+
+    for (const [pid, vote] of this.scVotes) {
+      const score = this.scores.get(pid)
+      if (!score) continue
+      if (vote === winner) {
+        const pts = 100 + Math.min(score.streak * 50, 200)
+        this.scores.set(pid, applyCorrectAnswer(score, pts, 0, 0))
+      } else {
+        this.scores.set(pid, applyWrongAnswer(score))
+      }
+    }
+    for (const [pid] of this.players) {
+      if (!this.scVotes.has(pid)) {
+        const score = this.scores.get(pid)
+        if (score) this.scores.set(pid, { ...score, streak: 0 })
+      }
+    }
+
+    const leaderboard = this.getLeaderboard()
+    this.io.to(this.code).emit('streamclash:voteResult', {
+      songA: { id: sA.id, title: sA.title, artist: sA.artist, year: sA.year, streams: sA.streams, coverUrl: this.scCoverUrls.get(sA.id) },
+      songB: { id: sB.id, title: sB.title, artist: sB.artist, year: sB.year, streams: sB.streams, coverUrl: this.scCoverUrls.get(sB.id) },
+      winner,
+      votesA,
+      votesB,
+      leaderboard,
+    })
+
+    setTimeout(() => {
+      if (this.status === 'playing') this.startNextScRound()
+    }, 5000)
+  }
+
   // ─── Helpers ──────────────────────────────────
 
   getLeaderboard(): PlayerScore[] {
@@ -537,13 +674,14 @@ export class GameRoom {
   }
 
   getPublicState(): RoomState {
+    const isSC = this.settings.mode === 'streamclash'
     return {
       code: this.code,
       status: this.status,
       players: [...this.players.values()],
       settings: this.settings,
-      currentRound: this.currentRoundIndex + 1,
-      totalRounds: this.playlist.length || this.settings.rounds,
+      currentRound: isSC ? this.scRoundIndex + 1 : this.currentRoundIndex + 1,
+      totalRounds: isSC ? (this.scPairs.length || this.settings.rounds) : (this.playlist.length || this.settings.rounds),
     }
   }
 

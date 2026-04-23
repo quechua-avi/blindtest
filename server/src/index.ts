@@ -10,6 +10,7 @@ import { CONFIG } from './config'
 import { SONG_LIBRARY } from './songs/songLibrary'
 import { STREAMCLASH_SONGS } from './songs/streamclashSongs'
 import { fetchDeezerPreview } from './songs/deezerLookup'
+import { GameManager } from './game/GameManager'
 import { registerLobbyHandlers } from './socket/handlers/lobbyHandlers'
 import { registerGameHandlers } from './socket/handlers/gameHandlers'
 import { registerChatHandlers } from './socket/handlers/chatHandlers'
@@ -120,6 +121,16 @@ app.get('/api/admin/songs', (req: Request, res: Response) => {
     deezerWebUrl: `https://www.deezer.com/search/${encodeURIComponent(`${s.title} ${s.artist}`)}`,
   }))
   res.json({ total: songs.length, songs })
+})
+
+// Admin — salles actives
+app.get('/api/admin/rooms', (req: Request, res: Response) => {
+  if (req.query.secret !== CONFIG.ADMIN_SECRET) {
+    res.status(401).json({ error: 'Unauthorized' })
+    return
+  }
+  const rooms = GameManager.getAllRooms().map((r) => r.getPublicState())
+  res.json({ total: rooms.length, rooms })
 })
 
 // Admin — liste des utilisateurs

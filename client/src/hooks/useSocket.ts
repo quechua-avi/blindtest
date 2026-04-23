@@ -119,6 +119,18 @@ export function useSocketSetup() {
       store.onSaboteurVoteUpdate(votes)
     })
 
+    // ─── StreamClash ────────────────────────
+    socket.on('streamclash:roundStart', (data) => {
+      store.onScRoundStart(data)
+      navigate('/game')
+    })
+    socket.on('streamclash:voteUpdate', (data) => {
+      store.onScVoteUpdate(data)
+    })
+    socket.on('streamclash:voteResult', (data) => {
+      store.onScVoteResult(data)
+    })
+
     // ─── Chat ──────────────────────────────
     socket.on('chat:message', (msg) => store.onChatMessage(msg))
     socket.on('chat:reaction', (reaction) => store.onReaction(reaction))

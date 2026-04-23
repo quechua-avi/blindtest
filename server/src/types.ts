@@ -1,6 +1,6 @@
 export type Genre = 'pop' | 'hiphop' | 'electronic' | 'rnb' | 'french' | 'latin' | 'jul'
 export type Decade = '2000s' | '2010s' | '2020s'
-export type GameMode = 'classic' | 'teams' | 'buzzer' | 'saboteur'
+export type GameMode = 'classic' | 'teams' | 'buzzer' | 'saboteur' | 'streamclash'
 export type AnswerMode = 'text' | 'multipleChoice'
 export type RoomStatus = 'lobby' | 'playing' | 'paused' | 'ended'
 export type AnswerMatchType = 'exact' | 'fuzzy' | 'partial'
@@ -98,6 +98,18 @@ export interface RoomState {
   totalRounds: number
 }
 
+export interface StreamClashSongPublic {
+  id: string
+  title: string
+  artist: string
+  year: number
+  coverUrl?: string
+}
+
+export interface StreamClashSongRevealed extends StreamClashSongPublic {
+  streams: number
+}
+
 export interface AnswerCheckResult {
   correct: boolean
   matched?: AnswerMatchType
@@ -134,6 +146,7 @@ export interface ClientToServerEvents {
   'game:pause': (data: { paused: boolean }) => void
   'game:end': () => void
   'game:saboteurVote': (data: { targetPlayerId: string }) => void
+  'streamclash:vote': (data: { side: 'A' | 'B' }) => void
   'chat:message': (data: { text: string }) => void
   'chat:reaction': (data: { emoji: string }) => void
 }
@@ -169,6 +182,22 @@ export interface ServerToClientEvents {
   'game:ended': (data: { finalResults: GameResults }) => void
   'game:youAreSaboteur': (data: { answer: string }) => void
   'game:saboteurVoteUpdate': (data: { votes: Array<{ voterName: string; voterAvatarColor: string }> }) => void
+  'streamclash:roundStart': (data: {
+    roundNumber: number
+    totalRounds: number
+    songA: StreamClashSongPublic
+    songB: StreamClashSongPublic
+    timeLimit: number
+  }) => void
+  'streamclash:voteUpdate': (data: { votesA: number; votesB: number; totalPlayers: number }) => void
+  'streamclash:voteResult': (data: {
+    songA: StreamClashSongRevealed
+    songB: StreamClashSongRevealed
+    winner: 'A' | 'B'
+    votesA: number
+    votesB: number
+    leaderboard: PlayerScore[]
+  }) => void
   'chat:message': (data: ChatMessage) => void
   'chat:reaction': (data: ReactionEvent) => void
 }

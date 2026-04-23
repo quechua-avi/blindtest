@@ -60,6 +60,10 @@ class GameManagerClass {
     }
   }
 
+  getAllRooms(): GameRoom[] {
+    return [...this.rooms.values()]
+  }
+
   get size(): number {
     return this.rooms.size
   }
