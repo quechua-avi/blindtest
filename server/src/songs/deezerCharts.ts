@@ -33,7 +33,8 @@ interface DeezerListResponse {
 
 export const CHART_SOURCES: Record<string, { url: string; label: string }> = {
   top_france: {
-    url: 'https://api.deezer.com/chart/0/tracks?limit=100',
+    // Playlist éditoriale "Top de France" Deezer (ID stable, mise à jour chaque vendredi)
+    url: 'https://api.deezer.com/playlist/1116190742/tracks?limit=100',
     label: 'Top 100 France',
   },
 }
