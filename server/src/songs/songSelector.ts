@@ -19,7 +19,7 @@ export function selectSongs(settings: GameSettings): Song[] {
   const includeCharts = settings.genres.includes('chartsweekly')
   const dynamicSongs = includeCharts ? getDynamicSongs() : []
 
-  const staticGenres = settings.genres.filter((g) => g !== 'chartsweekly')
+  const staticGenres = settings.genres.filter((g) => g !== 'chartsweekly') as Genre[]
   const staticFiltered = staticGenres.length > 0
     ? SONG_LIBRARY.filter((s) => staticGenres.includes(s.genre))
     : []
