@@ -1,5 +1,6 @@
 import type { Song, GameSettings } from '../types'
 import { SONG_LIBRARY } from './songLibrary'
+import { getDynamicSongs } from './deezerCharts'
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr]
@@ -14,7 +15,17 @@ function shuffle<T>(arr: T[]): T[] {
 const recentlyPlayed = new Set<string>()
 
 export function selectSongs(settings: GameSettings): Song[] {
-  const filtered = SONG_LIBRARY.filter((s) => settings.genres.includes(s.genre))
+  // Construire le pool : bibliothèque statique + chansons dynamiques si chartsweekly sélectionné
+  const includeCharts = settings.genres.includes('chartsweekly')
+  const dynamicSongs = includeCharts ? getDynamicSongs() : []
+
+  const staticGenres = settings.genres.filter((g) => g !== 'chartsweekly')
+  const staticFiltered = staticGenres.length > 0
+    ? SONG_LIBRARY.filter((s) => staticGenres.includes(s.genre))
+    : []
+
+  const allSongs = [...staticFiltered, ...dynamicSongs]
+  const filtered = allSongs
 
   // Exclure les chansons récemment jouées pour plus de variété
   const fresh = filtered.filter((s) => !recentlyPlayed.has(s.id))

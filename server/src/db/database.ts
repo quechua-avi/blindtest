@@ -11,6 +11,29 @@ db.pragma('journal_mode = WAL')
 db.pragma('foreign_keys = ON')
 
 db.exec(`
+  CREATE TABLE IF NOT EXISTS dynamic_songs (
+    id          TEXT    PRIMARY KEY,          -- 'deezer-{trackId}'
+    title       TEXT    NOT NULL,
+    artist      TEXT    NOT NULL,
+    year        INTEGER NOT NULL,
+    genre       TEXT    NOT NULL DEFAULT 'chartsweekly',
+    decade      TEXT    NOT NULL,
+    preview_url TEXT    NOT NULL,
+    cover_url   TEXT,
+    deezer_id   INTEGER NOT NULL,
+    position    INTEGER,
+    source      TEXT    NOT NULL DEFAULT 'top_france',
+    synced_at   INTEGER NOT NULL DEFAULT (unixepoch())
+  );
+
+  CREATE TABLE IF NOT EXISTS chart_sync_log (
+    id        INTEGER PRIMARY KEY AUTOINCREMENT,
+    source    TEXT    NOT NULL,
+    synced_at INTEGER NOT NULL DEFAULT (unixepoch()),
+    count     INTEGER NOT NULL,
+    status    TEXT    NOT NULL
+  );
+
   CREATE TABLE IF NOT EXISTS app_settings (
     key   TEXT PRIMARY KEY,
     value TEXT NOT NULL

@@ -15,6 +15,7 @@ import { registerLobbyHandlers } from './socket/handlers/lobbyHandlers'
 import { registerGameHandlers } from './socket/handlers/gameHandlers'
 import { registerChatHandlers } from './socket/handlers/chatHandlers'
 import { authRouter } from './auth/authRoutes'
+import { syncCharts, getDynamicSongs, getAllSyncInfos, startChartScheduler } from './songs/deezerCharts'
 import './db/database'  // init SQLite
 import { db } from './db/database'
 
@@ -148,6 +149,23 @@ app.get('/api/admin/users', (req: Request, res: Response) => {
   res.json({ total: (users as unknown[]).length, users })
 })
 
+// Admin — état des charts + liste des chansons dynamiques
+app.get('/api/admin/charts', (req: Request, res: Response) => {
+  if (req.query.secret !== CONFIG.ADMIN_SECRET) { res.status(401).json({ error: 'Unauthorized' }); return }
+  const source = (req.query.source as string) ?? 'top_france'
+  const songs = getDynamicSongs(source)
+  const syncInfos = getAllSyncInfos()
+  res.json({ songs, syncInfos, currentSource: source })
+})
+
+// Admin — déclencher une synchronisation manuelle
+app.post('/api/admin/charts/sync', async (req: Request, res: Response) => {
+  if (req.query.secret !== CONFIG.ADMIN_SECRET) { res.status(401).json({ error: 'Unauthorized' }); return }
+  const source = (req.query.source as string) ?? 'top_france'
+  const result = await syncCharts(source)
+  res.json(result)
+})
+
 // Admin — supprimer un utilisateur
 app.delete('/api/admin/users/:id', (req: Request, res: Response) => {
   if (req.query.secret !== CONFIG.ADMIN_SECRET) {
@@ -200,6 +218,9 @@ app.use(express.static(clientDist))
 app.get('*', (_req: Request, res: Response) => {
   res.sendFile(path.join(clientDist, 'index.html'))
 })
+
+// Démarrer le scheduler de synchronisation des charts Deezer (toutes les semaines)
+startChartScheduler(['top_france'])
 
 httpServer.listen(CONFIG.PORT, () => {
   console.log(`🎵 Blindtest Server → http://localhost:${CONFIG.PORT}`)

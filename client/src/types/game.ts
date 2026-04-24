@@ -1,4 +1,4 @@
-export type Genre = 'pop' | 'hiphop' | 'electronic' | 'rnb' | 'french' | 'latin' | 'jul'
+export type Genre = 'pop' | 'hiphop' | 'electronic' | 'rnb' | 'french' | 'latin' | 'jul' | 'chartsweekly'
 export type Decade = '2000s' | '2010s' | '2020s'
 export type GameMode = 'classic' | 'teams' | 'buzzer' | 'saboteur' | 'streamclash'
 export type AnswerMode = 'text' | 'multipleChoice'
@@ -21,6 +21,8 @@ export interface Song {
   year: number
   genre: Genre
   decade: Decade
+  previewUrl?: string
+  coverUrl?: string
 }
 
 export interface Player {
@@ -142,6 +144,7 @@ export const GENRE_LABELS: Record<Genre, string> = {
   french: 'Musique Française',
   latin: 'Latin',
   jul: 'Jul',
+  chartsweekly: '🏆 Top France',
 }
 
 export const GENRE_COLORS: Record<Genre, string> = {
@@ -152,6 +155,7 @@ export const GENRE_COLORS: Record<Genre, string> = {
   french: '#3b82f6',
   latin: '#f97316',
   jul: '#0ea5e9',
+  chartsweekly: '#10b981',
 }
 
 export const DECADE_LABELS: Record<Decade, string> = {

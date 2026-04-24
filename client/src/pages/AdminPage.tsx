@@ -19,6 +19,25 @@ interface AdminSong {
   deezerSearchUrl: string
 }
 
+interface ChartSong {
+  id: string
+  title: string
+  artist: string
+  year: number
+  preview_url: string
+  cover_url: string | null
+  position: number | null
+  source: string
+}
+
+interface SyncInfo {
+  source: string
+  label: string
+  syncedAt: number | null
+  count: number
+  status: string
+}
+
 interface AdminRoom {
   code: string
   status: string
@@ -54,8 +73,11 @@ export function AdminPage() {
   const [users, setUsers] = useState<AdminUser[]>([])
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [tab, setTab] = useState<'songs' | 'users' | 'settings' | 'rooms'>('songs')
+  const [tab, setTab] = useState<'songs' | 'users' | 'settings' | 'rooms' | 'charts'>('songs')
   const [rooms, setRooms] = useState<AdminRoom[]>([])
+  const [chartSongs, setChartSongs] = useState<ChartSong[]>([])
+  const [chartSyncInfos, setChartSyncInfos] = useState<SyncInfo[]>([])
+  const [chartSyncing, setChartSyncing] = useState(false)
   const [requireRoomPassword, setRequireRoomPassword] = useState(true)
   const [roomPassword, setRoomPassword]               = useState('')
   const [settingsSaved, setSettingsSaved]             = useState(false)
@@ -149,6 +171,25 @@ export function AdminPage() {
     })
   }, [songs, filterGenre, filterDecade, search, sortBy])
 
+  const fetchCharts = async () => {
+    try {
+      const res = await fetch(`/api/admin/charts?secret=${encodeURIComponent(secret)}`)
+      if (!res.ok) return
+      const data = await res.json()
+      setChartSongs(data.songs ?? [])
+      setChartSyncInfos(data.syncInfos ?? [])
+    } catch {}
+  }
+
+  const triggerSync = async (source: string) => {
+    setChartSyncing(true)
+    try {
+      await fetch(`/api/admin/charts/sync?secret=${encodeURIComponent(secret)}&source=${encodeURIComponent(source)}`, { method: 'POST' })
+      await fetchCharts()
+    } catch {}
+    setChartSyncing(false)
+  }
+
   const deleteUser = async (userId: number, username: string) => {
     if (!confirm(`Supprimer le compte de "${username}" ? Cette action est irréversible.`)) return
     try {
@@ -240,7 +281,7 @@ export function AdminPage() {
       {/* Tabs */}
       <div className="bg-white border-b border-slate-200 px-6">
         <div className="flex gap-1">
-          {(['songs', 'users', 'rooms', 'settings'] as const).map((t) => (
+          {(['songs', 'users', 'rooms', 'charts', 'settings'] as const).map((t) => (
             <button
               key={t}
               onClick={() => {
@@ -248,6 +289,7 @@ export function AdminPage() {
                 if (t === 'rooms') {
                   fetch(`/api/admin/rooms?secret=${encodeURIComponent(secret)}`).then(r => r.json()).then(d => setRooms(d.rooms ?? [])).catch(() => {})
                 }
+                if (t === 'charts') fetchCharts()
               }}
               className={`px-4 py-3 text-sm font-semibold border-b-2 transition-colors cursor-pointer ${
                 tab === t
@@ -255,13 +297,143 @@ export function AdminPage() {
                   : 'border-transparent text-slate-500 hover:text-slate-700'
               }`}
             >
-              {t === 'songs' ? `Chansons (${songs.length})` : t === 'users' ? `Utilisateurs (${users.length})` : t === 'rooms' ? `Salles (${rooms.length})` : 'Paramètres'}
+              {t === 'songs' ? `Chansons (${songs.length})`
+                : t === 'users' ? `Utilisateurs (${users.length})`
+                : t === 'rooms' ? `Salles (${rooms.length})`
+                : t === 'charts' ? `Charts (${chartSongs.length})`
+                : 'Paramètres'}
             </button>
           ))}
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-6 space-y-5">
+        {tab === 'charts' && (
+          <div className="space-y-5">
+            {/* En-tête */}
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <div>
+                <h2 className="text-base font-bold text-slate-800">Charts Deezer</h2>
+                <p className="text-slate-400 text-sm mt-0.5">
+                  Synchronisation automatique chaque semaine · Chansons utilisées quand le genre "Top France" est sélectionné
+                </p>
+              </div>
+              <button
+                onClick={fetchCharts}
+                className="text-xs text-violet-600 border border-violet-200 rounded-lg px-3 py-1.5 cursor-pointer hover:bg-violet-50 transition-colors"
+              >
+                ↻ Actualiser
+              </button>
+            </div>
+
+            {/* Sources + statuts de sync */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {chartSyncInfos.length === 0 ? (
+                <div className="col-span-3 bg-white border border-slate-200 rounded-2xl shadow-sm p-6 text-center text-slate-400 text-sm">
+                  Aucune source configurée — cliquez sur "Synchroniser" pour lancer la première sync.
+                </div>
+              ) : chartSyncInfos.map((info) => {
+                const lastDate = info.syncedAt
+                  ? new Date(info.syncedAt * 1000).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+                  : null
+                const isOk = info.status === 'ok' || info.status === 'never'
+                return (
+                  <div key={info.source} className="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 space-y-4">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <p className="font-bold text-slate-800 text-sm">{info.label}</p>
+                        <p className="text-xs text-slate-400 font-mono mt-0.5">{info.source}</p>
+                      </div>
+                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${
+                        info.status === 'ok' ? 'bg-emerald-100 text-emerald-700'
+                          : info.status === 'never' ? 'bg-slate-100 text-slate-500'
+                          : 'bg-red-100 text-red-600'
+                      }`}>
+                        {info.status === 'ok' ? '✓ OK' : info.status === 'never' ? 'Jamais sync' : '⚠ Erreur'}
+                      </span>
+                    </div>
+                    <div className="text-xs text-slate-500 space-y-1">
+                      <p>
+                        <span className="font-semibold">{info.count}</span> chansons
+                        {lastDate && <> · Dernière sync : <span className="font-semibold">{lastDate}</span></>}
+                      </p>
+                      {!isOk && <p className="text-red-500 truncate">{info.status}</p>}
+                    </div>
+                    <motion.button
+                      onClick={() => triggerSync(info.source)}
+                      disabled={chartSyncing}
+                      whileTap={{ scale: 0.95 }}
+                      className="w-full py-2 bg-violet-600 text-white rounded-xl text-xs font-semibold disabled:opacity-40 hover:bg-violet-700 transition-colors cursor-pointer"
+                    >
+                      {chartSyncing ? 'Synchronisation...' : '⚡ Synchroniser maintenant'}
+                    </motion.button>
+                  </div>
+                )
+              })}
+
+              {/* Carte "Ajouter" si aucune sync infos = état initial */}
+              {chartSyncInfos.length === 0 && (
+                <div className="bg-white border border-dashed border-slate-300 rounded-2xl p-5 flex flex-col items-center justify-center gap-3 text-center">
+                  <p className="text-slate-400 text-sm">Top 100 France</p>
+                  <motion.button
+                    onClick={() => triggerSync('top_france')}
+                    disabled={chartSyncing}
+                    whileTap={{ scale: 0.95 }}
+                    className="px-4 py-2 bg-violet-600 text-white rounded-xl text-xs font-semibold disabled:opacity-40 cursor-pointer"
+                  >
+                    {chartSyncing ? 'Sync...' : 'Première sync'}
+                  </motion.button>
+                </div>
+              )}
+            </div>
+
+            {/* Liste des chansons */}
+            {chartSongs.length > 0 && (
+              <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+                <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+                  <p className="text-sm font-bold text-slate-800">{chartSongs.length} chansons actuelles</p>
+                  <p className="text-xs text-slate-400">Les previews viennent directement de Deezer — temps de chargement quasi nul</p>
+                </div>
+                <div className="divide-y divide-slate-100 max-h-[600px] overflow-y-auto">
+                  {chartSongs.map((song) => (
+                    <div key={song.id} className="flex items-center gap-3 px-5 py-3 hover:bg-slate-50 transition-colors">
+                      {/* Position */}
+                      <span className="text-xs font-bold text-slate-300 w-6 text-right flex-shrink-0">
+                        {song.position ?? '—'}
+                      </span>
+                      {/* Pochette */}
+                      <div className="w-10 h-10 rounded-lg bg-slate-100 flex-shrink-0 overflow-hidden">
+                        {song.cover_url
+                          ? <img src={song.cover_url} alt={song.title} className="w-full h-full object-cover" />
+                          : <div className="w-full h-full flex items-center justify-center text-slate-300 text-lg">♪</div>
+                        }
+                      </div>
+                      {/* Infos */}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-slate-800 truncate">{song.title}</p>
+                        <p className="text-xs text-slate-400 truncate">{song.artist} · {song.year}</p>
+                      </div>
+                      {/* Preview player */}
+                      <audio
+                        controls
+                        src={song.preview_url}
+                        preload="none"
+                        className="h-7 w-32 flex-shrink-0 opacity-60 hover:opacity-100 transition-opacity"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {chartSongs.length === 0 && chartSyncInfos.length > 0 && (
+              <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-8 text-center text-slate-400 text-sm">
+                Aucune chanson en DB — synchronisez une source pour commencer.
+              </div>
+            )}
+          </div>
+        )}
+
         {tab === 'rooms' && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">

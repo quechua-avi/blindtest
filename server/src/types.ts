@@ -1,4 +1,4 @@
-export type Genre = 'pop' | 'hiphop' | 'electronic' | 'rnb' | 'french' | 'latin' | 'jul'
+export type Genre = 'pop' | 'hiphop' | 'electronic' | 'rnb' | 'french' | 'latin' | 'jul' | 'chartsweekly'
 export type Decade = '2000s' | '2010s' | '2020s'
 export type GameMode = 'classic' | 'teams' | 'buzzer' | 'saboteur' | 'streamclash'
 export type AnswerMode = 'text' | 'multipleChoice'
@@ -23,6 +23,8 @@ export interface Song {
   decade: Decade
   alternativeTitles?: string[]
   alternativeArtists?: string[]
+  previewUrl?: string  // pré-rempli pour les chansons dynamiques Deezer (évite le lookup)
+  coverUrl?: string
 }
 
 export interface Player {

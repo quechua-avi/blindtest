@@ -195,6 +195,12 @@ export class GameRoom {
     console.log(`[Deezer] Pré-fetch de ${this.playlist.length} chansons...`)
     await Promise.all(
       this.playlist.map(async (song) => {
+        // Les chansons dynamiques (Deezer charts) ont déjà leur URL — pas de lookup nécessaire
+        if (song.previewUrl) {
+          this.previewUrls.set(song.id, song.previewUrl)
+          if (song.coverUrl) this.coverUrls.set(song.id, song.coverUrl)
+          return
+        }
         const result = await fetchDeezerPreview(song.title, song.artist)
         if (result) {
           this.previewUrls.set(song.id, result.previewUrl)
