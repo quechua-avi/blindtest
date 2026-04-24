@@ -1,4 +1,4 @@
-import type { Song, GameSettings } from '../types'
+import type { Song, GameSettings, Genre } from '../types'
 import { SONG_LIBRARY } from './songLibrary'
 import { getDynamicSongs } from './deezerCharts'
 
