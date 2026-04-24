@@ -38,6 +38,13 @@ interface SyncInfo {
   status: string
 }
 
+interface EnrichmentStatus {
+  total: number
+  cached: number
+  missing: number
+  pending: number
+}
+
 interface AdminRoom {
   code: string
   status: string
@@ -78,6 +85,8 @@ export function AdminPage() {
   const [chartSongs, setChartSongs] = useState<ChartSong[]>([])
   const [chartSyncInfos, setChartSyncInfos] = useState<SyncInfo[]>([])
   const [chartSyncing, setChartSyncing] = useState(false)
+  const [enrichment, setEnrichment] = useState<EnrichmentStatus | null>(null)
+  const [enrichmentRunning, setEnrichmentRunning] = useState(false)
   const [requireRoomPassword, setRequireRoomPassword] = useState(true)
   const [roomPassword, setRoomPassword]               = useState('')
   const [settingsSaved, setSettingsSaved]             = useState(false)
@@ -109,10 +118,12 @@ export function AdminPage() {
         setSecret('')
         return
       }
-      const [songsData, usersData, settingsData, roomsData] = await Promise.all([songsRes.json(), usersRes.json(), settingsRes.json(), roomsRes.json()])
+      const enrichmentRes = await fetch(`/api/admin/enrichment?secret=${encodeURIComponent(s)}`)
+      const [songsData, usersData, settingsData, roomsData, enrichmentData] = await Promise.all([songsRes.json(), usersRes.json(), settingsRes.json(), roomsRes.json(), enrichmentRes.json()])
       setSongs(songsData.songs)
       setUsers(usersData.users ?? [])
       setRooms(roomsData.rooms ?? [])
+      setEnrichment(enrichmentData)
       setRequireRoomPassword(settingsData.requireRoomPassword ?? true)
       setRoomPassword(settingsData.roomPassword ?? '')
       sessionStorage.setItem(ADMIN_SECRET_KEY, s)
@@ -188,6 +199,26 @@ export function AdminPage() {
       await fetchCharts()
     } catch {}
     setChartSyncing(false)
+  }
+
+  const runEnrichment = async () => {
+    setEnrichmentRunning(true)
+    try {
+      await fetch(`/api/admin/enrichment/run?secret=${encodeURIComponent(secret)}`, { method: 'POST' })
+      // Poll status every 5s for 60s
+      let attempts = 0
+      const poll = setInterval(async () => {
+        const res = await fetch(`/api/admin/enrichment?secret=${encodeURIComponent(secret)}`)
+        const data: EnrichmentStatus = await res.json()
+        setEnrichment(data)
+        if (data.pending === 0 || ++attempts >= 12) {
+          clearInterval(poll)
+          setEnrichmentRunning(false)
+        }
+      }, 5000)
+    } catch {
+      setEnrichmentRunning(false)
+    }
   }
 
   const deleteUser = async (userId: number, username: string) => {
@@ -626,7 +657,50 @@ export function AdminPage() {
           </div>
         )}
         {tab === 'songs' && (
-        <>{/* Stats */}
+        <>
+        {/* Enrichissement Deezer */}
+        {enrichment && (
+          <div className={`rounded-2xl border p-4 flex flex-wrap items-center gap-4 shadow-sm ${
+            enrichment.pending > 0 ? 'bg-amber-50 border-amber-200' : 'bg-emerald-50 border-emerald-200'
+          }`}>
+            <div className="flex-1 min-w-0">
+              <p className={`text-sm font-bold ${enrichment.pending > 0 ? 'text-amber-800' : 'text-emerald-800'}`}>
+                Previews Deezer — bibliothèque statique
+              </p>
+              <p className="text-xs mt-0.5 text-slate-500">
+                <span className="font-semibold text-emerald-700">{enrichment.cached}</span> avec preview ·{' '}
+                <span className="font-semibold text-slate-500">{enrichment.missing}</span> introuvables ·{' '}
+                <span className={`font-semibold ${enrichment.pending > 0 ? 'text-amber-600' : 'text-slate-400'}`}>
+                  {enrichment.pending} en attente
+                </span>{' '}
+                / {enrichment.total} total
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-32 h-2 bg-slate-200 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-emerald-500 rounded-full transition-all duration-500"
+                  style={{ width: `${Math.round((enrichment.cached / enrichment.total) * 100)}%` }}
+                />
+              </div>
+              <span className="text-xs font-bold text-slate-600">
+                {Math.round((enrichment.cached / enrichment.total) * 100)}%
+              </span>
+              {enrichment.pending > 0 && (
+                <motion.button
+                  onClick={runEnrichment}
+                  disabled={enrichmentRunning}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-3 py-1.5 bg-amber-600 text-white rounded-lg text-xs font-semibold disabled:opacity-50 hover:bg-amber-700 transition-colors cursor-pointer"
+                >
+                  {enrichmentRunning ? 'En cours...' : '▶ Lancer'}
+                </motion.button>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
           {GENRE_ORDER.map((g) => (
             <div

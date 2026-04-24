@@ -34,6 +34,13 @@ db.exec(`
     status    TEXT    NOT NULL
   );
 
+  CREATE TABLE IF NOT EXISTS song_previews (
+    song_id     TEXT    PRIMARY KEY,
+    preview_url TEXT    NOT NULL DEFAULT '',
+    cover_url   TEXT,
+    fetched_at  INTEGER NOT NULL DEFAULT (unixepoch())
+  );
+
   CREATE TABLE IF NOT EXISTS app_settings (
     key   TEXT PRIMARY KEY,
     value TEXT NOT NULL

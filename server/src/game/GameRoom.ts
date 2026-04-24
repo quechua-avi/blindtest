@@ -16,6 +16,7 @@ import { SONG_LIBRARY } from '../songs/songLibrary'
 import { STREAMCLASH_SONGS } from '../songs/streamclashSongs'
 import type { StreamClashSong } from '../songs/streamclashSongs'
 import { fetchDeezerPreview } from '../songs/deezerLookup'
+import { getCachedPreview, upsertPreview } from '../songs/previewEnrichment'
 import { checkAnswer } from '../matching/fuzzyMatch'
 
 const SINGLE_ARTIST_GENRES = new Set(['jul'])
@@ -192,24 +193,34 @@ export class GameRoom {
   }
 
   private async prefetchAllPreviews(): Promise<void> {
-    console.log(`[Deezer] Pré-fetch de ${this.playlist.length} chansons...`)
     await Promise.all(
       this.playlist.map(async (song) => {
-        // Les chansons dynamiques (Deezer charts) ont déjà leur URL — pas de lookup nécessaire
+        // 1. Chansons dynamiques (Deezer charts) : URL déjà présente
         if (song.previewUrl) {
           this.previewUrls.set(song.id, song.previewUrl)
           if (song.coverUrl) this.coverUrls.set(song.id, song.coverUrl)
           return
         }
+        // 2. Cache DB (bibliothèque statique enrichie au démarrage)
+        const cached = getCachedPreview(song.id)
+        if (cached) {
+          this.previewUrls.set(song.id, cached.previewUrl)
+          if (cached.coverUrl) this.coverUrls.set(song.id, cached.coverUrl)
+          return
+        }
+        // 3. Fallback : fetch Deezer en live + mise en cache
         const result = await fetchDeezerPreview(song.title, song.artist)
         if (result) {
           this.previewUrls.set(song.id, result.previewUrl)
           if (result.coverUrl) this.coverUrls.set(song.id, result.coverUrl)
+          upsertPreview(song.id, result.previewUrl, result.coverUrl)
+        } else {
+          upsertPreview(song.id, '', undefined) // marquer comme introuvable
         }
       })
     )
     const found = this.previewUrls.size
-    console.log(`[Deezer] ${found}/${this.playlist.length} previews trouvées`)
+    console.log(`[Deezer] ${found}/${this.playlist.length} previews prêtes`)
   }
 
   // ─── Round lifecycle ──────────────────────────

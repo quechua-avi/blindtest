@@ -16,6 +16,7 @@ import { registerGameHandlers } from './socket/handlers/gameHandlers'
 import { registerChatHandlers } from './socket/handlers/chatHandlers'
 import { authRouter } from './auth/authRoutes'
 import { syncCharts, getDynamicSongs, getAllSyncInfos, startChartScheduler } from './songs/deezerCharts'
+import { startEnrichment, getEnrichmentStatus } from './songs/previewEnrichment'
 import './db/database'  // init SQLite
 import { db } from './db/database'
 
@@ -166,6 +167,19 @@ app.post('/api/admin/charts/sync', async (req: Request, res: Response) => {
   res.json(result)
 })
 
+// Admin — statut d'enrichissement des previews Deezer
+app.get('/api/admin/enrichment', (req: Request, res: Response) => {
+  if (req.query.secret !== CONFIG.ADMIN_SECRET) { res.status(401).json({ error: 'Unauthorized' }); return }
+  res.json(getEnrichmentStatus())
+})
+
+// Admin — relancer l'enrichissement manuellement
+app.post('/api/admin/enrichment/run', (req: Request, res: Response) => {
+  if (req.query.secret !== CONFIG.ADMIN_SECRET) { res.status(401).json({ error: 'Unauthorized' }); return }
+  startEnrichment() // non-bloquant
+  res.json({ ok: true, message: 'Enrichissement lancé en arrière-plan' })
+})
+
 // Admin — supprimer un utilisateur
 app.delete('/api/admin/users/:id', (req: Request, res: Response) => {
   if (req.query.secret !== CONFIG.ADMIN_SECRET) {
@@ -221,6 +235,9 @@ app.get('*', (_req: Request, res: Response) => {
 
 // Démarrer le scheduler de synchronisation des charts Deezer (toutes les semaines)
 startChartScheduler(['top_france'])
+
+// Enrichir la bibliothèque statique avec les previews Deezer (arrière-plan, non-bloquant)
+startEnrichment()
 
 httpServer.listen(CONFIG.PORT, () => {
   console.log(`🎵 Blindtest Server → http://localhost:${CONFIG.PORT}`)
