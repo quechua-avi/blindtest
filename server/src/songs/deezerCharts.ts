@@ -18,9 +18,9 @@ interface DeezerTrack {
   id: number
   title: string
   artist: { name: string }
-  album: { cover_medium: string }
+  album: { cover_medium: string; release_date?: string }
   preview: string      // URL MP3 30s
-  release_date: string // "YYYY-MM-DD"
+  release_date?: string // "YYYY-MM-DD" — absent sur certains endpoints chart
   duration: number
 }
 
@@ -148,6 +148,8 @@ export async function syncCharts(source: string = 'top_france'): Promise<SyncRes
     const json = await res.json() as DeezerListResponse
     if (json.error) throw new Error(json.error.message)
     tracks = json.data ?? []
+    console.log(`[Charts] ${tracks.length} pistes reçues de Deezer`)
+    if (tracks.length > 0) console.log(`[Charts] Exemple piste[0]:`, JSON.stringify(tracks[0]).slice(0, 300))
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
     console.error(`[Charts] Erreur fetch "${source}":`, message)
@@ -173,8 +175,9 @@ export async function syncCharts(source: string = 'top_france'): Promise<SyncRes
     const t = tracks[i]
     if (!t.preview) { skipped++; continue }
 
-    const yearStr = t.release_date?.slice(0, 4)
-    const year = parseInt(yearStr)
+    // release_date peut être absent sur l'endpoint /chart — fallback sur album ou année en cours
+    const rawDate = t.release_date ?? t.album?.release_date ?? String(new Date().getFullYear())
+    const year = parseInt(rawDate.slice(0, 4))
     if (isNaN(year)) { skipped++; continue }
 
     const decade = yearToDecade(year)
@@ -196,7 +199,7 @@ export async function syncCharts(source: string = 'top_france'): Promise<SyncRes
   }
 
   db.prepare('INSERT INTO chart_sync_log (source, count, status) VALUES (?, ?, ?)').run(source, inserted, 'ok')
-  console.log(`[Charts] Sync "${source}" : ${inserted} insérées, ${skipped} ignorées (sans preview)`)
+  console.log(`[Charts] Sync "${source}" : ${inserted} insérées, ${skipped} ignorées`)
 
   return { source, count: inserted, skipped }
 }
