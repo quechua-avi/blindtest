@@ -402,12 +402,12 @@ export function AdminPage() {
                 )
               })}
 
-              {/* Carte "Ajouter" si aucune sync infos = état initial */}
+              {/* Carte "Première sync" si aucune info */}
               {chartSyncInfos.length === 0 && (
                 <div className="bg-white border border-dashed border-slate-300 rounded-2xl p-5 flex flex-col items-center justify-center gap-3 text-center">
-                  <p className="text-slate-400 text-sm">Top 100 France</p>
+                  <p className="text-slate-400 text-sm">Aucune playlist synchronisée</p>
                   <motion.button
-                    onClick={() => triggerSync('top_france')}
+                    onClick={() => triggerSync('chartsweekly')}
                     disabled={chartSyncing}
                     whileTap={{ scale: 0.95 }}
                     className="px-4 py-2 bg-violet-600 text-white rounded-xl text-xs font-semibold disabled:opacity-40 cursor-pointer"

@@ -5,7 +5,7 @@ import cors from 'cors'
 import path from 'path'
 import fs from 'fs'
 import jwt from 'jsonwebtoken'
-import type { ClientToServerEvents, ServerToClientEvents } from './types'
+import type { ClientToServerEvents, ServerToClientEvents, Genre } from './types'
 import { CONFIG } from './config'
 import { SONG_LIBRARY } from './songs/songLibrary'
 import { STREAMCLASH_SONGS } from './songs/streamclashSongs'
@@ -153,7 +153,7 @@ app.get('/api/admin/users', (req: Request, res: Response) => {
 // Admin — état des charts + liste des chansons dynamiques
 app.get('/api/admin/charts', (req: Request, res: Response) => {
   if (req.query.secret !== CONFIG.ADMIN_SECRET) { res.status(401).json({ error: 'Unauthorized' }); return }
-  const source = (req.query.source as string) ?? 'top_france'
+  const source = (req.query.source as string) ?? 'chartsweekly'
   const songs = getDynamicSongs(source)
   const syncInfos = getAllSyncInfos()
   res.json({ songs, syncInfos, currentSource: source })
@@ -162,8 +162,8 @@ app.get('/api/admin/charts', (req: Request, res: Response) => {
 // Admin — déclencher une synchronisation manuelle
 app.post('/api/admin/charts/sync', async (req: Request, res: Response) => {
   if (req.query.secret !== CONFIG.ADMIN_SECRET) { res.status(401).json({ error: 'Unauthorized' }); return }
-  const source = (req.query.source as string) ?? 'top_france'
-  const result = await syncCharts(source)
+  const genre = ((req.query.source as string) ?? 'chartsweekly') as Genre
+  const result = await syncCharts(genre)
   res.json(result)
 })
 
@@ -233,8 +233,8 @@ app.get('*', (_req: Request, res: Response) => {
   res.sendFile(path.join(clientDist, 'index.html'))
 })
 
-// Démarrer le scheduler de synchronisation des charts Deezer (toutes les semaines)
-startChartScheduler(['top_france'])
+// Démarrer le scheduler de synchronisation des playlists Deezer (toutes les semaines)
+startChartScheduler()
 
 // Enrichir la bibliothèque statique avec les previews Deezer (arrière-plan, non-bloquant)
 startEnrichment()

@@ -1,12 +1,9 @@
 /**
- * deezerCharts.ts — synchronisation des charts Deezer vers la DB SQLite
+ * deezerCharts.ts — synchronisation des playlists Deezer vers la DB SQLite
  *
- * Sources disponibles :
- *  - top_france : https://api.deezer.com/chart/0/tracks  (Top 100 France, se renouvelle le vendredi)
- *  - playlist:{id} : n'importe quelle playlist publique Deezer
- *
- * L'API Deezer est publique et ne nécessite aucune clé.
- * Les previews (30s MP3) et les pochettes sont incluses directement dans la réponse.
+ * Certains genres sont entièrement alimentés par une playlist Deezer publique
+ * plutôt que par la bibliothèque statique. Les previews (30s MP3) et pochettes
+ * sont incluses directement dans la réponse — aucune clé API requise.
  */
 
 import { db } from '../db/database'
@@ -29,22 +26,19 @@ interface DeezerListResponse {
   error?: { type: string; message: string; code: number }
 }
 
-// ─── Sources connues ───────────────────────────────────────────────────────────
+// ─── Genres alimentés par une playlist Deezer ─────────────────────────────────
+// Pour ajouter un genre : trouver la playlist sur deezer.com, copier l'ID depuis l'URL.
 
-export const CHART_SOURCES: Record<string, { url: string; label: string }> = {
-  top_france: {
-    // Playlist officielle "Top France" par Deezer Charts (100 titres, mise à jour chaque semaine)
+export const GENRE_PLAYLISTS: Partial<Record<Genre, { url: string; label: string }>> = {
+  chartsweekly: {
     url: 'https://api.deezer.com/playlist/1109890291/tracks?limit=100',
     label: 'Top 100 France',
   },
-}
-
-export function getSourceUrl(source: string): string {
-  if (CHART_SOURCES[source]) return CHART_SOURCES[source].url
-  // Support playlist:{id}
-  const m = source.match(/^playlist:(\d+)$/)
-  if (m) return `https://api.deezer.com/playlist/${m[1]}/tracks?limit=100`
-  throw new Error(`Source inconnue : ${source}`)
+  jul: {
+    // Playlist officielle "100% Jul" par Deezer Artist Editor (50 titres)
+    url: 'https://api.deezer.com/playlist/6051368644/tracks?limit=100',
+    label: '100% Jul',
+  },
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -100,15 +94,15 @@ export interface SyncInfo {
   status: string
 }
 
-export function getSyncInfo(source: string): SyncInfo {
+export function getSyncInfo(genre: Genre): SyncInfo {
   const last = db.prepare(
     'SELECT synced_at, count, status FROM chart_sync_log WHERE source = ? ORDER BY synced_at DESC LIMIT 1'
-  ).get(source) as { synced_at: number; count: number; status: string } | undefined
+  ).get(genre) as { synced_at: number; count: number; status: string } | undefined
 
-  const label = CHART_SOURCES[source]?.label ?? source
+  const label = GENRE_PLAYLISTS[genre]?.label ?? genre
 
   return {
-    source,
+    source: genre,
     label,
     syncedAt: last?.synced_at ?? null,
     count: last?.count ?? 0,
@@ -117,10 +111,7 @@ export function getSyncInfo(source: string): SyncInfo {
 }
 
 export function getAllSyncInfos(): SyncInfo[] {
-  // Récupère toutes les sources présentes dans la DB + les sources connues
-  const dbSources = db.prepare('SELECT DISTINCT source FROM dynamic_songs').all() as { source: string }[]
-  const allSources = new Set([...Object.keys(CHART_SOURCES), ...dbSources.map((r) => r.source)])
-  return [...allSources].map(getSyncInfo)
+  return (Object.keys(GENRE_PLAYLISTS) as Genre[]).map(getSyncInfo)
 }
 
 // ─── Synchronisation ──────────────────────────────────────────────────────────
@@ -132,15 +123,14 @@ export interface SyncResult {
   error?: string
 }
 
-export async function syncCharts(source: string = 'top_france'): Promise<SyncResult> {
-  let url: string
-  try {
-    url = getSourceUrl(source)
-  } catch (err) {
-    return { source, count: 0, skipped: 0, error: String(err) }
+export async function syncCharts(genre: Genre = 'chartsweekly'): Promise<SyncResult> {
+  const config = GENRE_PLAYLISTS[genre]
+  if (!config) {
+    return { source: genre, count: 0, skipped: 0, error: `Genre "${genre}" n'a pas de playlist Deezer configurée` }
   }
 
-  console.log(`[Charts] Début sync "${source}" → ${url}`)
+  const { url } = config
+  console.log(`[Charts] Début sync "${genre}" → ${url}`)
 
   let tracks: DeezerTrack[]
   try {
@@ -153,20 +143,20 @@ export async function syncCharts(source: string = 'top_france'): Promise<SyncRes
     if (tracks.length > 0) console.log(`[Charts] Exemple piste[0]:`, JSON.stringify(tracks[0]).slice(0, 300))
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err)
-    console.error(`[Charts] Erreur fetch "${source}":`, message)
+    console.error(`[Charts] Erreur fetch "${genre}":`, message)
     try {
-      db.prepare('INSERT INTO chart_sync_log (source, count, status) VALUES (?, 0, ?)').run(source, `error:${message}`)
+      db.prepare('INSERT INTO chart_sync_log (source, count, status) VALUES (?, 0, ?)').run(genre, `error:${message}`)
     } catch {}
-    return { source, count: 0, skipped: 0, error: message }
+    return { source: genre, count: 0, skipped: 0, error: message }
   }
 
   // Supprimer les anciennes chansons de cette source
-  db.prepare('DELETE FROM dynamic_songs WHERE source = ?').run(source)
+  db.prepare('DELETE FROM dynamic_songs WHERE source = ?').run(genre)
 
   const insert = db.prepare(`
     INSERT OR REPLACE INTO dynamic_songs
       (id, title, artist, year, genre, decade, preview_url, cover_url, deezer_id, position, source, synced_at)
-    VALUES (?, ?, ?, ?, 'chartsweekly', ?, ?, ?, ?, ?, ?, unixepoch())
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, unixepoch())
   `)
 
   let inserted = 0
@@ -189,45 +179,44 @@ export async function syncCharts(source: string = 'top_france'): Promise<SyncRes
       t.title,
       t.artist.name,
       year,
+      genre,
       decade,
       t.preview,
       t.album?.cover_medium ?? null,
       t.id,
       i + 1,
-      source,
+      genre,
     )
     inserted++
   }
 
-  db.prepare('INSERT INTO chart_sync_log (source, count, status) VALUES (?, ?, ?)').run(source, inserted, 'ok')
-  console.log(`[Charts] Sync "${source}" : ${inserted} insérées, ${skipped} ignorées`)
+  db.prepare('INSERT INTO chart_sync_log (source, count, status) VALUES (?, ?, ?)').run(genre, inserted, 'ok')
+  console.log(`[Charts] Sync "${genre}" : ${inserted} insérées, ${skipped} ignorées`)
 
-  return { source, count: inserted, skipped }
+  return { source: genre, count: inserted, skipped }
 }
 
 // ─── Scheduler (sans dépendance externe) ─────────────────────────────────────
 // Vérifie toutes les heures si un sync est nécessaire (> 7 jours depuis le dernier)
 
-export function startChartScheduler(sources: string[] = ['top_france']) {
-  const INTERVAL_MS   = 60 * 60 * 1000  // vérification toutes les heures
-  const SYNC_EVERY_MS = 7 * 24 * 60 * 60 * 1000  // sync si > 7 jours
+export function startChartScheduler(genres: Genre[] = Object.keys(GENRE_PLAYLISTS) as Genre[]) {
+  const INTERVAL_MS   = 60 * 60 * 1000         // vérification toutes les heures
+  const SYNC_EVERY_MS = 7 * 24 * 60 * 60 * 1000 // sync si > 7 jours
 
   async function checkAndSync() {
-    for (const source of sources) {
-      const info = getSyncInfo(source)
+    for (const genre of genres) {
+      const info = getSyncInfo(genre)
       const lastMs = info.syncedAt ? info.syncedAt * 1000 : 0
       const age = Date.now() - lastMs
       if (age >= SYNC_EVERY_MS) {
-        console.log(`[Charts] Auto-sync "${source}" (dernier sync il y a ${Math.round(age / 86400000)}j)`)
-        await syncCharts(source)
+        console.log(`[Charts] Auto-sync "${genre}" (dernier sync il y a ${Math.round(age / 86400000)}j)`)
+        await syncCharts(genre)
       }
     }
   }
 
-  // Vérification immédiate au démarrage
   checkAndSync()
-  // Puis toutes les heures
   setInterval(checkAndSync, INTERVAL_MS)
 
-  console.log(`[Charts] Scheduler démarré — ${sources.length} source(s) surveillée(s)`)
+  console.log(`[Charts] Scheduler démarré — ${genres.length} genre(s) surveillé(s): ${genres.join(', ')}`)
 }
