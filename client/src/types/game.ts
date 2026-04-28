@@ -1,4 +1,4 @@
-export type Genre = 'pop' | 'hiphop' | 'electronic' | 'rnb' | 'french' | 'latin' | 'jul' | 'chartsweekly'
+export type Genre = 'complet' | 'jul' | 'chartsweekly'
 export type Decade = '2000s' | '2010s' | '2020s'
 export type GameMode = 'classic' | 'teams' | 'buzzer' | 'saboteur' | 'streamclash'
 export type AnswerMode = 'text' | 'multipleChoice'
@@ -137,23 +137,13 @@ export interface StreamClashRevealData {
 }
 
 export const GENRE_LABELS: Record<Genre, string> = {
-  pop: 'Pop',
-  hiphop: 'Hip-Hop',
-  electronic: 'Electronic',
-  rnb: 'R&B',
-  french: 'Musique Française',
-  latin: 'Latin',
+  complet: '🎵 Complet',
   jul: 'Jul',
   chartsweekly: '🏆 Top France',
 }
 
 export const GENRE_COLORS: Record<Genre, string> = {
-  pop: '#ec4899',
-  hiphop: '#f59e0b',
-  electronic: '#8b5cf6',
-  rnb: '#6366f1',
-  french: '#3b82f6',
-  latin: '#f97316',
+  complet: '#7c3aed',
   jul: '#0ea5e9',
   chartsweekly: '#10b981',
 }

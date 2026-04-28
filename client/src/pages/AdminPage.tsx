@@ -69,7 +69,7 @@ interface AdminUser {
   best_streak: number
 }
 
-const GENRE_ORDER: Genre[] = ['pop', 'hiphop', 'electronic', 'rnb', 'french', 'latin', 'jul']
+const GENRE_ORDER: Genre[] = ['complet', 'jul', 'chartsweekly']
 const DECADE_ORDER: Decade[] = ['2000s', '2010s', '2020s']
 
 export function AdminPage() {
