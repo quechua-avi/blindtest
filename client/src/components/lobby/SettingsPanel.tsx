@@ -9,7 +9,7 @@ interface SettingsPanelProps {
   light?: boolean
 }
 
-const GENRES: Genre[] = ['complet', 'jul', 'chartsweekly']
+const GENRES: Genre[] = ['chartsweekly', 'rapfr', 'jul', 'varfr', 'hits2000', 'hits2010', 'hits2020', 'electronic', 'latino']
 
 function toggle<T>(arr: T[], val: T): T[] {
   return arr.includes(val) ? arr.filter((x) => x !== val) : [...arr, val]

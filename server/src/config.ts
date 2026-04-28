@@ -12,7 +12,7 @@ export const CONFIG = {
   BETWEEN_ROUNDS_DELAY_MS: 5000,         // 5s entre les rounds
   DEFAULT_SETTINGS: {
     mode: 'classic' as const,
-    genres: ['complet'] as const,
+    genres: ['hits2010'] as const,
     rounds: 10,
     answerMode: 'text' as const,
     playDuration: 20,

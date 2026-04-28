@@ -8,12 +8,15 @@ import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
 
 const GENRES = [
-  { label: 'Pop',        color: '#ec4899' },
-  { label: 'Hip-Hop',    color: '#f59e0b' },
-  { label: 'Electronic', color: '#8b5cf6' },
-  { label: 'R&B',        color: '#6366f1' },
-  { label: 'Français',   color: '#3b82f6' },
-  { label: 'Latin',      color: '#f97316' },
+  { label: '🏆 Top France',   color: '#10b981' },
+  { label: '🎤 Rap Français', color: '#f59e0b' },
+  { label: 'Jul',             color: '#0ea5e9' },
+  { label: '🇫🇷 Variété FR',  color: '#3b82f6' },
+  { label: '📼 Années 2000',  color: '#ec4899' },
+  { label: '💿 Années 2010',  color: '#6366f1' },
+  { label: '🚀 Années 2020',  color: '#f97316' },
+  { label: '⚡ Electronic',   color: '#8b5cf6' },
+  { label: '🔥 Latino',       color: '#ef4444' },
 ]
 
 const BARS = [0.35, 0.7, 1, 0.55, 0.85, 0.45, 0.9, 0.65, 1, 0.5, 0.75, 0.4]

@@ -1,5 +1,4 @@
 import type { Song, GameSettings } from '../types'
-import { SONG_LIBRARY } from './songLibrary'
 import { GENRE_PLAYLISTS, getDynamicSongs } from './deezerCharts'
 
 function shuffle<T>(arr: T[]): T[] {
@@ -19,11 +18,7 @@ export function selectSongs(settings: GameSettings): Song[] {
   // Genres sans playlist → bibliothèque statique
   const allSongs: Song[] = []
   for (const genre of settings.genres) {
-    if (GENRE_PLAYLISTS[genre]) {
-      allSongs.push(...getDynamicSongs(genre))
-    } else {
-      allSongs.push(...SONG_LIBRARY.filter((s) => s.genre === genre))
-    }
+    allSongs.push(...getDynamicSongs(genre))
   }
   const filtered = allSongs
 

@@ -1,4 +1,4 @@
-export type Genre = 'complet' | 'jul' | 'chartsweekly'
+export type Genre = 'jul' | 'chartsweekly' | 'rapfr' | 'hits2000' | 'hits2010' | 'hits2020' | 'varfr' | 'electronic' | 'latino'
 export type Decade = '2000s' | '2010s' | '2020s'
 export type GameMode = 'classic' | 'teams' | 'buzzer' | 'saboteur' | 'streamclash'
 export type AnswerMode = 'text' | 'multipleChoice'

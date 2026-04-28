@@ -35,9 +35,36 @@ export const GENRE_PLAYLISTS: Partial<Record<Genre, { url: string; label: string
     label: 'Top 100 France',
   },
   jul: {
-    // Playlist officielle "100% Jul" par Deezer Artist Editor (50 titres)
     url: 'https://api.deezer.com/playlist/6051368644/tracks?limit=100',
     label: '100% Jul',
+  },
+  rapfr: {
+    url: 'https://api.deezer.com/playlist/1629661895/tracks?limit=100',
+    label: 'Rap Soirée FR 2010–2026',
+  },
+  hits2000: {
+    url: 'https://api.deezer.com/playlist/248297032/tracks?limit=100',
+    label: '00s Hits',
+  },
+  hits2010: {
+    url: 'https://api.deezer.com/playlist/11153461484/tracks?limit=100',
+    label: '10s HITS',
+  },
+  hits2020: {
+    url: 'https://api.deezer.com/playlist/13650084141/tracks?limit=100',
+    label: '20s Hits',
+  },
+  varfr: {
+    url: 'https://api.deezer.com/playlist/1189520191/tracks?limit=100',
+    label: 'Bleu Blanc Hits',
+  },
+  electronic: {
+    url: 'https://api.deezer.com/playlist/1902101402/tracks?limit=100',
+    label: 'Electronic Hits',
+  },
+  latino: {
+    url: 'https://api.deezer.com/playlist/178699142/tracks?limit=100',
+    label: 'Fuego Latino',
   },
 }
 

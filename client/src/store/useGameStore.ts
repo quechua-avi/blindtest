@@ -122,7 +122,7 @@ interface GameStore {
 
 const DEFAULT_SETTINGS: GameSettings = {
   mode: 'classic',
-  genres: ['complet'],
+  genres: ['hits2010'],
   rounds: 10,
   answerMode: 'text',
   playDuration: 20,

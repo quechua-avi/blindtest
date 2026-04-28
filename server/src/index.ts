@@ -7,7 +7,6 @@ import fs from 'fs'
 import jwt from 'jsonwebtoken'
 import type { ClientToServerEvents, ServerToClientEvents, Genre } from './types'
 import { CONFIG } from './config'
-import { SONG_LIBRARY } from './songs/songLibrary'
 import { STREAMCLASH_SONGS } from './songs/streamclashSongs'
 import { fetchDeezerPreview } from './songs/deezerLookup'
 import { GameManager } from './game/GameManager'
@@ -15,8 +14,7 @@ import { registerLobbyHandlers } from './socket/handlers/lobbyHandlers'
 import { registerGameHandlers } from './socket/handlers/gameHandlers'
 import { registerChatHandlers } from './socket/handlers/chatHandlers'
 import { authRouter } from './auth/authRoutes'
-import { syncCharts, getDynamicSongs, getAllSyncInfos, startChartScheduler } from './songs/deezerCharts'
-import { startEnrichment, getEnrichmentStatus } from './songs/previewEnrichment'
+import { syncCharts, getDynamicSongs, getAllSyncInfos, startChartScheduler, GENRE_PLAYLISTS } from './songs/deezerCharts'
 import './db/database'  // init SQLite
 import { db } from './db/database'
 
@@ -111,17 +109,21 @@ app.get('/api/streamclash/songs', async (_req: Request, res: Response) => {
   res.json(songs)
 })
 
-// Admin — liste des chansons avec URL Deezer
+// Admin — liste des chansons (dynamic_songs depuis Deezer)
 app.get('/api/admin/songs', (req: Request, res: Response) => {
   if (req.query.secret !== CONFIG.ADMIN_SECRET) {
     res.status(401).json({ error: 'Unauthorized' })
     return
   }
-  const songs = SONG_LIBRARY.map((s) => ({
-    ...s,
-    deezerSearchUrl: `https://api.deezer.com/search?q=artist:"${encodeURIComponent(s.artist.replace(/ ft\.?.+$/i, '').trim())}" track:"${encodeURIComponent(s.title)}"&limit=3&output=jsonp`,
-    deezerWebUrl: `https://www.deezer.com/search/${encodeURIComponent(`${s.title} ${s.artist}`)}`,
-  }))
+  const dynamic = getDynamicSongs()
+  const songs = dynamic.map((s) => {
+    const deezerId = s.id.replace('deezer-', '')
+    return {
+      ...s,
+      deezerWebUrl: `https://www.deezer.com/track/${deezerId}`,
+      deezerSearchUrl: `https://www.deezer.com/search/${encodeURIComponent(`${s.title} ${s.artist}`)}`,
+    }
+  })
   res.json({ total: songs.length, songs })
 })
 
@@ -167,17 +169,20 @@ app.post('/api/admin/charts/sync', async (req: Request, res: Response) => {
   res.json(result)
 })
 
-// Admin — statut d'enrichissement des previews Deezer
+// Admin — statut des previews (songs dynamiques Deezer)
 app.get('/api/admin/enrichment', (req: Request, res: Response) => {
   if (req.query.secret !== CONFIG.ADMIN_SECRET) { res.status(401).json({ error: 'Unauthorized' }); return }
-  res.json(getEnrichmentStatus())
+  const total = (db.prepare('SELECT COUNT(*) as c FROM dynamic_songs').get() as { c: number }).c
+  const cached = (db.prepare("SELECT COUNT(*) as c FROM dynamic_songs WHERE preview_url != ''").get() as { c: number }).c
+  res.json({ total, cached, missing: 0, pending: total - cached })
 })
 
-// Admin — relancer l'enrichissement manuellement
-app.post('/api/admin/enrichment/run', (req: Request, res: Response) => {
+// Admin — re-sync toutes les playlists (remplace l'enrichissement statique)
+app.post('/api/admin/enrichment/run', async (req: Request, res: Response) => {
   if (req.query.secret !== CONFIG.ADMIN_SECRET) { res.status(401).json({ error: 'Unauthorized' }); return }
-  startEnrichment() // non-bloquant
-  res.json({ ok: true, message: 'Enrichissement lancé en arrière-plan' })
+  const genres = Object.keys(GENRE_PLAYLISTS) as Genre[]
+  for (const g of genres) await syncCharts(g)
+  res.json({ ok: true, message: `${genres.length} playlists re-syncées` })
 })
 
 // Admin — supprimer un utilisateur
@@ -236,8 +241,6 @@ app.get('*', (_req: Request, res: Response) => {
 // Démarrer le scheduler de synchronisation des playlists Deezer (toutes les semaines)
 startChartScheduler()
 
-// Enrichir la bibliothèque statique avec les previews Deezer (arrière-plan, non-bloquant)
-startEnrichment()
 
 httpServer.listen(CONFIG.PORT, () => {
   console.log(`🎵 Blindtest Server → http://localhost:${CONFIG.PORT}`)

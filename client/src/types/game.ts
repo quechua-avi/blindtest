@@ -1,4 +1,4 @@
-export type Genre = 'complet' | 'jul' | 'chartsweekly'
+export type Genre = 'jul' | 'chartsweekly' | 'rapfr' | 'hits2000' | 'hits2010' | 'hits2020' | 'varfr' | 'electronic' | 'latino'
 export type Decade = '2000s' | '2010s' | '2020s'
 export type GameMode = 'classic' | 'teams' | 'buzzer' | 'saboteur' | 'streamclash'
 export type AnswerMode = 'text' | 'multipleChoice'
@@ -137,15 +137,27 @@ export interface StreamClashRevealData {
 }
 
 export const GENRE_LABELS: Record<Genre, string> = {
-  complet: '🎵 Complet',
   jul: 'Jul',
   chartsweekly: '🏆 Top France',
+  rapfr: '🎤 Rap Français',
+  hits2000: '📼 Années 2000',
+  hits2010: '💿 Années 2010',
+  hits2020: '🚀 Années 2020',
+  varfr: '🇫🇷 Variété FR',
+  electronic: '⚡ Electronic',
+  latino: '🔥 Latino',
 }
 
 export const GENRE_COLORS: Record<Genre, string> = {
-  complet: '#7c3aed',
   jul: '#0ea5e9',
   chartsweekly: '#10b981',
+  rapfr: '#f59e0b',
+  hits2000: '#ec4899',
+  hits2010: '#6366f1',
+  hits2020: '#f97316',
+  varfr: '#3b82f6',
+  electronic: '#8b5cf6',
+  latino: '#ef4444',
 }
 
 export const DECADE_LABELS: Record<Decade, string> = {
