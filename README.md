@@ -15,36 +15,7 @@ npm --version
 
 ---
 
-## Installation locale (développement)
-
-```bash
-# 1. Installer toutes les dépendances (une seule fois)
-npm install
-
-# 2. Lancer serveur + client en parallèle
-npm run dev
-```
-
-| Service | URL |
-|---------|-----|
-| Interface joueur | http://localhost:5173 |
-| API serveur | http://localhost:3001 |
-| Page admin | http://localhost:3001/admin |
-
-Au premier démarrage, le serveur crée automatiquement la base SQLite (`data/beatblind.db`) et lance la synchronisation de toutes les playlists Deezer. Attendre ~30 secondes que les 9 genres soient chargés (voir les logs `[Charts]` dans le terminal).
-
----
-
-## Jouer à plusieurs sur le même réseau
-
-1. Lancer `npm run dev` sur la machine hôte
-2. Trouver l'IP locale : `ipconfig` (Windows) → ex. `192.168.1.42`
-3. Les autres appareils ouvrent `http://192.168.1.42:5173`
-4. L'hôte crée une salle, partage le code à 6 lettres
-
----
-
-## Déploiement Railway (production)
+## Déploiement Railway
 
 ### 1. Créer le projet Railway
 
