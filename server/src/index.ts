@@ -12,7 +12,7 @@ import { registerLobbyHandlers } from './socket/handlers/lobbyHandlers'
 import { registerGameHandlers } from './socket/handlers/gameHandlers'
 import { registerChatHandlers } from './socket/handlers/chatHandlers'
 import { authRouter } from './auth/authRoutes'
-import { syncCharts, getDynamicSongs, getAllSyncInfos, startChartScheduler, GENRE_PLAYLISTS } from './songs/deezerCharts'
+import { syncCharts, getDynamicSongs, getAllSyncInfos, startChartScheduler, GENRE_PLAYLISTS, patchMissingRanks } from './songs/deezerCharts'
 import './db/database'  // init SQLite
 import { db } from './db/database'
 
@@ -151,6 +151,13 @@ app.get('/api/admin/enrichment', (req: Request, res: Response) => {
   const total = (db.prepare('SELECT COUNT(*) as c FROM dynamic_songs').get() as { c: number }).c
   const cached = (db.prepare("SELECT COUNT(*) as c FROM dynamic_songs WHERE preview_url != ''").get() as { c: number }).c
   res.json({ total, cached, missing: 0, pending: total - cached })
+})
+
+// Admin — patch rank pour les chansons sans rank (sans re-sync complet)
+app.post('/api/admin/enrichment/patch-rank', async (req: Request, res: Response) => {
+  if (req.query.secret !== CONFIG.ADMIN_SECRET) { res.status(401).json({ error: 'Unauthorized' }); return }
+  const result = await patchMissingRanks()
+  res.json({ ok: true, ...result })
 })
 
 // Admin — re-sync toutes les playlists (remplace l'enrichissement statique)

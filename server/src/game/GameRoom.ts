@@ -650,7 +650,11 @@ export class GameRoom {
     if (this.roundTimer) { clearTimeout(this.roundTimer); this.roundTimer = null }
 
     const [sA, sB] = this.scPairs[this.scRoundIndex]
-    const winner: 'A' | 'B' = (sA.rank ?? 0) >= (sB.rank ?? 0) ? 'A' : 'B'
+    const rankA = sA.rank ?? 0
+    const rankB = sB.rank ?? 0
+    const winner: 'A' | 'B' = rankA !== rankB
+      ? (rankA >= rankB ? 'A' : 'B')
+      : (Math.random() > 0.5 ? 'A' : 'B')
 
     const votesA = [...this.scVotes.values()].filter(v => v === 'A').length
     const votesB = this.scVotes.size - votesA

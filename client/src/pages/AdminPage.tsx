@@ -87,6 +87,8 @@ export function AdminPage() {
   const [chartSyncing, setChartSyncing] = useState(false)
   const [enrichment, setEnrichment] = useState<EnrichmentStatus | null>(null)
   const [enrichmentRunning, setEnrichmentRunning] = useState(false)
+  const [rankPatching, setRankPatching] = useState(false)
+  const [rankPatchResult, setRankPatchResult] = useState<{ updated: number; errors: number } | null>(null)
   const [requireRoomPassword, setRequireRoomPassword] = useState(true)
   const [roomPassword, setRoomPassword]               = useState('')
   const [settingsSaved, setSettingsSaved]             = useState(false)
@@ -219,6 +221,17 @@ export function AdminPage() {
     } catch {
       setEnrichmentRunning(false)
     }
+  }
+
+  const patchRank = async () => {
+    setRankPatching(true)
+    setRankPatchResult(null)
+    try {
+      const res = await fetch(`/api/admin/enrichment/patch-rank?secret=${encodeURIComponent(secret)}`, { method: 'POST' })
+      const data = await res.json()
+      setRankPatchResult({ updated: data.updated ?? 0, errors: data.errors ?? 0 })
+    } catch {}
+    setRankPatching(false)
   }
 
   const deleteUser = async (userId: number, username: string) => {
@@ -699,6 +712,30 @@ export function AdminPage() {
             </div>
           </div>
         )}
+
+        {/* Patch rank Deezer */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-4 flex flex-wrap items-center gap-4 shadow-sm">
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold text-slate-800">Popularité Deezer (rank)</p>
+            <p className="text-xs mt-0.5 text-slate-500">
+              Récupère le score de popularité Deezer pour les chansons qui affichent 0.
+              Utilisé dans StreamClash pour désigner la chanson gagnante.
+            </p>
+            {rankPatchResult && (
+              <p className="text-xs mt-1 text-emerald-700 font-semibold">
+                ✓ {rankPatchResult.updated} mises à jour · {rankPatchResult.errors} erreurs
+              </p>
+            )}
+          </div>
+          <motion.button
+            onClick={patchRank}
+            disabled={rankPatching}
+            whileTap={{ scale: 0.95 }}
+            className="px-3 py-1.5 bg-violet-600 text-white rounded-lg text-xs font-semibold disabled:opacity-50 hover:bg-violet-700 transition-colors cursor-pointer"
+          >
+            {rankPatching ? 'En cours...' : '🏆 Patch rank'}
+          </motion.button>
+        </div>
 
         {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">

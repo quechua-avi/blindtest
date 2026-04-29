@@ -113,7 +113,7 @@ function SongCard({
 
       {/* Popularité révélée après vote */}
       <AnimatePresence>
-        {isReveal && song.streams !== undefined && song.streams > 0 && (
+        {isReveal && song.streams !== undefined && (
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -125,7 +125,7 @@ function SongCard({
             }`}
           >
             <p className={`text-xl font-black ${isWinner ? 'text-amber-600' : 'text-slate-400'}`}>
-              {formatPopularity(song.streams)}
+              {song.streams > 0 ? formatPopularity(song.streams) : '—'}
             </p>
             <p className="text-xs text-slate-400">popularité Deezer</p>
           </motion.div>
@@ -137,7 +137,7 @@ function SongCard({
 
 export function StreamClashGame() {
   const navigate = useNavigate()
-  const { stopSong } = useAudioPlayerContext()
+  const { playSong, stopSong } = useAudioPlayerContext()
   const {
     scRoundNumber,
     scTotalRounds,
@@ -155,7 +155,13 @@ export function StreamClashGame() {
     myPlayerId,
     isHost,
     setMyScVote,
+    pendingSong,
   } = useGameStore()
+
+  // Déclencher l'audio directement (sans dépendre de l'effet dans GamePage)
+  useEffect(() => {
+    if (pendingSong) playSong(pendingSong.previewUrl)
+  }, [pendingSong]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Arrêter la musique quand le reveal arrive
   useEffect(() => {

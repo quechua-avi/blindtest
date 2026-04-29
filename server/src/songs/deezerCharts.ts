@@ -227,6 +227,30 @@ export async function syncCharts(genre: Genre = 'chartsweekly'): Promise<SyncRes
   return { source: genre, count: inserted, skipped }
 }
 
+// ─── Patch rank pour les chansons existantes sans rank ───────────────────────
+
+export async function patchMissingRanks(): Promise<{ updated: number; errors: number }> {
+  const rows = db.prepare("SELECT id, deezer_id FROM dynamic_songs WHERE rank = 0").all() as { id: string; deezer_id: number }[]
+  let updated = 0
+  let errors = 0
+  const update = db.prepare('UPDATE dynamic_songs SET rank = ? WHERE id = ?')
+
+  for (const row of rows) {
+    try {
+      const res = await fetch(`https://api.deezer.com/track/${row.deezer_id}`, { signal: AbortSignal.timeout(8_000) })
+      if (!res.ok) { errors++; continue }
+      const data = await res.json() as { rank?: number; error?: unknown }
+      if (data.error || data.rank === undefined) { errors++; continue }
+      update.run(data.rank, row.id)
+      updated++
+      await new Promise((r) => setTimeout(r, 300))
+    } catch {
+      errors++
+    }
+  }
+  return { updated, errors }
+}
+
 // ─── Scheduler (sans dépendance externe) ─────────────────────────────────────
 // Vérifie toutes les heures si un sync est nécessaire (> 7 jours depuis le dernier)
 
