@@ -226,9 +226,12 @@ export async function syncCharts(genre: Genre = 'chartsweekly'): Promise<SyncRes
 // ─── Scheduler (sans dépendance externe) ─────────────────────────────────────
 // Vérifie toutes les heures si un sync est nécessaire (> 7 jours depuis le dernier)
 
+const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms))
+
 export function startChartScheduler(genres: Genre[] = Object.keys(GENRE_PLAYLISTS) as Genre[]) {
   const INTERVAL_MS   = 60 * 60 * 1000         // vérification toutes les heures
   const SYNC_EVERY_MS = 7 * 24 * 60 * 60 * 1000 // sync si > 7 jours
+  const SYNC_DELAY_MS = 2_000                   // délai entre syncs pour éviter le rate-limit Deezer
 
   async function checkAndSync() {
     for (const genre of genres) {
@@ -238,6 +241,7 @@ export function startChartScheduler(genres: Genre[] = Object.keys(GENRE_PLAYLIST
       if (age >= SYNC_EVERY_MS) {
         console.log(`[Charts] Auto-sync "${genre}" (dernier sync il y a ${Math.round(age / 86400000)}j)`)
         await syncCharts(genre)
+        await sleep(SYNC_DELAY_MS)
       }
     }
   }

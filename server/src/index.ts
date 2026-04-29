@@ -181,8 +181,13 @@ app.get('/api/admin/enrichment', (req: Request, res: Response) => {
 app.post('/api/admin/enrichment/run', async (req: Request, res: Response) => {
   if (req.query.secret !== CONFIG.ADMIN_SECRET) { res.status(401).json({ error: 'Unauthorized' }); return }
   const genres = Object.keys(GENRE_PLAYLISTS) as Genre[]
-  for (const g of genres) await syncCharts(g)
-  res.json({ ok: true, message: `${genres.length} playlists re-syncées` })
+  const results = []
+  for (const g of genres) {
+    const r = await syncCharts(g)
+    results.push(r)
+    await new Promise((resolve) => setTimeout(resolve, 2000))
+  }
+  res.json({ ok: true, message: `${genres.length} playlists re-syncées`, results })
 })
 
 // Admin — supprimer un utilisateur
