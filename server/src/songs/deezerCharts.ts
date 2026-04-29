@@ -19,6 +19,7 @@ interface DeezerTrack {
   preview: string      // URL MP3 30s
   release_date?: string // "YYYY-MM-DD" — absent sur certains endpoints chart
   duration: number
+  rank?: number        // score de popularité Deezer (0–1 000 000)
 }
 
 interface DeezerListResponse {
@@ -89,6 +90,7 @@ interface DynamicSongRow {
   position: number | null
   source: string
   synced_at: number
+  rank: number
 }
 
 function rowToSong(row: DynamicSongRow): Song {
@@ -101,6 +103,7 @@ function rowToSong(row: DynamicSongRow): Song {
     decade: row.decade as Decade,
     previewUrl: row.preview_url,
     coverUrl: row.cover_url ?? undefined,
+    rank: row.rank ?? 0,
   }
 }
 
@@ -182,8 +185,8 @@ export async function syncCharts(genre: Genre = 'chartsweekly'): Promise<SyncRes
 
   const insert = db.prepare(`
     INSERT OR REPLACE INTO dynamic_songs
-      (id, title, artist, year, genre, decade, preview_url, cover_url, deezer_id, position, source, synced_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, unixepoch())
+      (id, title, artist, year, genre, decade, preview_url, cover_url, deezer_id, position, source, synced_at, rank)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, unixepoch(), ?)
   `)
 
   let inserted = 0
@@ -213,6 +216,7 @@ export async function syncCharts(genre: Genre = 'chartsweekly'): Promise<SyncRes
       t.id,
       i + 1,
       genre,
+      t.rank ?? 0,
     )
     inserted++
   }

@@ -25,6 +25,7 @@ export interface Song {
   alternativeArtists?: string[]
   previewUrl?: string  // pré-rempli pour les chansons dynamiques Deezer (évite le lookup)
   coverUrl?: string
+  rank?: number        // score de popularité Deezer (0–1 000 000)
 }
 
 export interface Player {
@@ -191,6 +192,8 @@ export interface ServerToClientEvents {
     songB: StreamClashSongPublic
     timeLimit: number
   }) => void
+  'streamclash:nowPlaying': (data: { side: 'A' | 'B' }) => void
+  'streamclash:votingOpen': (data: { timeLimit: number }) => void
   'streamclash:voteUpdate': (data: { votesA: number; votesB: number; totalPlayers: number }) => void
   'streamclash:voteResult': (data: {
     songA: StreamClashSongRevealed

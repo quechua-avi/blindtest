@@ -124,6 +124,12 @@ export function useSocketSetup() {
       store.onScRoundStart(data)
       navigate('/game')
     })
+    socket.on('streamclash:nowPlaying', ({ side }) => {
+      store.onScNowPlaying(side)
+    })
+    socket.on('streamclash:votingOpen', ({ timeLimit }) => {
+      store.onScVotingOpen(timeLimit)
+    })
     socket.on('streamclash:voteUpdate', (data) => {
       store.onScVoteUpdate(data)
     })

@@ -23,6 +23,7 @@ export interface Song {
   decade: Decade
   previewUrl?: string
   coverUrl?: string
+  rank?: number
 }
 
 export interface Player {

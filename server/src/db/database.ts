@@ -23,7 +23,8 @@ db.exec(`
     deezer_id   INTEGER NOT NULL,
     position    INTEGER,
     source      TEXT    NOT NULL DEFAULT 'top_france',
-    synced_at   INTEGER NOT NULL DEFAULT (unixepoch())
+    synced_at   INTEGER NOT NULL DEFAULT (unixepoch()),
+    rank        INTEGER NOT NULL DEFAULT 0
   );
 
   CREATE TABLE IF NOT EXISTS chart_sync_log (
@@ -71,5 +72,8 @@ db.exec(`
     best_streak    INTEGER NOT NULL DEFAULT 0
   );
 `)
+
+// Migration : ajouter rank si la colonne n'existe pas encore
+try { db.exec('ALTER TABLE dynamic_songs ADD COLUMN rank INTEGER NOT NULL DEFAULT 0') } catch {}
 
 console.log('[DB] SQLite initialisée')

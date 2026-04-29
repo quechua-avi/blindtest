@@ -13,9 +13,6 @@ import type {
 import { CONFIG } from '../config'
 import { selectSongs, generateChoices } from '../songs/songSelector'
 import { getDynamicSongs } from '../songs/deezerCharts'
-import { STREAMCLASH_SONGS } from '../songs/streamclashSongs'
-import type { StreamClashSong } from '../songs/streamclashSongs'
-import { fetchDeezerPreview } from '../songs/deezerLookup'
 import { checkAnswer } from '../matching/fuzzyMatch'
 
 const SINGLE_ARTIST_GENRES = new Set(['jul'])
@@ -63,11 +60,12 @@ export class GameRoom {
   private saboteurId: string | null = null
   private currentVotes: Map<string, string> = new Map() // voterId → targetId
   // StreamClash mode
-  private scPairs: [StreamClashSong, StreamClashSong][] = []
+  private scPairs: [Song, Song][] = []
   private scVotes: Map<string, 'A' | 'B'> = new Map()
   private scRoundIndex = -1
-  private scCoverUrls: Map<string, string> = new Map()
   private scRevealed = false
+  private scVotingIsOpen = false
+  private scListenTimers: NodeJS.Timeout[] = []
 
   constructor(io: IoServer, hostSocket: Socket, hostName: string, avatarColor: string, userId?: number) {
     this.io = io
@@ -531,14 +529,21 @@ export class GameRoom {
 
   // ─── StreamClash ──────────────────────────────
 
+  private static readonly SC_LISTEN_EACH = 9   // secondes d'écoute par chanson
+  private static readonly SC_VOTE_DURATION = 18 // secondes de vote
+
   private startStreamClash(): string | null {
-    const shuffled = [...STREAMCLASH_SONGS].sort(() => Math.random() - 0.5)
+    // Songs rapfr depuis la DB, filtrées sur celles qui ont un preview
+    const pool = getDynamicSongs('rapfr').filter((s) => !!s.previewUrl)
+    if (pool.length < 2) return 'Pas assez de chansons Rap FR disponibles (synchro en cours ?)'
+
+    const shuffled = [...pool].sort(() => Math.random() - 0.5)
     this.scPairs = []
     const maxRounds = Math.min(this.settings.rounds, Math.floor(shuffled.length / 2))
     for (let i = 0; i + 1 < shuffled.length && this.scPairs.length < maxRounds; i += 2) {
       this.scPairs.push([shuffled[i], shuffled[i + 1]])
     }
-    if (this.scPairs.length === 0) return 'Pas assez de chansons StreamClash'
+    if (this.scPairs.length === 0) return 'Pas assez de chansons disponibles'
 
     for (const [id, player] of this.players) {
       this.scores.set(id, createInitialScore(id, player.name, player.avatarColor))
@@ -548,23 +553,12 @@ export class GameRoom {
     this.scRoundIndex = -1
     this.scVotes = new Map()
     this.scRevealed = false
+    this.scVotingIsOpen = false
     this.gameStartedAt = Date.now()
     this.songsPlayed = []
 
-    this.prefetchScCovers().then(() => this.startNextScRound())
+    this.startNextScRound()
     return null
-  }
-
-  private async prefetchScCovers(): Promise<void> {
-    const songs = this.scPairs.flat()
-    await Promise.all(
-      songs.map(async (song) => {
-        if (this.scCoverUrls.has(song.id)) return
-        const result = await fetchDeezerPreview(song.title, song.artist)
-        if (result?.coverUrl) this.scCoverUrls.set(song.id, result.coverUrl)
-      })
-    )
-    console.log(`[StreamClash] ${this.scCoverUrls.size}/${songs.length} pochettes chargées`)
   }
 
   private startNextScRound() {
@@ -574,26 +568,64 @@ export class GameRoom {
       return
     }
 
+    this.clearScListenTimers()
     this.scVotes = new Map()
     this.scRevealed = false
+    this.scVotingIsOpen = false
 
     const [sA, sB] = this.scPairs[this.scRoundIndex]
+    const listenEach = GameRoom.SC_LISTEN_EACH
+    const voteDuration = GameRoom.SC_VOTE_DURATION
+
     this.io.to(this.code).emit('streamclash:roundStart', {
       roundNumber: this.scRoundIndex + 1,
       totalRounds: this.scPairs.length,
-      songA: { id: sA.id, title: sA.title, artist: sA.artist, year: sA.year, coverUrl: this.scCoverUrls.get(sA.id) },
-      songB: { id: sB.id, title: sB.title, artist: sB.artist, year: sB.year, coverUrl: this.scCoverUrls.get(sB.id) },
-      timeLimit: 20,
+      songA: { id: sA.id, title: sA.title, artist: sA.artist, year: sA.year, coverUrl: sA.coverUrl },
+      songB: { id: sB.id, title: sB.title, artist: sB.artist, year: sB.year, coverUrl: sB.coverUrl },
+      timeLimit: listenEach * 2 + voteDuration,
     })
 
+    // t=0 : écoute chanson A
+    this.io.to(this.code).emit('streamclash:nowPlaying', { side: 'A' })
+    if (sA.previewUrl) this.io.to(this.code).emit('game:playSong', { previewUrl: sA.previewUrl })
+
+    // t=listenEach : écoute chanson B
+    this.scListenTimers.push(setTimeout(() => {
+      this.io.to(this.code).emit('streamclash:nowPlaying', { side: 'B' })
+      if (sB.previewUrl) this.io.to(this.code).emit('game:playSong', { previewUrl: sB.previewUrl })
+    }, listenEach * 1000))
+
+    // t=listenEach*2 : ouverture du vote + tick countdown
+    this.scListenTimers.push(setTimeout(() => {
+      this.scVotingIsOpen = true
+      this.io.to(this.code).emit('streamclash:votingOpen', { timeLimit: voteDuration })
+
+      let timeRemaining = voteDuration
+      this.tickTimer = setInterval(() => {
+        timeRemaining--
+        this.io.to(this.code).emit('game:tick', { timeRemaining })
+        if (timeRemaining <= 0) {
+          if (this.tickTimer) { clearInterval(this.tickTimer); this.tickTimer = null }
+          if (!this.scRevealed) this.revealScRound()
+        }
+      }, 1000)
+    }, listenEach * 2 * 1000))
+
+    // Garde-fou : reveal forcé après la durée totale + 2s
     this.roundTimer = setTimeout(() => {
       if (!this.scRevealed) this.revealScRound()
-    }, 20 * 1000)
+    }, (listenEach * 2 + voteDuration + 2) * 1000)
+  }
+
+  private clearScListenTimers() {
+    for (const t of this.scListenTimers) clearTimeout(t)
+    this.scListenTimers = []
+    if (this.tickTimer) { clearInterval(this.tickTimer); this.tickTimer = null }
   }
 
   handleScVote(playerId: string, side: 'A' | 'B') {
     if (this.settings.mode !== 'streamclash') return
-    if (this.scRevealed) return
+    if (!this.scVotingIsOpen || this.scRevealed) return
     if (this.scVotes.has(playerId)) return
     if (!this.players.has(playerId)) return
 
@@ -603,8 +635,10 @@ export class GameRoom {
     const votesB = this.scVotes.size - votesA
     this.io.to(this.code).emit('streamclash:voteUpdate', { votesA, votesB, totalPlayers: this.players.size })
 
+    // Tous les joueurs ont voté → reveal immédiat
     if (this.scVotes.size >= this.players.size) {
       if (this.roundTimer) { clearTimeout(this.roundTimer); this.roundTimer = null }
+      this.clearScListenTimers()
       this.revealScRound()
     }
   }
@@ -612,10 +646,11 @@ export class GameRoom {
   private revealScRound() {
     if (this.scRevealed) return
     this.scRevealed = true
+    this.clearScListenTimers()
     if (this.roundTimer) { clearTimeout(this.roundTimer); this.roundTimer = null }
 
     const [sA, sB] = this.scPairs[this.scRoundIndex]
-    const winner: 'A' | 'B' = sA.streams >= sB.streams ? 'A' : 'B'
+    const winner: 'A' | 'B' = (sA.rank ?? 0) >= (sB.rank ?? 0) ? 'A' : 'B'
 
     const votesA = [...this.scVotes.values()].filter(v => v === 'A').length
     const votesB = this.scVotes.size - votesA
@@ -639,8 +674,8 @@ export class GameRoom {
 
     const leaderboard = this.getLeaderboard()
     this.io.to(this.code).emit('streamclash:voteResult', {
-      songA: { id: sA.id, title: sA.title, artist: sA.artist, year: sA.year, streams: sA.streams, coverUrl: this.scCoverUrls.get(sA.id) },
-      songB: { id: sB.id, title: sB.title, artist: sB.artist, year: sB.year, streams: sB.streams, coverUrl: this.scCoverUrls.get(sB.id) },
+      songA: { id: sA.id, title: sA.title, artist: sA.artist, year: sA.year, streams: sA.rank ?? 0, coverUrl: sA.coverUrl },
+      songB: { id: sB.id, title: sB.title, artist: sB.artist, year: sB.year, streams: sB.rank ?? 0, coverUrl: sB.coverUrl },
       winner,
       votesA,
       votesB,
@@ -694,6 +729,7 @@ export class GameRoom {
     if (this.roundTimer) { clearTimeout(this.roundTimer); this.roundTimer = null }
     if (this.tickTimer) { clearInterval(this.tickTimer); this.tickTimer = null }
     if (this.buzzerTimer) { clearTimeout(this.buzzerTimer); this.buzzerTimer = null }
+    this.clearScListenTimers()
   }
 
   destroy() {

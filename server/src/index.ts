@@ -7,8 +7,6 @@ import fs from 'fs'
 import jwt from 'jsonwebtoken'
 import type { ClientToServerEvents, ServerToClientEvents, Genre } from './types'
 import { CONFIG } from './config'
-import { STREAMCLASH_SONGS } from './songs/streamclashSongs'
-import { fetchDeezerPreview } from './songs/deezerLookup'
 import { GameManager } from './game/GameManager'
 import { registerLobbyHandlers } from './socket/handlers/lobbyHandlers'
 import { registerGameHandlers } from './socket/handlers/gameHandlers'
@@ -81,31 +79,9 @@ app.put('/api/admin/settings', (req: Request, res: Response) => {
   })
 })
 
-// ─── StreamClash ───────────────────────────────────────────────────────────────
-// Cache des pochettes Deezer pour le catalogue StreamClash
-const streamclashCoverCache = new Map<string, string>()
-let streamclashCoversPrefetched = false
-
-async function prefetchStreamclashCovers() {
-  if (streamclashCoversPrefetched) return
-  streamclashCoversPrefetched = true
-  await Promise.all(
-    STREAMCLASH_SONGS.map(async (song) => {
-      if (streamclashCoverCache.has(song.id)) return
-      const result = await fetchDeezerPreview(song.title, song.artist)
-      if (result?.coverUrl) streamclashCoverCache.set(song.id, result.coverUrl)
-    })
-  )
-  console.log(`[StreamClash] ${streamclashCoverCache.size}/${STREAMCLASH_SONGS.length} pochettes chargées`)
-}
-
-app.get('/api/streamclash/songs', async (_req: Request, res: Response) => {
-  // Lancer le prefetch en arrière-plan si pas encore fait
-  prefetchStreamclashCovers()
-  const songs = STREAMCLASH_SONGS.map((s) => ({
-    ...s,
-    coverUrl: streamclashCoverCache.get(s.id),
-  }))
+// ─── StreamClash — catalogue dynamique (rapfr depuis DB) ──────────────────────
+app.get('/api/streamclash/songs', (_req: Request, res: Response) => {
+  const songs = getDynamicSongs('rapfr').filter((s) => !!s.previewUrl)
   res.json(songs)
 })
 

@@ -74,6 +74,8 @@ interface GameStore {
   scTotalPlayers: number
   myScVote: 'A' | 'B' | null
   scReveal: StreamClashRevealData | null
+  scActiveCard: 'A' | 'B' | null
+  scVotingOpen: boolean
 
   // Chat
   messages: ChatMessage[]
@@ -114,6 +116,8 @@ interface GameStore {
   onSaboteurVoteUpdate: (votes: Array<{ voterName: string; voterAvatarColor: string }>) => void
   setMyVote: (targetId: string | null) => void
   onScRoundStart: (data: { roundNumber: number; totalRounds: number; songA: StreamClashSongPublic; songB: StreamClashSongPublic; timeLimit: number }) => void
+  onScNowPlaying: (side: 'A' | 'B') => void
+  onScVotingOpen: (timeLimit: number) => void
   onScVoteUpdate: (data: { votesA: number; votesB: number; totalPlayers: number }) => void
   onScVoteResult: (data: StreamClashRevealData) => void
   setMyScVote: (side: 'A' | 'B') => void
@@ -164,6 +168,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   scTotalPlayers: 0,
   myScVote: null,
   scReveal: null,
+  scActiveCard: null,
+  scVotingOpen: false,
   messages: [],
   reactions: [],
 
@@ -328,7 +334,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     scTotalPlayers: s.players.length,
     myScVote: null,
     scReveal: null,
+    scActiveCard: null,
+    scVotingOpen: false,
+    pendingSong: null,
   })),
+
+  onScNowPlaying: (side) => set({ scActiveCard: side }),
+
+  onScVotingOpen: (_timeLimit) => set({ scActiveCard: null, scVotingOpen: true }),
 
   onScVoteUpdate: ({ votesA, votesB, totalPlayers }) => set({ scVotesA: votesA, scVotesB: votesB, scTotalPlayers: totalPlayers }),
 
@@ -384,6 +397,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       scTotalPlayers: 0,
       myScVote: null,
       scReveal: null,
+      scActiveCard: null,
+      scVotingOpen: false,
       messages: [],
       reactions: [],
     })
