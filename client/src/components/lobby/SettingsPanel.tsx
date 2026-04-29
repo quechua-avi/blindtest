@@ -29,18 +29,43 @@ export function SettingsPanel({ settings, isHost, onChange, light }: SettingsPan
   const activeBtn = 'bg-primary/10 border-primary/40 text-primary'
 
   const isStreamClash = settings.mode === 'streamclash'
+  const scGenre = settings.scGenre ?? 'rapfr'
 
   return (
     <div className="space-y-6">
-      {/* StreamClash note */}
+      {/* Genres StreamClash (sélection unique) */}
       {isStreamClash && (
-        <div className={`rounded-xl px-4 py-3 text-sm ${light ? 'bg-violet-50 border border-violet-200 text-violet-700' : 'bg-primary/10 border border-primary/20 text-primary'}`}>
-          <p className="font-semibold">⚡ Mode StreamClash</p>
-          <p className="text-xs mt-0.5 opacity-80">Rap français · Catalogue de 43 titres · Données Spotify</p>
+        <div>
+          <label className={label}>Genre StreamClash</label>
+          <div className="flex flex-wrap gap-2">
+            {GENRES.map((g) => {
+              const active = scGenre === g
+              const color = GENRE_COLORS[g]
+              return (
+                <motion.button
+                  key={g}
+                  disabled={disabled}
+                  onClick={() => onChange({ scGenre: g })}
+                  whileTap={disabled ? {} : { scale: 0.88 }}
+                  whileHover={disabled ? {} : { scale: 1.06 }}
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors duration-200 ${
+                    disabled ? 'cursor-default' : 'cursor-pointer'
+                  }`}
+                  style={{
+                    backgroundColor: active ? color + '20' : 'transparent',
+                    borderColor: active ? color : light ? '#e2e8f0' : '#2a2a3a',
+                    color: active ? color : light ? '#94a3b8' : '#64748b',
+                  }}
+                >
+                  {GENRE_LABELS[g]}
+                </motion.button>
+              )
+            })}
+          </div>
         </div>
       )}
 
-      {/* Genres */}
+      {/* Genres blindtest classique (sélection multiple) */}
       {!isStreamClash && (
         <div>
           <label className={label}>Genres musicaux</label>

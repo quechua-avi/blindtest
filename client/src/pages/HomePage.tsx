@@ -34,11 +34,16 @@ export function HomePage() {
   const [joinLoading, setJoinLoading]         = useState(false)
   const [createLoading, setCreateLoading]     = useState(false)
   const [requirePassword, setRequirePassword] = useState(true)
+  const [totalSongs, setTotalSongs]           = useState<number | null>(null)
 
   useEffect(() => {
     fetch('/api/settings')
       .then((r) => r.json())
       .then((d) => setRequirePassword(d.requireRoomPassword ?? true))
+      .catch(() => {})
+    fetch('/api/stats')
+      .then((r) => r.json())
+      .then((d) => { if (d.totalSongs > 0) setTotalSongs(d.totalSongs) })
       .catch(() => {})
   }, [])
 
@@ -139,7 +144,7 @@ export function HomePage() {
             Beat<span className="text-primary">Blind</span>
           </h1>
           <p className="text-slate-500 text-lg mb-6">
-            Blindtest musical multijoueur · <span className="font-semibold text-slate-700">986 titres</span> · 2000–2026
+            Blindtest musical multijoueur · <span className="font-semibold text-slate-700">{totalSongs !== null ? `${totalSongs} titres` : '986 titres'}</span> · 2000–2026
           </p>
 
           <div className="flex items-center justify-center gap-2 flex-wrap">

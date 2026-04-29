@@ -17,6 +17,8 @@ interface AudioPlayerCtx {
   playSong: (previewUrl: string) => void
   stopSong: () => void
   isPlaying: boolean
+  audioBlocked: boolean
+  unlockAudio: () => void
 }
 
 export const AudioPlayerContext = createContext<AudioPlayerCtx | null>(null)
@@ -29,10 +31,25 @@ export function useAudioPlayerContext() {
 
 function AppRoutes() {
   useSocketSetup()
-  const { playSong, stopSong, isPlaying } = useAudioPlayer()
+  const { playSong, stopSong, isPlaying, audioBlocked, unlockAudio } = useAudioPlayer()
 
   return (
-    <AudioPlayerContext.Provider value={{ playSong, stopSong, isPlaying }}>
+    <AudioPlayerContext.Provider value={{ playSong, stopSong, isPlaying, audioBlocked, unlockAudio }}>
+      {audioBlocked && (
+        <button
+          onClick={unlockAudio}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+        >
+          <div className="bg-white rounded-2xl p-6 shadow-xl text-center max-w-xs mx-4">
+            <p className="text-3xl mb-3">🔇</p>
+            <p className="font-bold text-slate-900 text-lg mb-1">Autoriser le son</p>
+            <p className="text-sm text-slate-500 mb-5">Ton navigateur a bloqué la lecture audio. Appuie pour activer.</p>
+            <div className="bg-violet-600 text-white rounded-xl px-6 py-2.5 font-semibold text-sm inline-block">
+              Activer le son ▶
+            </div>
+          </div>
+        </button>
+      )}
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/join/:code" element={<JoinPage />} />

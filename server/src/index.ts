@@ -54,6 +54,12 @@ app.get('/api/settings', (_req: Request, res: Response) => {
   res.json({ requireRoomPassword: getSetting('require_room_password') === '1' })
 })
 
+// GET /api/stats — public, compteur de titres disponibles
+app.get('/api/stats', (_req: Request, res: Response) => {
+  const totalSongs = (db.prepare('SELECT COUNT(*) as c FROM dynamic_songs').get() as { c: number }).c
+  res.json({ totalSongs })
+})
+
 // GET /api/admin/settings — paramètres complets (admin)
 app.get('/api/admin/settings', (req: Request, res: Response) => {
   if (req.query.secret !== CONFIG.ADMIN_SECRET) { res.status(401).json({ error: 'Unauthorized' }); return }

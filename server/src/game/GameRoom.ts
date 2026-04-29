@@ -533,9 +533,9 @@ export class GameRoom {
   private static readonly SC_VOTE_DURATION = 18 // secondes de vote
 
   private startStreamClash(): string | null {
-    // Songs rapfr depuis la DB, filtrées sur celles qui ont un preview
-    const pool = getDynamicSongs('rapfr').filter((s) => !!s.previewUrl)
-    if (pool.length < 2) return 'Pas assez de chansons Rap FR disponibles (synchro en cours ?)'
+    const scGenre = this.settings.scGenre ?? 'rapfr'
+    const pool = getDynamicSongs(scGenre).filter((s) => !!s.previewUrl)
+    if (pool.length < 2) return `Pas assez de chansons "${scGenre}" disponibles (synchro en cours ?)`
 
     const shuffled = [...pool].sort(() => Math.random() - 0.5)
     this.scPairs = []

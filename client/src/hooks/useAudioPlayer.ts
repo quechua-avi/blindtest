@@ -4,6 +4,8 @@ import { usePlayerStore } from '../store/usePlayerStore'
 export function useAudioPlayer() {
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
+  const [audioBlocked, setAudioBlocked] = useState(false)
+  const pendingUrlRef = useRef<string | null>(null)
   const volume = usePlayerStore((s) => s.volume)
 
   // Créer l'élément audio une seule fois
@@ -43,9 +45,29 @@ export function useAudioPlayer() {
     audio.pause()
     audio.src = previewUrl
     audio.currentTime = 0
-    audio.play().catch((err) => {
+    audio.play().then(() => {
+      setAudioBlocked(false)
+      pendingUrlRef.current = null
+    }).catch((err: Error) => {
       console.warn('[AudioPlayer] play() bloqué:', err)
+      if (err?.name === 'NotAllowedError') {
+        pendingUrlRef.current = previewUrl
+        setAudioBlocked(true)
+      }
     })
+  }, [])
+
+  const unlockAudio = useCallback(() => {
+    const audio = audioRef.current
+    if (!audio) return
+    const url = pendingUrlRef.current ?? audio.src
+    if (!url) return
+    audio.src = url
+    audio.currentTime = 0
+    audio.play().then(() => {
+      setAudioBlocked(false)
+      pendingUrlRef.current = null
+    }).catch(() => {})
   }, [])
 
   const stopSong = useCallback(() => {
@@ -54,11 +76,13 @@ export function useAudioPlayer() {
     audio.pause()
     audio.src = ''
     setIsPlaying(false)
+    setAudioBlocked(false)
+    pendingUrlRef.current = null
   }, [])
 
   const setVolume = useCallback((v: number) => {
     if (audioRef.current) audioRef.current.volume = v / 100
   }, [])
 
-  return { playSong, stopSong, setVolume, isPlaying }
+  return { playSong, stopSong, setVolume, isPlaying, audioBlocked, unlockAudio }
 }
