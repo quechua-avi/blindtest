@@ -12,7 +12,7 @@ import { registerLobbyHandlers } from './socket/handlers/lobbyHandlers'
 import { registerGameHandlers } from './socket/handlers/gameHandlers'
 import { registerChatHandlers } from './socket/handlers/chatHandlers'
 import { authRouter } from './auth/authRoutes'
-import { syncCharts, getDynamicSongs, getAllSyncInfos, startChartScheduler, GENRE_PLAYLISTS, patchMissingRanks } from './songs/deezerCharts'
+import { syncCharts, getDynamicSongs, getAllSyncInfos, startChartScheduler, GENRE_PLAYLISTS, patchMissingRanks, getCustomPlaylists, createCustomPlaylist, deleteCustomPlaylist } from './songs/deezerCharts'
 import './db/database'  // init SQLite
 import { db } from './db/database'
 
@@ -60,6 +60,17 @@ app.get('/api/stats', (_req: Request, res: Response) => {
   res.json({ totalSongs })
 })
 
+// GET /api/genres — public, retourne les genres custom pour le lobby
+app.get('/api/genres', (_req: Request, res: Response) => {
+  const custom = getCustomPlaylists().map((p) => ({
+    id: p.id,
+    label: p.label,
+    color: p.color,
+    emoji: p.emoji,
+  }))
+  res.json({ custom })
+})
+
 // GET /api/admin/settings — paramètres complets (admin)
 app.get('/api/admin/settings', (req: Request, res: Response) => {
   if (req.query.secret !== CONFIG.ADMIN_SECRET) { res.status(401).json({ error: 'Unauthorized' }); return }
@@ -89,6 +100,38 @@ app.put('/api/admin/settings', (req: Request, res: Response) => {
 app.get('/api/streamclash/songs', (_req: Request, res: Response) => {
   const songs = getDynamicSongs('rapfr').filter((s) => !!s.previewUrl)
   res.json(songs)
+})
+
+// Admin — liste des playlists custom
+app.get('/api/admin/playlists', (req: Request, res: Response) => {
+  if (req.query.secret !== CONFIG.ADMIN_SECRET) { res.status(401).json({ error: 'Unauthorized' }); return }
+  res.json(getCustomPlaylists())
+})
+
+// Admin — créer une playlist custom
+app.post('/api/admin/playlists', (req: Request, res: Response) => {
+  if (req.query.secret !== CONFIG.ADMIN_SECRET) { res.status(401).json({ error: 'Unauthorized' }); return }
+  const { url, label, color = '#7c3aed', emoji = '🎵' } = req.body ?? {}
+  if (!url || typeof url !== 'string' || !label || typeof label !== 'string') {
+    res.status(400).json({ error: 'url et label requis' }); return
+  }
+  // Accepte une URL Deezer web (deezer.com/playlist/ID) ou API
+  const match = (url as string).match(/playlist\/(\d+)/)
+  if (!match) { res.status(400).json({ error: 'URL invalide — doit contenir /playlist/{id}' }); return }
+  const slug = label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 30)
+  const id = `custom-${slug}`
+  const apiUrl = `https://api.deezer.com/playlist/${match[1]}/tracks?limit=100`
+  createCustomPlaylist({ id, label, url: apiUrl, color, emoji })
+  res.json({ id, label, url: apiUrl, color, emoji })
+})
+
+// Admin — supprimer une playlist custom + ses chansons
+app.delete('/api/admin/playlists/:id', (req: Request, res: Response) => {
+  if (req.query.secret !== CONFIG.ADMIN_SECRET) { res.status(401).json({ error: 'Unauthorized' }); return }
+  const { id } = req.params
+  if (!id.startsWith('custom-')) { res.status(400).json({ error: 'ID invalide' }); return }
+  deleteCustomPlaylist(id)
+  res.json({ ok: true })
 })
 
 // Admin — liste des chansons (dynamic_songs depuis Deezer)
@@ -146,7 +189,7 @@ app.get('/api/admin/charts', (req: Request, res: Response) => {
 // Admin — déclencher une synchronisation manuelle
 app.post('/api/admin/charts/sync', async (req: Request, res: Response) => {
   if (req.query.secret !== CONFIG.ADMIN_SECRET) { res.status(401).json({ error: 'Unauthorized' }); return }
-  const genre = ((req.query.source as string) ?? 'chartsweekly') as Genre
+  const genre = (req.query.source as string) ?? 'chartsweekly'
   const result = await syncCharts(genre)
   res.json(result)
 })

@@ -12,7 +12,7 @@ export interface GameSettings {
   answerMode: AnswerMode
   playDuration: number
   maxPlayers: number
-  scGenre?: Genre  // genre utilisé en mode StreamClash (défaut: rapfr)
+  scGenre?: string  // genre utilisé en mode StreamClash — peut être un genre hardcodé ou custom (défaut: rapfr)
 }
 
 export interface Song {

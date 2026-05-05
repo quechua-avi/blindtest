@@ -72,6 +72,36 @@ export const GENRE_PLAYLISTS: Partial<Record<Genre, { url: string; label: string
   },
 }
 
+// ─── Custom playlists (stockées en DB) ───────────────────────────────────────
+
+export interface CustomPlaylist {
+  id: string
+  label: string
+  url: string
+  color: string
+  emoji: string
+  createdAt: number
+}
+
+interface CustomPlaylistRow {
+  id: string; label: string; url: string; color: string; emoji: string; created_at: number
+}
+
+export function getCustomPlaylists(): CustomPlaylist[] {
+  const rows = db.prepare('SELECT * FROM custom_playlists ORDER BY created_at DESC').all() as CustomPlaylistRow[]
+  return rows.map((r) => ({ id: r.id, label: r.label, url: r.url, color: r.color, emoji: r.emoji, createdAt: r.created_at }))
+}
+
+export function createCustomPlaylist(data: Omit<CustomPlaylist, 'createdAt'>): void {
+  db.prepare('INSERT OR REPLACE INTO custom_playlists (id, label, url, color, emoji) VALUES (?, ?, ?, ?, ?)')
+    .run(data.id, data.label, data.url, data.color, data.emoji)
+}
+
+export function deleteCustomPlaylist(id: string): void {
+  db.prepare('DELETE FROM custom_playlists WHERE id = ?').run(id)
+  db.prepare('DELETE FROM dynamic_songs WHERE source = ?').run(id)
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function yearToDecade(year: number): Decade {
@@ -127,15 +157,17 @@ export interface SyncInfo {
   status: string
 }
 
-export function getSyncInfo(genre: Genre): SyncInfo {
+export function getSyncInfo(source: string): SyncInfo {
   const last = db.prepare(
     'SELECT synced_at, count, status FROM chart_sync_log WHERE source = ? ORDER BY synced_at DESC LIMIT 1'
-  ).get(genre) as { synced_at: number; count: number; status: string } | undefined
+  ).get(source) as { synced_at: number; count: number; status: string } | undefined
 
-  const label = GENRE_PLAYLISTS[genre]?.label ?? genre
+  const label = GENRE_PLAYLISTS[source as Genre]?.label
+    ?? (db.prepare('SELECT label FROM custom_playlists WHERE id = ?').get(source) as { label: string } | undefined)?.label
+    ?? source
 
   return {
-    source: genre,
+    source,
     label,
     syncedAt: last?.synced_at ?? null,
     count: last?.count ?? 0,
@@ -144,7 +176,9 @@ export function getSyncInfo(genre: Genre): SyncInfo {
 }
 
 export function getAllSyncInfos(): SyncInfo[] {
-  return (Object.keys(GENRE_PLAYLISTS) as Genre[]).map(getSyncInfo)
+  const hardcoded = (Object.keys(GENRE_PLAYLISTS) as Genre[]).map(getSyncInfo)
+  const custom = getCustomPlaylists().map((p) => getSyncInfo(p.id))
+  return [...hardcoded, ...custom]
 }
 
 // ─── Synchronisation ──────────────────────────────────────────────────────────
@@ -156,8 +190,13 @@ export interface SyncResult {
   error?: string
 }
 
-export async function syncCharts(genre: Genre = 'chartsweekly'): Promise<SyncResult> {
-  const config = GENRE_PLAYLISTS[genre]
+export async function syncCharts(genre: string = 'chartsweekly'): Promise<SyncResult> {
+  // Cherche d'abord dans les playlists hardcodées, puis dans la DB
+  let config: { url: string; label: string; decade?: Decade } | undefined = GENRE_PLAYLISTS[genre as Genre]
+  if (!config) {
+    const custom = db.prepare('SELECT url, label FROM custom_playlists WHERE id = ?').get(genre) as { url: string; label: string } | undefined
+    if (custom) config = { url: custom.url, label: custom.label }
+  }
   if (!config) {
     return { source: genre, count: 0, skipped: 0, error: `Genre "${genre}" n'a pas de playlist Deezer configurée` }
   }
@@ -260,7 +299,7 @@ export async function patchMissingRanks(): Promise<{ updated: number; errors: nu
 
 const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms))
 
-export function startChartScheduler(genres: Genre[] = Object.keys(GENRE_PLAYLISTS) as Genre[]) {
+export function startChartScheduler(genres: string[] = Object.keys(GENRE_PLAYLISTS)) {
   const INTERVAL_MS   = 60 * 60 * 1000         // vérification toutes les heures
   const SYNC_EVERY_MS = 7 * 24 * 60 * 60 * 1000 // sync si > 7 jours
   const SYNC_DELAY_MS = 2_000                   // délai entre syncs pour éviter le rate-limit Deezer

@@ -71,6 +71,15 @@ db.exec(`
     correct_answers INTEGER NOT NULL DEFAULT 0,
     best_streak    INTEGER NOT NULL DEFAULT 0
   );
+
+  CREATE TABLE IF NOT EXISTS custom_playlists (
+    id         TEXT    PRIMARY KEY,
+    label      TEXT    NOT NULL,
+    url        TEXT    NOT NULL,
+    color      TEXT    NOT NULL DEFAULT '#7c3aed',
+    emoji      TEXT    NOT NULL DEFAULT '🎵',
+    created_at INTEGER NOT NULL DEFAULT (unixepoch())
+  );
 `)
 
 // Migration : ajouter rank si la colonne n'existe pas encore

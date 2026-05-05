@@ -45,6 +45,15 @@ interface EnrichmentStatus {
   pending: number
 }
 
+interface CustomPlaylist {
+  id: string
+  label: string
+  url: string
+  color: string
+  emoji: string
+  createdAt: number
+}
+
 interface AdminRoom {
   code: string
   status: string
@@ -93,6 +102,14 @@ export function AdminPage() {
   const [roomPassword, setRoomPassword]               = useState('')
   const [settingsSaved, setSettingsSaved]             = useState(false)
   const [settingsLoading, setSettingsLoading]         = useState(false)
+  const [customPlaylists, setCustomPlaylists] = useState<CustomPlaylist[]>([])
+  const [newPlaylistUrl, setNewPlaylistUrl] = useState('')
+  const [newPlaylistLabel, setNewPlaylistLabel] = useState('')
+  const [newPlaylistColor, setNewPlaylistColor] = useState('#6366f1')
+  const [newPlaylistEmoji, setNewPlaylistEmoji] = useState('🎵')
+  const [playlistSaving, setPlaylistSaving] = useState(false)
+  const [playlistError, setPlaylistError] = useState('')
+
   const [filterGenre, setFilterGenre] = useState<Genre | 'all'>('all')
   const [filterDecade, setFilterDecade] = useState<Decade | 'all'>('all')
   const [search, setSearch] = useState('')
@@ -186,11 +203,46 @@ export function AdminPage() {
 
   const fetchCharts = async () => {
     try {
-      const res = await fetch(`/api/admin/charts?secret=${encodeURIComponent(secret)}`)
-      if (!res.ok) return
+      const [chartsRes, playlistsRes] = await Promise.all([
+        fetch(`/api/admin/charts?secret=${encodeURIComponent(secret)}`),
+        fetch(`/api/admin/playlists?secret=${encodeURIComponent(secret)}`),
+      ])
+      if (chartsRes.ok) {
+        const data = await chartsRes.json()
+        setChartSongs(data.songs ?? [])
+        setChartSyncInfos(data.syncInfos ?? [])
+      }
+      if (playlistsRes.ok) {
+        const data = await playlistsRes.json()
+        setCustomPlaylists(data ?? [])
+      }
+    } catch {}
+  }
+
+  const addPlaylist = async () => {
+    if (!newPlaylistUrl.trim() || !newPlaylistLabel.trim()) return
+    setPlaylistSaving(true)
+    setPlaylistError('')
+    try {
+      const res = await fetch(`/api/admin/playlists?secret=${encodeURIComponent(secret)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: newPlaylistUrl.trim(), label: newPlaylistLabel.trim(), color: newPlaylistColor, emoji: newPlaylistEmoji }),
+      })
       const data = await res.json()
-      setChartSongs(data.songs ?? [])
-      setChartSyncInfos(data.syncInfos ?? [])
+      if (!res.ok) { setPlaylistError(data.error ?? 'Erreur'); return }
+      setNewPlaylistUrl('')
+      setNewPlaylistLabel('')
+      await fetchCharts()
+    } catch { setPlaylistError('Impossible de joindre le serveur') }
+    finally { setPlaylistSaving(false) }
+  }
+
+  const deletePlaylist = async (id: string, label: string) => {
+    if (!confirm(`Supprimer la playlist "${label}" et ses ${chartSyncInfos.find(i => i.source === id)?.count ?? 0} chansons ?`)) return
+    try {
+      await fetch(`/api/admin/playlists/${id}?secret=${encodeURIComponent(secret)}`, { method: 'DELETE' })
+      await fetchCharts()
     } catch {}
   }
 
@@ -368,6 +420,94 @@ export function AdminPage() {
               >
                 ↻ Actualiser
               </button>
+            </div>
+
+            {/* Playlists custom */}
+            <div className="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 space-y-4">
+              <div>
+                <p className="text-sm font-bold text-slate-800">Ajouter une playlist Deezer</p>
+                <p className="text-xs text-slate-400 mt-0.5">Colle l'URL d'une playlist Deezer (ex : deezer.com/fr/playlist/123456). Elle apparaîtra dans le genre picker StreamClash.</p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <input
+                  type="text"
+                  value={newPlaylistUrl}
+                  onChange={(e) => setNewPlaylistUrl(e.target.value)}
+                  placeholder="https://www.deezer.com/fr/playlist/..."
+                  className="col-span-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 text-sm font-mono"
+                />
+                <input
+                  type="text"
+                  value={newPlaylistLabel}
+                  onChange={(e) => setNewPlaylistLabel(e.target.value)}
+                  placeholder="Nom affiché (ex: Rock 90s)"
+                  className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 text-sm"
+                />
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newPlaylistEmoji}
+                    onChange={(e) => setNewPlaylistEmoji(e.target.value.slice(0, 2))}
+                    placeholder="🎵"
+                    className="w-16 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-violet-400 text-center text-lg"
+                  />
+                  <div className="flex flex-wrap gap-1.5 items-center flex-1">
+                    {['#6366f1','#f59e0b','#10b981','#ef4444','#0ea5e9','#ec4899','#f97316','#8b5cf6','#14b8a6'].map((c) => (
+                      <button
+                        key={c}
+                        onClick={() => setNewPlaylistColor(c)}
+                        className={`w-6 h-6 rounded-full flex-shrink-0 cursor-pointer transition-transform hover:scale-110 ${newPlaylistColor === c ? 'ring-2 ring-offset-1 ring-slate-400 scale-110' : ''}`}
+                        style={{ backgroundColor: c }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+              {playlistError && <p className="text-xs text-red-500">{playlistError}</p>}
+              <div className="flex items-center gap-3">
+                <motion.button
+                  onClick={addPlaylist}
+                  disabled={playlistSaving || !newPlaylistUrl.trim() || !newPlaylistLabel.trim()}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-4 py-2 bg-violet-600 text-white rounded-xl text-xs font-semibold disabled:opacity-40 hover:bg-violet-700 transition-colors cursor-pointer"
+                >
+                  {playlistSaving ? 'Création...' : '+ Ajouter la playlist'}
+                </motion.button>
+                {customPlaylists.length > 0 && (
+                  <span className="text-xs text-slate-400">{customPlaylists.length} playlist{customPlaylists.length > 1 ? 's' : ''} custom</span>
+                )}
+              </div>
+              {customPlaylists.length > 0 && (
+                <div className="space-y-2 pt-1 border-t border-slate-100">
+                  {customPlaylists.map((p) => {
+                    const syncInfo = chartSyncInfos.find((i) => i.source === p.id)
+                    return (
+                      <div key={p.id} className="flex items-center gap-3 py-2">
+                        <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: p.color }} />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-slate-800 truncate">{p.emoji} {p.label}</p>
+                          <p className="text-xs text-slate-400 font-mono truncate">{p.id} · {syncInfo?.count ?? 0} chansons</p>
+                        </div>
+                        <motion.button
+                          onClick={() => triggerSync(p.id)}
+                          disabled={chartSyncing}
+                          whileTap={{ scale: 0.95 }}
+                          className="px-2.5 py-1 bg-violet-100 text-violet-700 rounded-lg text-xs font-semibold hover:bg-violet-200 transition-colors cursor-pointer disabled:opacity-40"
+                        >
+                          ⚡ Sync
+                        </motion.button>
+                        <motion.button
+                          onClick={() => deletePlaylist(p.id, p.label)}
+                          whileTap={{ scale: 0.9 }}
+                          className="px-2.5 py-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg text-xs font-semibold transition-colors cursor-pointer"
+                        >
+                          Supprimer
+                        </motion.button>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
             </div>
 
             {/* Sources + statuts de sync */}
