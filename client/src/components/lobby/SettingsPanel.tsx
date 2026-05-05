@@ -128,6 +128,30 @@ export function SettingsPanel({ settings, isHost, onChange, light }: SettingsPan
                 </motion.button>
               )
             })}
+            {customGenres.map((g) => {
+              const active = settings.genres.includes(g.id)
+              return (
+                <motion.button
+                  key={g.id}
+                  disabled={disabled}
+                  onClick={() => onChange({ genres: toggle(settings.genres, g.id) })}
+                  whileTap={disabled ? {} : { scale: 0.88 }}
+                  whileHover={disabled ? {} : { scale: 1.06 }}
+                  animate={active ? { scale: [1, 1.1, 1] } : {}}
+                  transition={{ duration: 0.2 }}
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors duration-200 ${
+                    disabled ? 'cursor-default' : 'cursor-pointer'
+                  }`}
+                  style={{
+                    backgroundColor: active ? g.color + '20' : 'transparent',
+                    borderColor: active ? g.color : light ? '#e2e8f0' : '#2a2a3a',
+                    color: active ? g.color : light ? '#94a3b8' : '#64748b',
+                  }}
+                >
+                  {g.emoji} {g.label}
+                </motion.button>
+              )
+            })}
           </div>
         </div>
       )}
