@@ -190,12 +190,22 @@ export class GameRoom {
   }
 
   private async prefetchAllPreviews(): Promise<void> {
-    for (const song of this.playlist) {
-      if (song.previewUrl) {
-        this.previewUrls.set(song.id, song.previewUrl)
-        if (song.coverUrl) this.coverUrls.set(song.id, song.coverUrl)
-      }
-    }
+    // Les URLs de preview Deezer expirent en ~15 min — on re-fetch des URLs fraîches au démarrage
+    await Promise.all(this.playlist.map(async (song) => {
+      if (song.coverUrl) this.coverUrls.set(song.id, song.coverUrl)
+      const deezerId = song.id.replace('deezer-', '')
+      try {
+        const res = await fetch(`https://api.deezer.com/track/${deezerId}`, { signal: AbortSignal.timeout(8_000) })
+        if (res.ok) {
+          const data = await res.json() as { preview?: string; error?: unknown }
+          if (!data.error && data.preview) {
+            this.previewUrls.set(song.id, data.preview)
+            return
+          }
+        }
+      } catch {}
+      if (song.previewUrl) this.previewUrls.set(song.id, song.previewUrl)
+    }))
     console.log(`[Deezer] ${this.previewUrls.size}/${this.playlist.length} previews prêtes`)
   }
 
@@ -556,9 +566,26 @@ export class GameRoom {
     this.scVotingIsOpen = false
     this.gameStartedAt = Date.now()
     this.songsPlayed = []
+    this.previewUrls = new Map()
 
-    this.startNextScRound()
+    this.prefetchScPreviews().then(() => this.startNextScRound())
     return null
+  }
+
+  private async prefetchScPreviews(): Promise<void> {
+    const allSongs = this.scPairs.flat()
+    await Promise.all(allSongs.map(async (song) => {
+      const deezerId = song.id.replace('deezer-', '')
+      try {
+        const res = await fetch(`https://api.deezer.com/track/${deezerId}`, { signal: AbortSignal.timeout(8_000) })
+        if (res.ok) {
+          const data = await res.json() as { preview?: string; error?: unknown }
+          if (!data.error && data.preview) { this.previewUrls.set(song.id, data.preview); return }
+        }
+      } catch {}
+      if (song.previewUrl) this.previewUrls.set(song.id, song.previewUrl)
+    }))
+    console.log(`[StreamClash] ${this.previewUrls.size}/${allSongs.length} previews prêtes`)
   }
 
   private startNextScRound() {
@@ -587,12 +614,14 @@ export class GameRoom {
 
     // t=0 : écoute chanson A
     this.io.to(this.code).emit('streamclash:nowPlaying', { side: 'A' })
-    if (sA.previewUrl) this.io.to(this.code).emit('game:playSong', { previewUrl: sA.previewUrl })
+    const urlA = this.previewUrls.get(sA.id)
+    if (urlA) this.io.to(this.code).emit('game:playSong', { previewUrl: urlA })
 
     // t=listenEach : écoute chanson B
     this.scListenTimers.push(setTimeout(() => {
       this.io.to(this.code).emit('streamclash:nowPlaying', { side: 'B' })
-      if (sB.previewUrl) this.io.to(this.code).emit('game:playSong', { previewUrl: sB.previewUrl })
+      const urlB = this.previewUrls.get(sB.id)
+      if (urlB) this.io.to(this.code).emit('game:playSong', { previewUrl: urlB })
     }, listenEach * 1000))
 
     // t=listenEach*2 : ouverture du vote + tick countdown
