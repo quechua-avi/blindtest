@@ -30,7 +30,7 @@ interface DeezerListResponse {
 // ─── Genres alimentés par une playlist Deezer ─────────────────────────────────
 // Pour ajouter un genre : trouver la playlist sur deezer.com, copier l'ID depuis l'URL.
 
-export const GENRE_PLAYLISTS: Partial<Record<Genre, { url: string; label: string }>> = {
+export const GENRE_PLAYLISTS: Partial<Record<Genre, { url: string; label: string; decade?: Decade }>> = {
   chartsweekly: {
     url: 'https://api.deezer.com/playlist/1109890291/tracks?limit=100',
     label: 'Top 100 France',
@@ -46,14 +46,17 @@ export const GENRE_PLAYLISTS: Partial<Record<Genre, { url: string; label: string
   hits2000: {
     url: 'https://api.deezer.com/playlist/248297032/tracks?limit=100',
     label: '00s Hits',
+    decade: '2000s',
   },
   hits2010: {
     url: 'https://api.deezer.com/playlist/11153461484/tracks?limit=100',
     label: '10s HITS',
+    decade: '2010s',
   },
   hits2020: {
     url: 'https://api.deezer.com/playlist/13650084141/tracks?limit=100',
     label: '20s Hits',
+    decade: '2020s',
   },
   varfr: {
     url: 'https://api.deezer.com/playlist/1189520191/tracks?limit=100',
@@ -196,12 +199,13 @@ export async function syncCharts(genre: Genre = 'chartsweekly'): Promise<SyncRes
     const t = tracks[i]
     if (!t.preview) { skipped++; continue }
 
-    // release_date peut être absent sur l'endpoint /chart — fallback sur album ou année en cours
+    // release_date absent sur l'endpoint playlist → fallback album → année en cours
     const rawDate = t.release_date ?? t.album?.release_date ?? String(new Date().getFullYear())
     const year = parseInt(rawDate.slice(0, 4))
     if (isNaN(year)) { skipped++; continue }
 
-    const decade = yearToDecade(year)
+    // Pour les genres décennaux, forcer la décennie depuis la config (l'API ne renvoie pas release_date)
+    const decade = config.decade ?? yearToDecade(year)
     const id = `deezer-${t.id}`
 
     insert.run(
