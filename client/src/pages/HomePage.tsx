@@ -63,7 +63,7 @@ function GamePreviewCard() {
         </div>
 
         {/* album art */}
-        <div className="w-full h-28 rounded-2xl mb-4 overflow-hidden relative flex items-center justify-center bg-gradient-to-br from-violet-500 to-indigo-600">
+        <div className="w-full h-28 rounded-2xl mb-4 overflow-hidden relative flex items-center justify-center bg-gradient-to-br from-orange-400 to-amber-600">
           {/* vinyl */}
           <motion.div
             animate={{ rotate: 360 }}
@@ -71,13 +71,13 @@ function GamePreviewCard() {
             className="absolute"
           >
             <svg viewBox="0 0 100 100" width="90" height="90">
-              <circle cx="50" cy="50" r="48" fill="#1e1b4b" />
-              <circle cx="50" cy="50" r="38" fill="#2d2b5e" />
+              <circle cx="50" cy="50" r="48" fill="#1c0a00" />
+              <circle cx="50" cy="50" r="38" fill="#2d1200" />
               {[32, 36, 40, 44].map((r) => (
                 <circle key={r} cx="50" cy="50" r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="0.8" />
               ))}
-              <circle cx="50" cy="50" r="22" fill="#312e81" />
-              <circle cx="50" cy="50" r="10" fill="#4338ca" />
+              <circle cx="50" cy="50" r="22" fill="#431407" />
+              <circle cx="50" cy="50" r="10" fill="#ea580c" />
               <circle cx="50" cy="50" r="4" fill="rgba(255,255,255,0.5)" />
             </svg>
           </motion.div>

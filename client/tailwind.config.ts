@@ -12,9 +12,9 @@ export default {
           border: '#2a2a3a',
         },
         primary: {
-          DEFAULT: '#7c3aed',
-          glow: '#6d28d9',
-          light: '#a78bfa',
+          DEFAULT: '#f97316',
+          glow: '#ea580c',
+          light: '#fb923c',
         },
         accent: '#06b6d4',
         genre: {
@@ -55,8 +55,8 @@ export default {
         },
       },
       boxShadow: {
-        glow: '0 0 20px rgba(124, 58, 237, 0.4)',
-        'glow-sm': '0 0 10px rgba(124, 58, 237, 0.3)',
+        glow: '0 0 20px rgba(249, 115, 22, 0.4)',
+        'glow-sm': '0 0 10px rgba(249, 115, 22, 0.3)',
         'glow-accent': '0 0 20px rgba(6, 182, 212, 0.3)',
       },
     },
