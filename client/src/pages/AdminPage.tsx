@@ -105,7 +105,7 @@ export function AdminPage() {
   const [customPlaylists, setCustomPlaylists] = useState<CustomPlaylist[]>([])
   const [newPlaylistUrl, setNewPlaylistUrl] = useState('')
   const [newPlaylistLabel, setNewPlaylistLabel] = useState('')
-  const [newPlaylistColor, setNewPlaylistColor] = useState('#6366f1')
+  const [newPlaylistColor, setNewPlaylistColor] = useState('#f97316')
   const [newPlaylistEmoji, setNewPlaylistEmoji] = useState('🎵')
   const [playlistSaving, setPlaylistSaving] = useState(false)
   const [playlistError, setPlaylistError] = useState('')
@@ -323,7 +323,7 @@ export function AdminPage() {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && fetchAll(input)}
             placeholder="Mot de passe..."
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100"
+            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20"
           />
           {error && <p className="text-red-500 text-sm text-center">{error}</p>}
           <motion.button
@@ -331,7 +331,7 @@ export function AdminPage() {
             disabled={loading || !input}
             whileTap={{ scale: 0.95 }}
             whileHover={{ scale: 1.02 }}
-            className="w-full py-3 bg-violet-600 text-white rounded-xl font-semibold disabled:opacity-40 cursor-pointer hover:bg-violet-700 transition-colors"
+            className="w-full py-3 bg-primary text-white rounded-xl font-semibold disabled:opacity-40 cursor-pointer hover:bg-orange-600 transition-colors"
           >
             {loading ? 'Connexion...' : 'Accéder'}
           </motion.button>
@@ -389,7 +389,7 @@ export function AdminPage() {
               }}
               className={`px-4 py-3 text-sm font-semibold border-b-2 transition-colors cursor-pointer ${
                 tab === t
-                  ? 'border-violet-600 text-violet-600'
+                  ? 'border-primary text-primary'
                   : 'border-transparent text-slate-500 hover:text-slate-700'
               }`}
             >
@@ -416,7 +416,7 @@ export function AdminPage() {
               </div>
               <button
                 onClick={fetchCharts}
-                className="text-xs text-violet-600 border border-violet-200 rounded-lg px-3 py-1.5 cursor-pointer hover:bg-violet-50 transition-colors"
+                className="text-xs text-primary border border-primary/20 rounded-lg px-3 py-1.5 cursor-pointer hover:bg-primary/5 transition-colors"
               >
                 ↻ Actualiser
               </button>
@@ -434,14 +434,14 @@ export function AdminPage() {
                   value={newPlaylistUrl}
                   onChange={(e) => setNewPlaylistUrl(e.target.value)}
                   placeholder="https://www.deezer.com/fr/playlist/..."
-                  className="col-span-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 text-sm font-mono"
+                  className="col-span-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20 text-sm font-mono"
                 />
                 <input
                   type="text"
                   value={newPlaylistLabel}
                   onChange={(e) => setNewPlaylistLabel(e.target.value)}
                   placeholder="Nom affiché (ex: Rock 90s)"
-                  className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 text-sm"
+                  className="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20 text-sm"
                 />
                 <div className="flex gap-2">
                   <input
@@ -449,10 +449,10 @@ export function AdminPage() {
                     value={newPlaylistEmoji}
                     onChange={(e) => setNewPlaylistEmoji(e.target.value.slice(0, 2))}
                     placeholder="🎵"
-                    className="w-16 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-violet-400 text-center text-lg"
+                    className="w-16 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-primary/60 text-center text-lg"
                   />
                   <div className="flex flex-wrap gap-1.5 items-center flex-1">
-                    {['#6366f1','#f59e0b','#10b981','#ef4444','#0ea5e9','#ec4899','#f97316','#8b5cf6','#14b8a6'].map((c) => (
+                    {['#f97316','#f59e0b','#10b981','#ef4444','#0ea5e9','#ec4899','#ea580c','#0284c7','#14b8a6'].map((c) => (
                       <button
                         key={c}
                         onClick={() => setNewPlaylistColor(c)}
@@ -469,7 +469,7 @@ export function AdminPage() {
                   onClick={addPlaylist}
                   disabled={playlistSaving || !newPlaylistUrl.trim() || !newPlaylistLabel.trim()}
                   whileTap={{ scale: 0.95 }}
-                  className="px-4 py-2 bg-violet-600 text-white rounded-xl text-xs font-semibold disabled:opacity-40 hover:bg-violet-700 transition-colors cursor-pointer"
+                  className="px-4 py-2 bg-primary text-white rounded-xl text-xs font-semibold disabled:opacity-40 hover:bg-orange-600 transition-colors cursor-pointer"
                 >
                   {playlistSaving ? 'Création...' : '+ Ajouter la playlist'}
                 </motion.button>
@@ -492,7 +492,7 @@ export function AdminPage() {
                           onClick={() => triggerSync(p.id)}
                           disabled={chartSyncing}
                           whileTap={{ scale: 0.95 }}
-                          className="px-2.5 py-1 bg-violet-100 text-violet-700 rounded-lg text-xs font-semibold hover:bg-violet-200 transition-colors cursor-pointer disabled:opacity-40"
+                          className="px-2.5 py-1 bg-primary/10 text-primary rounded-lg text-xs font-semibold hover:bg-primary/20 transition-colors cursor-pointer disabled:opacity-40"
                         >
                           ⚡ Sync
                         </motion.button>
@@ -547,7 +547,7 @@ export function AdminPage() {
                       onClick={() => triggerSync(info.source)}
                       disabled={chartSyncing}
                       whileTap={{ scale: 0.95 }}
-                      className="w-full py-2 bg-violet-600 text-white rounded-xl text-xs font-semibold disabled:opacity-40 hover:bg-violet-700 transition-colors cursor-pointer"
+                      className="w-full py-2 bg-primary text-white rounded-xl text-xs font-semibold disabled:opacity-40 hover:bg-orange-600 transition-colors cursor-pointer"
                     >
                       {chartSyncing ? 'Synchronisation...' : '⚡ Synchroniser maintenant'}
                     </motion.button>
@@ -563,7 +563,7 @@ export function AdminPage() {
                     onClick={() => triggerSync('chartsweekly')}
                     disabled={chartSyncing}
                     whileTap={{ scale: 0.95 }}
-                    className="px-4 py-2 bg-violet-600 text-white rounded-xl text-xs font-semibold disabled:opacity-40 cursor-pointer"
+                    className="px-4 py-2 bg-primary text-white rounded-xl text-xs font-semibold disabled:opacity-40 cursor-pointer"
                   >
                     {chartSyncing ? 'Sync...' : 'Première sync'}
                   </motion.button>
@@ -624,7 +624,7 @@ export function AdminPage() {
               <h2 className="text-base font-bold text-slate-800">Salles actives ({rooms.length})</h2>
               <button
                 onClick={() => fetch(`/api/admin/rooms?secret=${encodeURIComponent(secret)}`).then(r => r.json()).then(d => setRooms(d.rooms ?? [])).catch(() => {})}
-                className="text-xs text-violet-600 border border-violet-200 rounded-lg px-3 py-1.5 cursor-pointer hover:bg-violet-50 transition-colors"
+                className="text-xs text-primary border border-primary/20 rounded-lg px-3 py-1.5 cursor-pointer hover:bg-primary/5 transition-colors"
               >
                 ↻ Actualiser
               </button>
@@ -702,7 +702,7 @@ export function AdminPage() {
               <button
                 onClick={() => setRequireRoomPassword((v) => !v)}
                 className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none ${
-                  requireRoomPassword ? 'bg-violet-600' : 'bg-slate-200'
+                  requireRoomPassword ? 'bg-primary' : 'bg-slate-200'
                 }`}
               >
                 <span
@@ -722,7 +722,7 @@ export function AdminPage() {
                   value={roomPassword}
                   onChange={(e) => setRoomPassword(e.target.value)}
                   placeholder="Minimum 4 caractères"
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 text-sm font-mono"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20 text-sm font-mono"
                 />
                 <p className="text-xs text-slate-400 mt-1">Partagez ce mot de passe uniquement avec les hôtes autorisés.</p>
               </div>
@@ -733,7 +733,7 @@ export function AdminPage() {
                 onClick={saveSettings}
                 disabled={settingsLoading || (requireRoomPassword && roomPassword.trim().length < 4)}
                 whileTap={{ scale: 0.95 }}
-                className="px-5 py-2.5 bg-violet-600 text-white rounded-xl text-sm font-semibold disabled:opacity-40 hover:bg-violet-700 transition-colors cursor-pointer"
+                className="px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold disabled:opacity-40 hover:bg-orange-600 transition-colors cursor-pointer"
               >
                 {settingsLoading ? 'Enregistrement...' : 'Enregistrer'}
               </motion.button>
@@ -871,7 +871,7 @@ export function AdminPage() {
             onClick={patchRank}
             disabled={rankPatching}
             whileTap={{ scale: 0.95 }}
-            className="px-3 py-1.5 bg-violet-600 text-white rounded-lg text-xs font-semibold disabled:opacity-50 hover:bg-violet-700 transition-colors cursor-pointer"
+            className="px-3 py-1.5 bg-primary text-white rounded-lg text-xs font-semibold disabled:opacity-50 hover:bg-orange-600 transition-colors cursor-pointer"
           >
             {rankPatching ? 'En cours...' : '🏆 Patch rank'}
           </motion.button>
@@ -906,7 +906,7 @@ export function AdminPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Rechercher titre, artiste, ID..."
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 text-sm"
+            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-primary/60 focus:ring-2 focus:ring-primary/20 text-sm"
           />
           <div className="flex flex-wrap gap-2 items-center">
             <span className="text-xs text-slate-400 uppercase tracking-wider font-semibold">Genre :</span>
@@ -920,7 +920,7 @@ export function AdminPage() {
                   filterGenre === g && g !== 'all'
                     ? { borderColor: GENRE_COLORS[g], color: GENRE_COLORS[g], backgroundColor: GENRE_COLORS[g] + '15' }
                     : filterGenre === g
-                    ? { borderColor: '#7c3aed', color: '#7c3aed', backgroundColor: '#ede9fe' }
+                    ? { borderColor: '#f97316', color: '#f97316', backgroundColor: '#fff7ed' }
                     : { borderColor: '#e2e8f0', color: '#94a3b8', backgroundColor: 'transparent' }
                 }
               >
@@ -938,7 +938,7 @@ export function AdminPage() {
                 className="px-3 py-1 rounded-full text-xs font-semibold border transition-colors cursor-pointer"
                 style={
                   filterDecade === d
-                    ? { borderColor: '#7c3aed', color: '#7c3aed', backgroundColor: '#ede9fe' }
+                    ? { borderColor: '#f97316', color: '#f97316', backgroundColor: '#fff7ed' }
                     : { borderColor: '#e2e8f0', color: '#94a3b8', backgroundColor: 'transparent' }
                 }
               >
@@ -954,7 +954,7 @@ export function AdminPage() {
                 className="px-3 py-1 rounded-full text-xs font-semibold border transition-colors cursor-pointer"
                 style={
                   sortBy === s
-                    ? { borderColor: '#7c3aed', color: '#7c3aed', backgroundColor: '#ede9fe' }
+                    ? { borderColor: '#f97316', color: '#f97316', backgroundColor: '#fff7ed' }
                     : { borderColor: '#e2e8f0', color: '#94a3b8', backgroundColor: 'transparent' }
                 }
               >
@@ -1024,7 +1024,7 @@ export function AdminPage() {
                           href={song.deezerWebUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-xs text-violet-600 hover:text-violet-800 hover:underline font-medium"
+                          className="text-xs text-primary hover:text-orange-700 hover:underline font-medium"
                         >
                           Deezer ↗
                         </a>

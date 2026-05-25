@@ -16,7 +16,7 @@ export function SettingsPage() {
 
   // Profile
   const [username, setUsername] = useState(user?.username ?? '')
-  const [avatarColor, setAvatarColorLocal] = useState(user?.avatarColor ?? '#7c3aed')
+  const [avatarColor, setAvatarColorLocal] = useState(user?.avatarColor ?? '#f97316')
   const [profileMsg, setProfileMsg] = useState<{ ok: boolean; text: string } | null>(null)
   const [profileLoading, setProfileLoading] = useState(false)
 

@@ -155,10 +155,10 @@ export const GENRE_COLORS: Record<Genre, string> = {
   chartsweekly: '#10b981',
   rapfr: '#f59e0b',
   hits2000: '#ec4899',
-  hits2010: '#6366f1',
+  hits2010: '#0284c7',
   hits2020: '#f97316',
   varfr: '#3b82f6',
-  electronic: '#8b5cf6',
+  electronic: '#0891b2',
   latino: '#ef4444',
 }
 

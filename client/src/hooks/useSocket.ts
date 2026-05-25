@@ -79,7 +79,7 @@ export function useSocketSetup() {
     socket.on('game:correctAnswer', (data) => {
       const players = useGameStore.getState().players
       const player = players.find((p) => p.id === data.playerId)
-      store.onCorrectAnswer({ ...data, avatarColor: player?.avatarColor ?? '#7c3aed' })
+      store.onCorrectAnswer({ ...data, avatarColor: player?.avatarColor ?? '#f97316' })
     })
 
     socket.on('game:wrongAnswer', ({ attemptsLeft }) => {

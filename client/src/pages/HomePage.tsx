@@ -13,9 +13,9 @@ const GENRES = [
   { label: 'Jul',             color: '#0ea5e9' },
   { label: '🇫🇷 Variété FR',  color: '#3b82f6' },
   { label: '📼 Années 2000',  color: '#ec4899' },
-  { label: '💿 Années 2010',  color: '#6366f1' },
+  { label: '💿 Années 2010',  color: '#0284c7' },
   { label: '🚀 Années 2020',  color: '#f97316' },
-  { label: '⚡ Electronic',   color: '#8b5cf6' },
+  { label: '⚡ Electronic',   color: '#0891b2' },
   { label: '🔥 Latino',       color: '#ef4444' },
 ]
 
@@ -104,7 +104,7 @@ function GamePreviewCard() {
         {/* score feed */}
         <div className="space-y-1.5">
           {[
-            { name: 'Alex', color: '#7c3aed', pts: '+850' },
+            { name: 'Alex', color: '#f97316', pts: '+850' },
             { name: 'Léa',  color: '#0ea5e9', pts: '+720' },
           ].map((p) => (
             <div key={p.name} className="flex items-center gap-2 text-xs">
@@ -243,7 +243,7 @@ export function HomePage() {
       <section className="bg-white border-b border-slate-100 relative overflow-hidden">
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute -top-32 -right-32 w-[500px] h-[500px] bg-primary/5 rounded-full" />
-          <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-violet-100/60 rounded-full" />
+          <div className="absolute -bottom-24 -left-24 w-80 h-80 bg-orange-100/60 rounded-full" />
         </div>
 
         <div className="max-w-5xl mx-auto px-6 py-16 sm:py-24 flex flex-col lg:flex-row items-center gap-14 relative">
@@ -349,7 +349,7 @@ export function HomePage() {
 
       {/* ── Compte : bannière ──────────────────────────────────── */}
       {!user && (
-        <section className="bg-gradient-to-r from-primary/10 via-violet-50 to-indigo-50 border-y border-primary/10">
+        <section className="bg-gradient-to-r from-primary/10 via-orange-50 to-amber-50 border-y border-primary/10">
           <div className="max-w-5xl mx-auto px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
               <p className="font-semibold text-slate-900 mb-0.5">Sauvegarde tes stats</p>

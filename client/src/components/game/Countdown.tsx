@@ -26,13 +26,13 @@ export function Countdown() {
           cy={48}
           r={radius}
           fill="none"
-          stroke={isUrgent ? '#ef4444' : '#7c3aed'}
+          stroke={isUrgent ? '#ef4444' : '#f97316'}
           strokeWidth={6}
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={strokeDashoffset}
           transform="rotate(-90 48 48)"
-          style={{ filter: isUrgent ? 'drop-shadow(0 0 8px #ef4444)' : 'drop-shadow(0 0 8px #7c3aed)' }}
+          style={{ filter: isUrgent ? 'drop-shadow(0 0 8px #ef4444)' : 'drop-shadow(0 0 8px #f97316)' }}
           animate={{ strokeDashoffset }}
           transition={{ duration: 0.9, ease: 'linear' }}
         />

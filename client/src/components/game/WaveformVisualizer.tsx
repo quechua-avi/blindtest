@@ -9,7 +9,7 @@ interface WaveformVisualizerProps {
 const BAR_COUNT = 24
 
 export function WaveformVisualizer({ genre, isPlaying }: WaveformVisualizerProps) {
-  const color = genre ? GENRE_COLORS[genre] : '#7c3aed'
+  const color = genre ? GENRE_COLORS[genre] : '#f97316'
 
   return (
     <div className="flex items-center justify-center gap-1 h-20">

@@ -38,11 +38,11 @@ function SongCard({
       ? 'border-amber-400 shadow-[0_0_24px_rgba(251,191,36,0.25)]'
       : 'border-slate-200 opacity-60'
     : isActive
-      ? 'border-primary shadow-[0_0_20px_rgba(139,92,246,0.3)]'
+      ? 'border-primary shadow-[0_0_20px_rgba(249,115,22,0.3)]'
       : isSelected
-        ? 'border-violet-400 shadow-md'
+        ? 'border-primary shadow-md'
         : isClickable
-          ? 'border-slate-200 hover:border-violet-300 hover:shadow-md cursor-pointer'
+          ? 'border-slate-200 hover:border-primary/60 hover:shadow-md cursor-pointer'
           : 'border-slate-200'
 
   return (
@@ -193,7 +193,7 @@ export function StreamClashGame() {
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="flex gap-1">
           {[0, 1, 2].map((i) => (
-            <div key={i} className="w-2 h-2 rounded-full bg-violet-500 animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />
+            <div key={i} className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: `${i * 0.15}s` }} />
           ))}
         </div>
       </div>
@@ -208,7 +208,7 @@ export function StreamClashGame() {
           <div className="flex items-center gap-2">
             <span className="text-lg">⚡</span>
             <span className="font-display font-extrabold text-slate-900 text-base">
-              Stream<span className="text-violet-600">Clash</span>
+              Stream<span className="text-primary">Clash</span>
             </span>
             <span className="text-slate-400 text-xs ml-1">{scRoundNumber}/{scTotalRounds}</span>
           </div>
@@ -233,7 +233,7 @@ export function StreamClashGame() {
 
       {/* Barre de progression globale */}
       <div className="w-full bg-slate-200 h-1">
-        <div className="h-1 bg-violet-500 transition-all duration-500" style={{ width: `${(scRoundNumber / scTotalRounds) * 100}%` }} />
+        <div className="h-1 bg-primary transition-all duration-500" style={{ width: `${(scRoundNumber / scTotalRounds) * 100}%` }} />
       </div>
 
       <main className="flex-1 flex flex-col items-center px-4 py-5 gap-4 max-w-2xl mx-auto w-full">
@@ -260,7 +260,7 @@ export function StreamClashGame() {
               initial={{ scale: 1.2 }}
               animate={{ scale: 1 }}
               className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-black text-base border-2 ${
-                timeRemaining <= 5 ? 'border-red-400 text-red-500 bg-red-50' : 'border-violet-300 text-violet-600 bg-violet-50'
+                timeRemaining <= 5 ? 'border-red-400 text-red-500 bg-red-50' : 'border-primary/60 text-primary bg-primary/5'
               }`}
             >
               {timeRemaining}
@@ -294,9 +294,9 @@ export function StreamClashGame() {
                 </p>
                 {totalVotes > 0 && (
                   <div className="text-xs text-slate-500 flex items-center gap-1.5">
-                    <span className="font-semibold text-violet-600">{scReveal.votesA} × A</span>
+                    <span className="font-semibold text-primary">{scReveal.votesA} × A</span>
                     <span className="text-slate-300">·</span>
-                    <span className="font-semibold text-violet-600">{scReveal.votesB} × B</span>
+                    <span className="font-semibold text-primary">{scReveal.votesB} × B</span>
                   </div>
                 )}
               </div>
@@ -308,11 +308,11 @@ export function StreamClashGame() {
               key="waiting"
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
-              className="w-full rounded-xl px-4 py-3 bg-violet-50 border border-violet-200"
+              className="w-full rounded-xl px-4 py-3 bg-primary/5 border border-primary/20"
             >
               <div className="flex items-center justify-between">
-                <p className="text-violet-700 font-semibold text-sm">✓ Vote enregistré · En attente des autres…</p>
-                <p className="text-xs text-violet-500 font-bold">{scVotesA + scVotesB}/{scTotalPlayers}</p>
+                <p className="text-primary font-semibold text-sm">✓ Vote enregistré · En attente des autres…</p>
+                <p className="text-xs text-primary/80 font-bold">{scVotesA + scVotesB}/{scTotalPlayers}</p>
               </div>
             </motion.div>
           )}
@@ -369,14 +369,14 @@ export function StreamClashGame() {
               {scReveal.leaderboard.slice(0, 5).map((p, i) => (
                 <div
                   key={p.playerId}
-                  className={`flex items-center gap-3 rounded-lg px-3 py-2 ${p.playerId === myPlayerId ? 'bg-violet-50 border border-violet-100' : 'bg-slate-50'}`}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2 ${p.playerId === myPlayerId ? 'bg-primary/5 border border-primary/10' : 'bg-slate-50'}`}
                 >
                   <span className="text-sm font-bold text-slate-400 w-5 text-center">{i + 1}</span>
                   <div className="w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center text-white text-xs font-bold" style={{ backgroundColor: p.avatarColor }}>
                     {p.playerName[0]?.toUpperCase()}
                   </div>
                   <span className="flex-1 text-sm font-semibold text-slate-800 truncate">{p.playerName}</span>
-                  <span className="text-sm font-bold text-violet-600 tabular-nums">{p.score.toLocaleString()}</span>
+                  <span className="text-sm font-bold text-primary tabular-nums">{p.score.toLocaleString()}</span>
                 </div>
               ))}
             </div>
