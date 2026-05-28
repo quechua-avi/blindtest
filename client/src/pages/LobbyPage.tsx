@@ -8,6 +8,16 @@ import { usePlayerStore } from '../store/usePlayerStore'
 import { PlayerList } from '../components/lobby/PlayerList'
 import { SettingsPanel } from '../components/lobby/SettingsPanel'
 import { Button } from '../components/ui/Button'
+import { GENRE_LABELS, GENRE_COLORS } from '../types/game'
+import type { Genre } from '../types/game'
+
+const MODE_LABELS: Record<string, string> = {
+  classic: '🎵 Classique',
+  buzzer: '🔔 Buzzer',
+  teams: '👥 Équipes',
+  saboteur: '🕵️ Saboteur',
+  streamclash: '⚡ StreamClash',
+}
 
 export function LobbyPage() {
   const navigate = useNavigate()
@@ -137,6 +147,47 @@ export function LobbyPage() {
                 >
                   {showQR ? 'Masquer QR' : '📷 QR code'}
                 </button>
+              </div>
+
+              {/* Mode + genres */}
+              <div className="flex items-center gap-1.5 flex-wrap justify-center sm:justify-start mt-3">
+                <span className="text-xs font-semibold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full">
+                  {MODE_LABELS[settings.mode] ?? settings.mode}
+                </span>
+                {settings.mode === 'streamclash' && settings.scGenre && GENRE_LABELS[settings.scGenre as Genre] && (
+                  <span
+                    className="text-xs font-semibold px-2.5 py-1 rounded-full border"
+                    style={{
+                      color: GENRE_COLORS[settings.scGenre as Genre],
+                      backgroundColor: GENRE_COLORS[settings.scGenre as Genre] + '18',
+                      borderColor: GENRE_COLORS[settings.scGenre as Genre] + '40',
+                    }}
+                  >
+                    {GENRE_LABELS[settings.scGenre as Genre]}
+                  </span>
+                )}
+                {settings.mode !== 'streamclash' && settings.genres.map((g) =>
+                  GENRE_LABELS[g as Genre] ? (
+                    <span
+                      key={g}
+                      className="text-xs font-semibold px-2.5 py-1 rounded-full border"
+                      style={{
+                        color: GENRE_COLORS[g as Genre],
+                        backgroundColor: GENRE_COLORS[g as Genre] + '18',
+                        borderColor: GENRE_COLORS[g as Genre] + '40',
+                      }}
+                    >
+                      {GENRE_LABELS[g as Genre]}
+                    </span>
+                  ) : (
+                    <span
+                      key={g}
+                      className="text-xs font-semibold px-2.5 py-1 rounded-full border border-primary/30 text-primary bg-primary/10"
+                    >
+                      {g}
+                    </span>
+                  )
+                )}
               </div>
             </div>
 

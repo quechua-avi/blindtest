@@ -55,7 +55,7 @@ function SongCard({
       ? 'border-amber-400 shadow-[0_0_32px_rgba(251,191,36,0.4)]'
       : 'border-slate-700 opacity-60'
     : isSelected
-      ? 'border-primary/60 shadow-[0_0_20px_rgba(139,92,246,0.3)]'
+      ? 'border-primary/60 shadow-[0_0_20px_rgba(249,115,22,0.3)]'
       : canVote
         ? 'border-slate-700 hover:border-slate-500 hover:shadow-lg cursor-pointer'
         : 'border-slate-700'
