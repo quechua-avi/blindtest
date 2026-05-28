@@ -640,16 +640,33 @@ export function AdminPage() {
                   const STATUS_COLORS: Record<string, string> = { lobby: 'bg-slate-100 text-slate-500', playing: 'bg-emerald-100 text-emerald-700', paused: 'bg-amber-100 text-amber-700', ended: 'bg-red-100 text-red-600' }
                   const MODE_LABELS: Record<string, string> = { classic: '🎵 Classique', buzzer: '🔔 Buzzer', teams: '👥 Équipes', saboteur: '🕵️ Saboteur', streamclash: '⚡ StreamClash' }
                   return (
-                    <div key={room.code} className="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 space-y-4">
-                      <div className="flex items-center justify-between">
+                    <div key={room.code} className="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 space-y-3">
+                      <div className="flex items-start justify-between gap-2">
                         <div>
                           <p className="font-display font-bold text-slate-900 text-xl tracking-widest">{room.code}</p>
-                          <p className="text-xs text-slate-400 mt-0.5">{MODE_LABELS[room.settings.mode] ?? room.settings.mode}</p>
+                          <p className="text-xs text-slate-500 mt-0.5 font-medium">{MODE_LABELS[room.settings.mode] ?? room.settings.mode} · {room.settings.rounds} rounds</p>
                         </div>
-                        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${STATUS_COLORS[room.status] ?? 'bg-slate-100 text-slate-500'}`}>
+                        <span className={`text-xs font-semibold px-2.5 py-1 rounded-full flex-shrink-0 ${STATUS_COLORS[room.status] ?? 'bg-slate-100 text-slate-500'}`}>
                           {STATUS_LABELS[room.status] ?? room.status}
                         </span>
                       </div>
+                      {room.settings.genres && room.settings.genres.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5">
+                          {room.settings.genres.map((g) => (
+                            <span
+                              key={g}
+                              className="text-xs font-semibold px-2 py-0.5 rounded-full border"
+                              style={{
+                                color: GENRE_COLORS[g as Genre] ?? '#94a3b8',
+                                backgroundColor: (GENRE_COLORS[g as Genre] ?? '#94a3b8') + '18',
+                                borderColor: (GENRE_COLORS[g as Genre] ?? '#94a3b8') + '40',
+                              }}
+                            >
+                              {GENRE_LABELS[g as Genre] ?? g}
+                            </span>
+                          ))}
+                        </div>
+                      )}
 
                       {room.status === 'playing' && (
                         <div className="flex items-center gap-2 text-xs text-slate-500">
