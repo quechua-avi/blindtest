@@ -36,9 +36,8 @@ export const GENRE_PLAYLISTS: Partial<Record<Genre, { url: string; label: string
     label: 'Top 100 France',
   },
   hits90: {
-    url: 'https://api.deezer.com/playlist/1362508145/tracks?limit=100',
-    label: 'Hits 90s',
-    decade: '1990s',
+    url: 'https://api.deezer.com/playlist/1363560485/tracks?limit=100',
+    label: 'Hits du moment',
   },
   jul: {
     url: 'https://api.deezer.com/playlist/6051368644/tracks?limit=100',

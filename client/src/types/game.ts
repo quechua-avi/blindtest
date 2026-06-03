@@ -142,7 +142,7 @@ export const GENRE_LABELS: Record<Genre, string> = {
   jul: 'Jul',
   chartsweekly: '🏆 Top France',
   rapfr: '🎤 Rap Français',
-  hits90: '📻 Années 90',
+  hits90: '🎵 Hits du moment',
   hits2000: '📼 Années 2000',
   hits2010: '💿 Années 2010',
   hits2020: '🚀 Années 2020',
