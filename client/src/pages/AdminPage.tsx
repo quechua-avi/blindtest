@@ -78,8 +78,8 @@ interface AdminUser {
   best_streak: number
 }
 
-const GENRE_ORDER: Genre[] = ['chartsweekly', 'rapfr', 'jul', 'varfr', 'hits2000', 'hits2010', 'hits2020', 'electronic', 'latino']
-const DECADE_ORDER: Decade[] = ['2000s', '2010s', '2020s']
+const GENRE_ORDER: Genre[] = ['chartsweekly', 'hits90', 'rapfr', 'jul', 'varfr', 'hits2000', 'hits2010', 'hits2020', 'electronic', 'latino']
+const DECADE_ORDER: Decade[] = ['1990s', '2000s', '2010s', '2020s']
 
 function relativeTime(ts: number | null): string {
   if (!ts) return 'Jamais'

@@ -165,6 +165,7 @@ export const GENRE_COLORS: Record<Genre, string> = {
 }
 
 export const DECADE_LABELS: Record<Decade, string> = {
+  '1990s': 'Années 90',
   '2000s': 'Années 2000',
   '2010s': 'Années 2010',
   '2020s': 'Années 2020',
