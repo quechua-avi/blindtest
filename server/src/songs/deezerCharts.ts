@@ -35,6 +35,11 @@ export const GENRE_PLAYLISTS: Partial<Record<Genre, { url: string; label: string
     url: 'https://api.deezer.com/playlist/1109890291/tracks?limit=100',
     label: 'Top 100 France',
   },
+  hits90: {
+    url: 'https://api.deezer.com/playlist/1362508145/tracks?limit=100',
+    label: 'Hits 90s',
+    decade: '1990s',
+  },
   jul: {
     url: 'https://api.deezer.com/playlist/6051368644/tracks?limit=100',
     label: '100% Jul',
@@ -107,7 +112,8 @@ export function deleteCustomPlaylist(id: string): void {
 function yearToDecade(year: number): Decade {
   if (year >= 2020) return '2020s'
   if (year >= 2010) return '2010s'
-  return '2000s'
+  if (year >= 2000) return '2000s'
+  return '1990s'
 }
 
 interface DynamicSongRow {

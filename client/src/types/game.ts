@@ -1,5 +1,5 @@
-export type Genre = 'jul' | 'chartsweekly' | 'rapfr' | 'hits2000' | 'hits2010' | 'hits2020' | 'varfr' | 'electronic' | 'latino'
-export type Decade = '2000s' | '2010s' | '2020s'
+export type Genre = 'jul' | 'chartsweekly' | 'rapfr' | 'hits90' | 'hits2000' | 'hits2010' | 'hits2020' | 'varfr' | 'electronic' | 'latino'
+export type Decade = '1990s' | '2000s' | '2010s' | '2020s'
 export type GameMode = 'classic' | 'teams' | 'buzzer' | 'saboteur' | 'streamclash'
 export type AnswerMode = 'text' | 'multipleChoice'
 export type RoomStatus = 'lobby' | 'playing' | 'paused' | 'ended'
@@ -142,6 +142,7 @@ export const GENRE_LABELS: Record<Genre, string> = {
   jul: 'Jul',
   chartsweekly: '🏆 Top France',
   rapfr: '🎤 Rap Français',
+  hits90: '📻 Années 90',
   hits2000: '📼 Années 2000',
   hits2010: '💿 Années 2010',
   hits2020: '🚀 Années 2020',
@@ -154,6 +155,7 @@ export const GENRE_COLORS: Record<Genre, string> = {
   jul: '#0ea5e9',
   chartsweekly: '#10b981',
   rapfr: '#f59e0b',
+  hits90: '#8b5cf6',
   hits2000: '#ec4899',
   hits2010: '#0284c7',
   hits2020: '#f97316',
