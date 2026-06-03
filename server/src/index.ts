@@ -51,7 +51,11 @@ function setSetting(key: string, value: string) {
 
 // GET /api/settings — public, retourne si le mot de passe est requis pour créer une salle
 app.get('/api/settings', (_req: Request, res: Response) => {
-  res.json({ requireRoomPassword: getSetting('require_room_password') === '1' })
+  res.json({
+    requireRoomPassword: getSetting('require_room_password') === '1',
+    maintenanceMode: getSetting('maintenance_mode') === '1',
+    maintenanceMessage: getSetting('maintenance_message') ?? 'Le serveur est temporairement en maintenance. Réessayez dans quelques minutes.',
+  })
 })
 
 // GET /api/stats — public, compteur de titres disponibles
@@ -77,22 +81,37 @@ app.get('/api/admin/settings', (req: Request, res: Response) => {
   res.json({
     requireRoomPassword: getSetting('require_room_password') === '1',
     roomPassword: getSetting('room_password') ?? '',
+    defaultRounds: parseInt(getSetting('default_rounds') ?? '10', 10),
+    maintenanceMode: getSetting('maintenance_mode') === '1',
+    maintenanceMessage: getSetting('maintenance_message') ?? 'Le serveur est temporairement en maintenance. Réessayez dans quelques minutes.',
   })
 })
 
 // PUT /api/admin/settings — modifier les paramètres
 app.put('/api/admin/settings', (req: Request, res: Response) => {
   if (req.query.secret !== CONFIG.ADMIN_SECRET) { res.status(401).json({ error: 'Unauthorized' }); return }
-  const { requireRoomPassword, roomPassword } = req.body ?? {}
+  const { requireRoomPassword, roomPassword, defaultRounds, maintenanceMode, maintenanceMessage } = req.body ?? {}
   if (typeof requireRoomPassword === 'boolean') {
     setSetting('require_room_password', requireRoomPassword ? '1' : '0')
   }
   if (typeof roomPassword === 'string' && roomPassword.trim().length >= 4) {
     setSetting('room_password', roomPassword.trim())
   }
+  if (typeof defaultRounds === 'number' && [5, 10, 15, 20].includes(defaultRounds)) {
+    setSetting('default_rounds', String(defaultRounds))
+  }
+  if (typeof maintenanceMode === 'boolean') {
+    setSetting('maintenance_mode', maintenanceMode ? '1' : '0')
+  }
+  if (typeof maintenanceMessage === 'string' && maintenanceMessage.trim()) {
+    setSetting('maintenance_message', maintenanceMessage.trim())
+  }
   res.json({
     requireRoomPassword: getSetting('require_room_password') === '1',
     roomPassword: getSetting('room_password') ?? '',
+    defaultRounds: parseInt(getSetting('default_rounds') ?? '10', 10),
+    maintenanceMode: getSetting('maintenance_mode') === '1',
+    maintenanceMessage: getSetting('maintenance_message') ?? '',
   })
 })
 

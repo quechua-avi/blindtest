@@ -138,6 +138,8 @@ export function AdminPage() {
   const [newPlaylistEmoji, setNewPlaylistEmoji] = useState('🎵')
   const [playlistSaving, setPlaylistSaving] = useState(false)
   const [playlistError, setPlaylistError] = useState('')
+  const [selectedChartSource, setSelectedChartSource] = useState<string | null>(null)
+  const [sourceLoading, setSourceLoading] = useState(false)
 
   // Filters
   const [filterGenre, setFilterGenre] = useState<Genre | 'all'>('all')
@@ -248,14 +250,29 @@ export function AdminPage() {
       ])
       if (chartsRes.ok) {
         const data = await chartsRes.json()
+        const infos: SyncInfo[] = data.syncInfos ?? []
+        setChartSyncInfos(infos)
         setChartSongs(data.songs ?? [])
-        setChartSyncInfos(data.syncInfos ?? [])
+        setSelectedChartSource((prev) => prev ?? infos[0]?.source ?? null)
       }
       if (playlistsRes.ok) {
         const data = await playlistsRes.json()
         setCustomPlaylists(data ?? [])
       }
     } catch {}
+  }
+
+  const fetchSourceSongs = async (source: string) => {
+    setSourceLoading(true)
+    try {
+      const res = await fetch(`/api/admin/charts?secret=${encodeURIComponent(secret)}&source=${encodeURIComponent(source)}`)
+      if (res.ok) {
+        const data = await res.json()
+        setChartSongs(data.songs ?? [])
+        setSelectedChartSource(source)
+      }
+    } catch {}
+    setSourceLoading(false)
   }
 
   const addPlaylist = async () => {
@@ -290,6 +307,7 @@ export function AdminPage() {
     try {
       await fetch(`/api/admin/charts/sync?secret=${encodeURIComponent(secret)}&source=${encodeURIComponent(source)}`, { method: 'POST' })
       await fetchCharts()
+      await fetchSourceSongs(source)
     } catch {}
     setChartSyncing(false)
   }
@@ -905,7 +923,7 @@ export function AdminPage() {
               <div>
                 <h2 className="text-base font-bold text-slate-800">Charts Deezer</h2>
                 <p className="text-slate-400 text-sm mt-0.5">
-                  Synchronisation automatique · {chartSongs.length} chansons en DB
+                  Synchronisation automatique · {chartSyncInfos.reduce((s, i) => s + i.count, 0)} chansons en DB
                 </p>
               </div>
               <button
@@ -1030,8 +1048,15 @@ export function AdminPage() {
                   const lastDate = info.syncedAt
                     ? new Date(info.syncedAt * 1000).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
                     : null
+                  const isSelected = selectedChartSource === info.source
                   return (
-                    <div key={info.source} className="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 space-y-3">
+                    <div
+                      key={info.source}
+                      onClick={() => fetchSourceSongs(info.source)}
+                      className={`bg-white border rounded-2xl shadow-sm p-5 space-y-3 cursor-pointer transition-all hover:border-primary/40 ${
+                        isSelected ? 'border-primary ring-2 ring-primary/20' : 'border-slate-200'
+                      }`}
+                    >
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
                           <p className="font-bold text-slate-800 text-sm">{info.label}</p>
@@ -1050,7 +1075,7 @@ export function AdminPage() {
                         {lastDate && <> · {lastDate}</>}
                       </p>
                       <motion.button
-                        onClick={() => triggerSync(info.source)}
+                        onClick={(e) => { e.stopPropagation(); triggerSync(info.source) }}
                         disabled={chartSyncing}
                         whileTap={{ scale: 0.95 }}
                         className="w-full py-2 bg-primary text-white rounded-xl text-xs font-semibold disabled:opacity-40 hover:bg-orange-600 transition-colors cursor-pointer"
@@ -1067,8 +1092,12 @@ export function AdminPage() {
             {chartSongs.length > 0 && (
               <div className="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
                 <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-                  <p className="text-sm font-bold text-slate-800">{chartSongs.length} chansons actuelles</p>
-                  <p className="text-xs text-slate-400">Previews Deezer · chargement quasi instantané</p>
+                  <div>
+                    <p className="text-sm font-bold text-slate-800">
+                      {sourceLoading ? 'Chargement...' : `${chartSongs.length} chansons${selectedChartSource ? ` — ${chartSyncInfos.find((i) => i.source === selectedChartSource)?.label ?? selectedChartSource}` : ''}`}
+                    </p>
+                  </div>
+                  <p className="text-xs text-slate-400">Previews Deezer</p>
                 </div>
                 <div className="divide-y divide-slate-100 max-h-[600px] overflow-y-auto">
                   {chartSongs.map((song) => (

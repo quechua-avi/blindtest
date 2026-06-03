@@ -137,12 +137,18 @@ export function HomePage() {
   const [joinLoading, setJoinLoading]         = useState(false)
   const [createLoading, setCreateLoading]     = useState(false)
   const [requirePassword, setRequirePassword] = useState(true)
+  const [maintenanceMode, setMaintenanceMode] = useState(false)
+  const [maintenanceMessage, setMaintenanceMessage] = useState('')
   const [totalSongs, setTotalSongs]           = useState<number | null>(null)
 
   useEffect(() => {
     fetch('/api/settings')
       .then((r) => r.json())
-      .then((d) => setRequirePassword(d.requireRoomPassword ?? true))
+      .then((d) => {
+        setRequirePassword(d.requireRoomPassword ?? true)
+        setMaintenanceMode(d.maintenanceMode ?? false)
+        setMaintenanceMessage(d.maintenanceMessage ?? '')
+      })
       .catch(() => {})
     fetch('/api/stats')
       .then((r) => r.json())
@@ -177,6 +183,25 @@ export function HomePage() {
     setCreateLoading(true)
     getSocket().emit('lobby:create', { playerName: trimmed, avatarColor, password: password.trim() || undefined })
     setTimeout(() => setCreateLoading(false), 3000)
+  }
+
+  if (maintenanceMode) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 text-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-sm"
+        >
+          <div className="text-6xl mb-5">🔧</div>
+          <h1 className="text-2xl font-bold text-slate-800 mb-2">Maintenance en cours</h1>
+          <p className="text-slate-500 text-sm leading-relaxed">
+            {maintenanceMessage || 'Le serveur est temporairement en maintenance. Réessayez dans quelques minutes.'}
+          </p>
+          <p className="mt-8 text-xs text-slate-400">BeatBlind</p>
+        </motion.div>
+      </div>
+    )
   }
 
   return (
