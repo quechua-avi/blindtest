@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import { useGameStore } from '../store/useGameStore'
 import { useAudioPlayerContext } from '../App'
 import { Countdown } from '../components/game/Countdown'
@@ -28,7 +29,6 @@ export function GamePage() {
     if (status === 'results') navigate('/results')
   }, [status, navigate])
 
-  // Déclencher la lecture dès que pendingSong change dans le store
   useEffect(() => {
     if (pendingSong) {
       stopSong()
@@ -36,14 +36,12 @@ export function GamePage() {
     }
   }, [pendingSong, playSong, stopSong])
 
-  // Arrêter la musique à la fin du round ou de la partie
   useEffect(() => {
     if (status === 'roundEnd' || status === 'results') {
       stopSong()
     }
   }, [status, stopSong])
 
-  // Buzzer mode : pause/reprise audio selon l'état du buzz
   useEffect(() => {
     if (settings.mode !== 'buzzer') return
     if (activeBuzz) {
@@ -60,38 +58,59 @@ export function GamePage() {
     return <StreamClashGame />
   }
 
+  const genreColor = currentRound ? (GENRE_COLORS[currentRound.genre as Genre] ?? '#f97316') : '#f97316'
+  const progress = currentRound ? (currentRound.roundNumber / currentRound.totalRounds) * 100 : 0
+
   return (
     <div className="min-h-screen bg-bg flex flex-col">
-      {/* Score feed flottant */}
       <ScoreFeed />
 
-      {/* Header */}
-      <header className="flex items-center justify-between px-4 pt-4 pb-2 max-w-5xl mx-auto w-full">
-        <div className="flex items-center gap-3">
-          {currentRound && (
-            <>
-              <Badge
-                label={GENRE_LABELS[currentRound.genre]}
-                color={GENRE_COLORS[currentRound.genre]}
-              />
-              <Badge
-                label={currentRound.decade}
-                className="bg-bg-card border border-bg-border text-slate-400"
-              />
-              <span className="text-slate-500 text-sm hidden sm:inline">
-                Round {currentRound.roundNumber}/{currentRound.totalRounds}
+      {/* ── Header sticky ──────────────────────────────────────── */}
+      <div className="sticky top-0 z-10 bg-bg/95 backdrop-blur border-b border-bg-border">
+        {/* Barre de progression des rounds */}
+        {currentRound && (
+          <div className="w-full h-0.5 bg-bg-border">
+            <motion.div
+              className="h-full rounded-full"
+              style={{ backgroundColor: genreColor }}
+              initial={false}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 0.6, ease: 'easeOut' }}
+            />
+          </div>
+        )}
+
+        <header className="flex items-center justify-between px-4 py-3 max-w-5xl mx-auto w-full">
+          <div className="flex items-center gap-2">
+            {currentRound && (
+              <>
+                <Badge
+                  label={GENRE_LABELS[currentRound.genre]}
+                  color={GENRE_COLORS[currentRound.genre]}
+                />
+                <span className="text-slate-500 text-xs font-medium hidden sm:inline">
+                  {currentRound.decade}
+                </span>
+              </>
+            )}
+          </div>
+
+          <div className="flex items-center gap-3">
+            {currentRound && (
+              <span className="text-sm tabular-nums">
+                <span className="text-white font-bold">{currentRound.roundNumber}</span>
+                <span className="text-slate-600">/{currentRound.totalRounds}</span>
               </span>
-            </>
-          )}
-        </div>
+            )}
+            <HostControls />
+          </div>
+        </header>
+      </div>
 
-        <div className="flex items-center gap-3">
-          <HostControls />
-        </div>
-      </header>
-
-      {/* Corps du jeu */}
+      {/* ── Corps du jeu ───────────────────────────────────────── */}
       <main className="flex-1 flex flex-col items-center justify-center gap-6 px-4 pb-32 max-w-5xl mx-auto w-full">
+
+        {/* Indice saboteur */}
         {isPlaying && isSaboteur && saboteurAnswer && (
           <div className="w-full max-w-lg mx-auto bg-amber-500/10 border border-amber-500/40 rounded-xl px-4 py-3 flex items-center gap-3">
             <span className="text-xl">🕵️</span>
@@ -112,7 +131,6 @@ export function GamePage() {
               </div>
             </div>
 
-            {/* Input, choix multiple, ou buzzer */}
             {settings.mode === 'buzzer'
               ? <BuzzerPanel />
               : settings.answerMode === 'text'
@@ -132,7 +150,7 @@ export function GamePage() {
         )}
       </main>
 
-      {/* Sidebar leaderboard (desktop uniquement, visible en playing) */}
+      {/* Sidebar leaderboard desktop */}
       {isPlaying && (
         <aside className="fixed right-4 top-20 w-56 hidden xl:block">
           <div className="bg-bg-card/80 backdrop-blur border border-bg-border rounded-2xl p-4">
@@ -141,7 +159,6 @@ export function GamePage() {
         </aside>
       )}
 
-      {/* Chat + Réactions */}
       <ChatPanel />
       <ReactionOverlay />
     </div>

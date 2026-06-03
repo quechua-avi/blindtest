@@ -1,6 +1,6 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { getSocket } from '../socket/socketClient'
 import { useGameStore } from '../store/useGameStore'
 import { PodiumDisplay } from '../components/results/PodiumDisplay'
@@ -19,6 +19,7 @@ function formatDuration(ms: number) {
 export function ResultsPage() {
   const navigate = useNavigate()
   const { finalResults, players, roomCode } = useGameStore()
+  const [activeTab, setActiveTab] = useState<'leaderboard' | 'songs'>('leaderboard')
 
   useEffect(() => {
     if (!finalResults) navigate('/')
@@ -38,27 +39,43 @@ export function ResultsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-bg py-8 px-4">
-      <div className="max-w-3xl mx-auto space-y-8">
-        {/* Header */}
+    <div className="min-h-screen bg-bg pb-28">
+      <div className="max-w-3xl mx-auto px-4 py-10 space-y-6">
+
+        {/* ── Header ─────────────────────────────────────────────── */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center"
         >
-          <div className="text-5xl mb-3">🏆</div>
-          <h1 className="font-display text-4xl font-extrabold text-white">Résultats</h1>
-          <p className="text-slate-500 mt-1">
-            {finalResults.leaderboard.length} joueurs · {finalResults.songsPlayed.length} chansons · {formatDuration(finalResults.gameDuration)}
-          </p>
+          <motion.div
+            initial={{ scale: 0, rotate: -15 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: 'spring', stiffness: 260, damping: 18, delay: 0.1 }}
+            className="text-6xl mb-4"
+          >
+            🏆
+          </motion.div>
+          <h1 className="font-display text-4xl font-extrabold text-white mb-4">Résultats</h1>
+          <div className="flex items-center justify-center gap-2 flex-wrap">
+            <span className="text-xs font-semibold bg-bg-card border border-bg-border px-3 py-1.5 rounded-full text-slate-400">
+              👥 {finalResults.leaderboard.length} joueur{finalResults.leaderboard.length > 1 ? 's' : ''}
+            </span>
+            <span className="text-xs font-semibold bg-bg-card border border-bg-border px-3 py-1.5 rounded-full text-slate-400">
+              🎵 {finalResults.songsPlayed.length} chansons
+            </span>
+            <span className="text-xs font-semibold bg-bg-card border border-bg-border px-3 py-1.5 rounded-full text-slate-400">
+              ⏱ {formatDuration(finalResults.gameDuration)}
+            </span>
+          </div>
         </motion.div>
 
-        {/* Vainqueur équipe (mode teams uniquement) */}
+        {/* ── Vainqueur équipe (mode teams) ──────────────────────── */}
         {finalResults.teamScores && finalResults.teamWinner && (
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.05 }}
+            transition={{ delay: 0.15 }}
             className={`rounded-2xl p-6 text-center border ${
               finalResults.teamWinner === 'tie'
                 ? 'bg-slate-700/30 border-slate-600'
@@ -88,12 +105,12 @@ export function ResultsPage() {
           </motion.div>
         )}
 
-        {/* Révélation saboteur */}
+        {/* ── Révélation saboteur ─────────────────────────────────── */}
         {finalResults.saboteurReveal && (
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.02, type: 'spring', stiffness: 200, damping: 18 }}
+            transition={{ delay: 0.1, type: 'spring', stiffness: 200, damping: 18 }}
             className={`rounded-2xl p-6 text-center border ${
               finalResults.saboteurReveal.caught
                 ? 'bg-emerald-500/10 border-emerald-500/40'
@@ -115,59 +132,91 @@ export function ResultsPage() {
             <p className={`font-semibold text-lg ${finalResults.saboteurReveal.caught ? 'text-emerald-300' : 'text-red-300'}`}>
               {finalResults.saboteurReveal.caught
                 ? 'était le saboteur · Démasqué ! +500 pts aux bons votants'
-                : 'était le saboteur · Il s\'en est tiré ! +2000 pts'
+                : "était le saboteur · Il s'en est tiré ! +2000 pts"
               }
             </p>
           </motion.div>
         )}
 
-        {/* Podium */}
+        {/* ── Podium ─────────────────────────────────────────────── */}
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.1 }}
-          className="bg-bg-card border border-bg-border rounded-2xl p-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="bg-bg-card border border-bg-border rounded-2xl p-8"
         >
           <PodiumDisplay leaderboard={finalResults.leaderboard} />
         </motion.div>
 
-        {/* MVP */}
+        {/* ── Distinctions ───────────────────────────────────────── */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.35 }}
         >
-          <h2 className="font-display text-lg font-bold text-white mb-3">Distinctions</h2>
+          <h2 className="font-display text-base font-bold text-slate-400 uppercase tracking-wider mb-3">
+            Distinctions
+          </h2>
           <MVPCards mvp={finalResults.mvp} />
         </motion.div>
 
-        {/* Classement complet */}
+        {/* ── Tabs classement / chansons ──────────────────────────── */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="bg-bg-card border border-bg-border rounded-2xl p-6"
+          transition={{ delay: 0.45 }}
         >
-          <h2 className="font-display text-lg font-bold text-white mb-4">Classement final</h2>
-          <Leaderboard />
-        </motion.div>
+          <div className="flex bg-bg-card border border-bg-border rounded-xl p-1 mb-4">
+            {(['leaderboard', 'songs'] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all cursor-pointer ${
+                  activeTab === tab
+                    ? 'bg-bg-surface text-white shadow-sm'
+                    : 'text-slate-500 hover:text-slate-300'
+                }`}
+              >
+                {tab === 'leaderboard' ? '🏅 Classement' : '🎵 Chansons'}
+              </button>
+            ))}
+          </div>
 
-        {/* Historique des chansons */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="bg-bg-card border border-bg-border rounded-2xl p-6"
-        >
-          <SongHistory songsPlayed={finalResults.songsPlayed} players={players} />
+          <AnimatePresence mode="wait">
+            {activeTab === 'leaderboard' ? (
+              <motion.div
+                key="lb"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15 }}
+                className="bg-bg-card border border-bg-border rounded-2xl p-6"
+              >
+                <Leaderboard />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="songs"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15 }}
+                className="bg-bg-card border border-bg-border rounded-2xl p-6"
+              >
+                <SongHistory songsPlayed={finalResults.songsPlayed} players={players} />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
+      </div>
 
-        {/* Actions */}
-        <div className="flex flex-col sm:flex-row gap-3 justify-center pb-8">
-          <Button size="lg" onClick={playAgain} className="w-full sm:w-auto px-10">
+      {/* ── CTA fixé en bas ────────────────────────────────────── */}
+      <div className="fixed bottom-0 left-0 right-0 z-20 bg-bg/95 backdrop-blur border-t border-bg-border px-4 py-4">
+        <div className="max-w-sm mx-auto flex gap-3">
+          <Button size="lg" onClick={playAgain} className="flex-1">
             🔄 Rejouer
           </Button>
-          <Button size="lg" variant="secondary" onClick={quit} className="w-full sm:w-auto px-10">
+          <Button size="lg" variant="secondary" onClick={quit} className="flex-1">
             🏠 Accueil
           </Button>
         </div>
